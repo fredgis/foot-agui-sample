@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚩 Debug Drapeaux - Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .step {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        .step h3 {
+            color: #0369a1;
+            margin-bottom: 10px;
+        }
+
+        .code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+
+        .flag-example {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f0f9ff;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .flag-big {
+            font-size: 4rem;
+        }
+
+        .correct {
+            background: #dcfce7;
+            border-left: 4px solid #16a34a;
+        }
+
+        .incorrect {
+            background: #fee2e2;
+            border-left: 4px solid #dc2626;
+        }
+
+        .test-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .test-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid #667eea;
+        }
+
+        .test-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .command {
+            background: #fef3c7;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            color: #92400e;
+            margin: 10px 0;
+        }
+
+        .expected {
+            background: #dcfce7;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .problem {
+            background: #fee2e2;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #dc2626;
+        }
+
+        .solution {
+            background: #dcfce7;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #16a34a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚩 Guide de Debug - Problème de Drapeaux</h1>
+            <p style="font-size: 1.2rem; color: #666; margin-top: 10px;">
+                Comment vérifier et corriger l'affichage des drapeaux
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>🔍 Diagnostic du Problème</h2>
+            
+            <div class="problem">
+                <h3>❌ Symptôme Actuel</h3>
+                <p style="margin: 10px 0;">Dans le titre de la page, vous voyez :</p>
+                <div style="font-size: 2rem; text-align: center; margin: 15px 0; font-weight: bold;">
+                    FR FC NANTES FR
+                </div>
+                <p style="margin: 10px 0;">Au lieu de :</p>
+                <div style="font-size: 2rem; text-align: center; margin: 15px 0; font-weight: bold;">
+                    🇫🇷 FC NANTES 🇫🇷
+                </div>
+            </div>
+
+            <div class="solution">
+                <h3>✅ Cause Identifiée</h3>
+                <p>L'agent Python retourne le code pays <code>"FR"</code> au lieu de l'emoji <code>"🇫🇷"</code></p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔧 Étapes de Vérification</h2>
+
+            <div class="step">
+                <h3>Étape 1 : Ouvrir la Console du Navigateur</h3>
+                <ol style="margin: 10px 0 10px 20px; line-height: 1.8;">
+                    <li>Dans Chrome/Edge : Appuyez sur <strong>F12</strong></li>
+                    <li>Cliquez sur l'onglet <strong>"Console"</strong></li>
+                    <li>Gardez cette console ouverte pendant vos tests</li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <h3>Étape 2 : Tester avec un Club</h3>
+                <p>Dans le chat de l'application, tapez :</p>
+                <div class="command">Parle-moi du FC Nantes</div>
+                <p style="margin-top: 10px;">ou</p>
+                <div class="command">Vive les Verts</div>
+            </div>
+
+            <div class="step">
+                <h3>Étape 3 : Vérifier les Logs Console</h3>
+                <p>Vous devriez voir dans la console :</p>
+                <div class="code">
+🎯 FRONTEND ACTION - update_club_info appelé avec: {...}
+🚩 DEBUG - countryFlag reçu: <span style="color: #f59e0b;">???</span>
+🌍 DEBUG - country reçu: <span style="color: #10b981;">"France"</span>
+🚩 Setting countryFlag to: <span style="color: #f59e0b;">???</span>
+                </div>
+                <p style="margin-top: 15px;">Si vous voyez <code>"FR"</code> au lieu de <code>"🇫🇷"</code>, c'est le problème !</p>
+            </div>
+
+            <div class="step">
+                <h3>Étape 4 : Vérifier les Logs de l'Agent Python</h3>
+                <p>Dans le terminal où l'agent tourne, cherchez :</p>
+                <div class="code">
+🔔 UPDATE_CLUB_INFO CALLED with: {
+  "name": "FC Nantes",
+  "country": "France",
+  "countryFlag": <span style="color: #f59e0b;">"FR"</span>  ← PROBLÈME ICI
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📋 Exemples Corrects vs Incorrects</h2>
+
+            <div class="flag-example correct">
+                <div class="flag-big">🇫🇷</div>
+                <div>
+                    <strong style="color: #16a34a;">✅ CORRECT</strong><br>
+                    <code>"countryFlag": "🇫🇷"</code>
+                </div>
+            </div>
+
+            <div class="flag-example incorrect">
+                <div style="font-size: 4rem; font-weight: bold;">FR</div>
+                <div>
+                    <strong style="color: #dc2626;">❌ INCORRECT</strong><br>
+                    <code>"countryFlag": "FR"</code>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px; color: #667eea;">Emojis de Drapeaux pour Tests</h3>
+            <div class="test-examples">
+                <div class="test-card">
+                    <h4>🇫🇷 France</h4>
+                    <div class="command">"countryFlag": "🇫🇷"</div>
+                    <p style="font-size: 0.9rem; color: #666;">Pour : PSG, OM, Lyon, ASSE, Nantes, etc.</p>
+                </div>
+
+                <div class="test-card">
+                    <h4>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre</h4>
+                    <div class="command">"countryFlag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿"</div>
+                    <p style="font-size: 0.9rem; color: #666;">Pour : Man Utd, Liverpool, Arsenal, etc.</p>
+                </div>
+
+                <div class="test-card">
+                    <h4>🇪🇸 Espagne</h4>
+                    <div class="command">"countryFlag": "🇪🇸"</div>
+                    <p style="font-size: 0.9rem; color: #666;">Pour : Real Madrid, Barcelona, Atlético, etc.</p>
+                </div>
+
+                <div class="test-card">
+                    <h4>🇩🇪 Allemagne</h4>
+                    <div class="command">"countryFlag": "🇩🇪"</div>
+                    <p style="font-size: 0.9rem; color: #666;">Pour : Bayern Munich, Dortmund, etc.</p>
+                </div>
+
+                <div class="test-card">
+                    <h4>🇮🇹 Italie</h4>
+                    <div class="command">"countryFlag": "🇮🇹"</div>
+                    <p style="font-size: 0.9rem; color: #666;">Pour : Juventus, Milan, Inter, etc.</p>
+                </div>
+
+                <div class="test-card">
+                    <h4>🇧🇷 Brésil</h4>
+                    <div class="command">"countryFlag": "🇧🇷"</div>
+                    <p style="font-size: 0.9rem; color: #666;">Pour : Flamengo, São Paulo, etc.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Tests à Effectuer</h2>
+
+            <div class="step">
+                <h3>Test 1 : FC Nantes</h3>
+                <div class="command">Parle-moi du FC Nantes</div>
+                <div class="expected">
+                    <strong>Attendu :</strong><br>
+                    • Drapeau : 🇫🇷<br>
+                    • Couleurs : Jaune et Vert<br>
+                    • Console : <code>countryFlag: "🇫🇷"</code>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Test 2 : Real Madrid</h3>
+                <div class="command">Tell me about Real Madrid</div>
+                <div class="expected">
+                    <strong>Attendu :</strong><br>
+                    • Drapeau : 🇪🇸<br>
+                    • Couleurs : Blanc<br>
+                    • Console : <code>countryFlag: "🇪🇸"</code>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Test 3 : AS Saint-Étienne</h3>
+                <div class="command">Vive les Verts</div>
+                <div class="expected">
+                    <strong>Attendu :</strong><br>
+                    • Drapeau : 🇫🇷<br>
+                    • Couleurs : Vert et Blanc<br>
+                    • Message dans le chat : "Allez les Verts ! 💚⚪..."<br>
+                    • Console : <code>countryFlag: "🇫🇷"</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔄 Actions de Correction</h2>
+
+            <div class="step">
+                <h3>Si vous voyez "FR" au lieu de "🇫🇷"</h3>
+                <ol style="margin: 10px 0 10px 20px; line-height: 1.8;">
+                    <li>L'agent GPT-5 ne génère pas correctement l'emoji</li>
+                    <li>Assurez-vous que l'agent a été redémarré après les modifications</li>
+                    <li>Vérifiez que les instructions contiennent bien des exemples avec emojis</li>
+                    <li>Le LLM doit retourner l'emoji Unicode, pas le code pays</li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <h3>Redémarrage de l'Application</h3>
+                <p>Dans le terminal :</p>
+                <div class="code">
+# Arrêter l'application
+Ctrl+C
+
+# Redémarrer
+npm run dev
+                </div>
+                <p style="margin-top: 10px;">Attendez que l'agent Python soit complètement démarré avant de tester.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📞 Rapport de Bug</h2>
+            <p>Si le problème persiste après redémarrage, envoyez ces informations :</p>
+            
+            <div class="step">
+                <h3>Informations à Fournir</h3>
+                <ol style="margin: 10px 0 10px 20px; line-height: 1.8;">
+                    <li>Capture d'écran de la console du navigateur</li>
+                    <li>Logs du terminal de l'agent Python</li>
+                    <li>La requête exacte testée (ex: "Parle-moi du FC Nantes")</li>
+                    <li>La valeur exacte vue dans les logs pour <code>countryFlag</code></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

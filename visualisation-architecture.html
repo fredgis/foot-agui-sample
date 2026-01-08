@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📐 Architecture - Diagrammes Mermaid</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 40px;
+            font-size: 1.2rem;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .info-box h2 {
+            color: white;
+            margin-bottom: 15px;
+        }
+        
+        .info-box ul {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+        
+        .info-box li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        
+        .diagram-section {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .diagram-section h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .success-badge {
+            background: #48bb78;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        
+        .code-ref {
+            background: #2d3748;
+            color: #a0aec0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .code-ref pre {
+            margin: 0;
+            color: #68d391;
+        }
+    </style>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#667eea',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#5a67d8',
+                lineColor: '#a0aec0',
+                secondaryColor: '#f7fafc',
+                tertiaryColor: '#fff'
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>📐 Architecture de l'Application</h1>
+        <p class="subtitle">Diagrammes Mermaid - Thème Football Mondial Dynamique</p>
+        
+        <div class="info-box">
+            <h2>✅ Documentation Mise à Jour</h2>
+            <ul>
+                <li><strong>README.md</strong> - Maintenant référence ARCHITECTURE.md dans la section "Structure du Projet"</li>
+                <li><strong>ARCHITECTURE.md</strong> - Tous les diagrammes convertis en format Mermaid</li>
+                <li><strong>Diagrammes Mermaid</strong> - Support natif dans GitHub, VS Code, et cette page HTML</li>
+            </ul>
+            <span class="success-badge">✅ TOUS LES DIAGRAMMES CONVERTIS</span>
+        </div>
+        
+        <div class="diagram-section">
+            <h2>🏗️ Architecture Macro</h2>
+            <p>Vue d'ensemble des services : Frontend → Backend → Azure OpenAI</p>
+            <pre class="mermaid">
+graph TB
+    User[👤 UTILISATEUR<br/>Navigateur Web]
+    
+    subgraph Frontend["🖥️ FRONTEND (Next.js 16)<br/>Port: 3000"]
+        ReactComp["⚛️ React Components<br/>- page.tsx<br/>- ClubInfoCard<br/>- Dynamic Theming"]
+        CopilotKit["📦 CopilotKit v1.50.0<br/>- CopilotSidebar<br/>- useCoAgent<br/>- useCopilotAction"]
+        ReactComp <--> CopilotKit
+    end
+    
+    subgraph Backend["🐍 BACKEND AGENT (Python FastAPI)<br/>Port: 8000"]
+        FastAPI["🚀 FastAPI Server<br/>- agent.py<br/>- main.py<br/>- STATE_SCHEMA"]
+        AIFunc["🤖 @ai_function<br/>update_club_info<br/>- Détection club<br/>- Extraction infos<br/>- Structuration données"]
+        FastAPI --> AIFunc
+    end
+    
+    subgraph Azure["☁️ AZURE OPENAI SERVICE"]
+        GPT["🧠 GPT-5.2<br/>gpt-4o-2024-08-06<br/>- Modèle de langage<br/>- Base connaissances mondiale<br/>- Génération réponses"]
+    end
+    
+    User -->|HTTP/WebSocket| Frontend
+    CopilotKit -->|POST /api/copilotkit| FastAPI
+    AIFunc -->|Azure OpenAI API| GPT
+    
+    style Frontend fill:#e1f5ff,stroke:#0066cc,stroke-width:2px
+    style Backend fill:#fff4e1,stroke:#ff9800,stroke-width:2px
+    style Azure fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    style User fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
+            </pre>
+        </div>
+        
+        <div class="diagram-section">
+            <h2>🚀 Initialisation de l'Application</h2>
+            <p>Démarrage des services Frontend et Backend</p>
+            <pre class="mermaid">
+graph LR
+    Start[🚀 Startup]
+    
+    subgraph FE["Frontend Next.js"]
+        LoadReact[Load React Components]
+        InitCK[Initialize CopilotKit]
+        ConnectBE[Connect to Backend Agent]
+    end
+    
+    subgraph BE["Backend Python FastAPI"]
+        LoadAgent[Load agent.py]
+        ConfigAzure[Configure Azure OpenAI]
+        StartServer[Start FastAPI Server<br/>Port 8000]
+    end
+    
+    Start --> LoadReact
+    LoadReact --> InitCK
+    InitCK --> ConnectBE
+    
+    Start --> LoadAgent
+    LoadAgent --> ConfigAzure
+    ConfigAzure --> StartServer
+    
+    style FE fill:#e1f5ff,stroke:#0066cc
+    style BE fill:#fff4e1,stroke:#ff9800
+            </pre>
+        </div>
+        
+        <div class="diagram-section">
+            <h2>💬 Interaction Utilisateur → Détection de Club</h2>
+            <p>Séquence complète de détection et mise à jour du thème</p>
+            <pre class="mermaid">
+sequenceDiagram
+    participant User as 👤 Utilisateur
+    participant UI as 🖥️ CopilotSidebar
+    participant Frontend as ⚛️ Frontend React
+    participant Agent as 🐍 Backend Agent
+    participant GPT as 🧠 GPT-5.2
+    
+    User->>UI: Tape "Parle-moi de l'AS Saint-Étienne"
+    UI->>Frontend: Capture message
+    Frontend->>Agent: POST /api/copilotkit<br/>{message: "..."}
+    
+    Note over Agent: INSTRUCTIONS:<br/>"Expert football, appelle<br/>update_club_info avec infos"
+    
+    Agent->>GPT: Prompt enrichi avec context
+    
+    Note over GPT: ANALYSE:<br/>- Détecte "AS Saint-Étienne"<br/>- Extrait infos base connaissances<br/>- Nom, fondation, stade, etc.
+    
+    GPT->>Agent: Function Call: update_club_info({...})
+    
+    Note over Agent: @ai_function<br/>update_club_info<br/>met à jour state
+    
+    Agent->>Frontend: State Update via WebSocket
+    
+    Note over Frontend: useCopilotAction handler:<br/>1. Vérifie si hardcodé<br/>2. Sinon extractColors()<br/>3. Met à jour états React
+    
+    Frontend->>UI: UI Re-render
+    UI->>User: Affiche nouveau thème<br/>+ message chat
+    
+    Note over User: Voit:<br/>🟢 Couleurs vertes<br/>🏟️ Stade Geoffroy-Guichard<br/>📊 Infos complètes
+            </pre>
+        </div>
+        
+        <div class="diagram-section">
+            <h2>🎨 Extraction de Couleurs</h2>
+            <p>Fonction extractColors() : texte → codes hexadécimaux</p>
+            <pre class="mermaid">
+flowchart TD
+    Input["📥 Input: colors = 'Green and White'"]
+    
+    Normalize["🔄 ÉTAPE 1: Normalisation<br/>- Minuscules<br/>- Supprimer ponctuation<br/>- Découper en mots<br/>Output: ['green', 'and', 'white']"]
+    
+    Map["🎨 ÉTAPE 2: Mapping couleurs<br/>colorMap = {<br/>'green': '#16A34A',<br/>'white': '#FFFFFF',<br/>'red': '#DC2626',<br/>... 50+ couleurs }"]
+    
+    Match["🔍 Recherche correspondances<br/>green → #16A34A<br/>white → #FFFFFF"]
+    
+    Select["✅ ÉTAPE 3: Sélection<br/>primary = #16A34A (première)<br/>secondary = #FFFFFF (deuxième)"]
+    
+    Output["📤 Return:<br/>{primary: '#16A34A',<br/>secondary: '#FFFFFF'}"]
+    
+    Apply["🖌️ Application<br/>setThemeColor('#16A34A')<br/>setSecondaryColor('#FFFFFF')<br/>Génération maillot SVG"]
+    
+    Input --> Normalize
+    Normalize --> Map
+    Map --> Match
+    Match --> Select
+    Select --> Output
+    Output --> Apply
+    
+    style Input fill:#e1f5ff
+    style Output fill:#e8f5e9
+    style Apply fill:#fff4e1
+            </pre>
+        </div>
+        
+        <div class="diagram-section">
+            <h2>🔄 Flux de Communication Complet</h2>
+            <p>Séquence complète User → React → Python → GPT → User</p>
+            <pre class="mermaid">
+sequenceDiagram
+    participant User as 👤 USER<br/>Browser
+    participant React as ⚛️ REACT<br/>Next.js
+    participant Python as 🐍 PYTHON<br/>FastAPI
+    participant GPT as 🧠 GPT<br/>5.2
+    
+    User->>React: 1️⃣ Tape message<br/>"ASSE ?"
+    
+    React->>Python: 2️⃣ POST /api/copilotkit<br/>{message: "ASSE ?"}
+    
+    Python->>GPT: 3️⃣ Enrichit prompt<br/>avec context + tools
+    
+    GPT->>Python: 4️⃣ Analyse + Call<br/>update_club_info({...})
+    
+    Python->>React: 5️⃣ State update<br/>{clubInfo: {...}}
+    
+    Note over React: 6️⃣ useCopilotAction<br/>handler() exec
+    
+    React->>User: 7️⃣ UI Update<br/>- Couleurs ✅<br/>- Maillot ✅<br/>- Infos ✅
+    
+    Python->>React: 8️⃣ Send text msg<br/>"Allez les Verts !..."
+    
+    React->>User: 9️⃣ Affiche msg<br/>dans le chat
+    
+    style User fill:#f3e5f5
+    style React fill:#e1f5ff
+    style Python fill:#fff4e1
+    style GPT fill:#e8f5e9
+            </pre>
+        </div>
+        
+        <div class="diagram-section">
+            <h2>🎯 Système de Thématisation</h2>
+            <p>Stratégie de choix : Thème hardcodé vs dynamique</p>
+            <pre class="mermaid">
+flowchart TD
+    Start["🔍 Détection du Club"]
+    
+    Check{"Club détecté ?"}
+    
+    Hardcoded{"📋 Hardcodé ?<br/>(5 clubs FR)"}
+    Dynamic["🤖 Dynamique<br/>(GPT-5.2)"]
+    
+    ThemePreconfig["🎨 Thème Préconfiguré<br/>- color (hardcodé)<br/>- logo (URL)<br/>- background (URL)"]
+    
+    ExtractColors["🎨 extractColors()<br/>- Parse colors text<br/>- Map to hex codes<br/>- Primary/Secondary"]
+    
+    Apply["✅ Application du Thème<br/>- Couleurs<br/>- Maillot SVG<br/>- Background<br/>- Infos"]
+    
+    Start --> Check
+    Check -->|Oui| Hardcoded
+    Check -->|Non| Dynamic
+    
+    Hardcoded -->|Oui| ThemePreconfig
+    Hardcoded -->|Non| Dynamic
+    
+    Dynamic --> ExtractColors
+    
+    ThemePreconfig --> Apply
+    ExtractColors --> Apply
+    
+    style Start fill:#e1f5ff
+    style Apply fill:#e8f5e9
+    style ThemePreconfig fill:#fff4e1
+    style ExtractColors fill:#f3e5f5
+            </pre>
+        </div>
+        
+        <div class="info-box" style="margin-top: 40px;">
+            <h2>📚 Comment Utiliser ces Diagrammes</h2>
+            <ul>
+                <li><strong>GitHub</strong> - Les diagrammes Mermaid s'affichent automatiquement dans les fichiers .md</li>
+                <li><strong>VS Code</strong> - Installer l'extension "Markdown Preview Mermaid Support"</li>
+                <li><strong>Documentation</strong> - Consultez ARCHITECTURE.md pour le markdown source</li>
+                <li><strong>Modification</strong> - Éditez les blocs ```mermaid dans ARCHITECTURE.md</li>
+            </ul>
+            <div class="code-ref">
+                <pre>Fichiers mis à jour :
+✅ README.md - Section "Structure du Projet" mise à jour
+✅ ARCHITECTURE.md - Tous les diagrammes en Mermaid
+✅ visualisation-architecture.html - Cette page de visualisation</pre>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

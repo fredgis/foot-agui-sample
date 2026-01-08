@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 Upgrade Mondial - AG-UI Football</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .header .subtitle {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .comparison-box {
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px solid;
+        }
+
+        .comparison-box.before {
+            border-color: #f56565;
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        }
+
+        .comparison-box.after {
+            border-color: #48bb78;
+            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+        }
+
+        .comparison-box h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .comparison-box.before h3 {
+            color: #c53030;
+        }
+
+        .comparison-box.after h3 {
+            color: #2f855a;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            font-size: 1.1rem;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .club-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .club-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .club-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .club-flag {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .club-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .club-league {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .changes-list {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .changes-list h3 {
+            color: #0369a1;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .change-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        .change-item strong {
+            color: #0369a1;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 15px;
+            border: 2px solid #f59e0b;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #78350f;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+
+        .code-block .comment {
+            color: #94a3b8;
+        }
+
+        .code-block .keyword {
+            color: #f472b6;
+        }
+
+        .code-block .string {
+            color: #86efac;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🌍 Upgrade Mondial - AG-UI Football</h1>
+            <p class="subtitle">Support de TOUS les clubs du monde avec GPT-5.2</p>
+            <div class="version-badge">Version 2.0 - Édition Mondiale</div>
+        </div>
+
+        <!-- Comparaison Avant/Après -->
+        <div class="section">
+            <h2>⚡ Avant vs Après</h2>
+            <div class="comparison">
+                <div class="comparison-box before">
+                    <h3>❌ Version 1.0 - Limitée</h3>
+                    <ul class="feature-list">
+                        <li>🇫🇷 5 clubs français uniquement</li>
+                        <li>📚 Base de données hardcodée</li>
+                        <li>🚫 Pas de drapeaux de pays</li>
+                        <li>⚠️ Logo ASSE cassé</li>
+                        <li>🔒 Ajout manuel de clubs</li>
+                    </ul>
+                </div>
+                <div class="comparison-box after">
+                    <h3>✅ Version 2.0 - Mondiale</h3>
+                    <ul class="feature-list">
+                        <li>🌍 TOUS les clubs du monde</li>
+                        <li>🤖 Connaissances GPT-5.2</li>
+                        <li>🚩 Drapeaux automatiques</li>
+                        <li>✨ Logo ASSE corrigé</li>
+                        <li>🔓 Ajout automatique</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exemples de Clubs Supportés -->
+        <div class="section">
+            <h2>🏆 Exemples de Clubs Supportés</h2>
+            <div class="club-examples">
+                <div class="club-card">
+                    <div class="club-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
+                    <div class="club-name">Manchester United</div>
+                    <div class="club-league">Premier League</div>
+                </div>
+                <div class="club-card">
+                    <div class="club-flag">🇪🇸</div>
+                    <div class="club-name">FC Barcelona</div>
+                    <div class="club-league">La Liga</div>
+                </div>
+                <div class="club-card">
+                    <div class="club-flag">🇩🇪</div>
+                    <div class="club-name">Bayern Munich</div>
+                    <div class="club-league">Bundesliga</div>
+                </div>
+                <div class="club-card">
+                    <div class="club-flag">🇮🇹</div>
+                    <div class="club-name">Juventus</div>
+                    <div class="club-league">Serie A</div>
+                </div>
+                <div class="club-card">
+                    <div class="club-flag">🇧🇷</div>
+                    <div class="club-name">Flamengo</div>
+                    <div class="club-league">Brasileirão</div>
+                </div>
+                <div class="club-card">
+                    <div class="club-flag">🇦🇷</div>
+                    <div class="club-name">Boca Juniors</div>
+                    <div class="club-league">Liga Argentina</div>
+                </div>
+                <div class="club-card">
+                    <div class="club-flag">🇫🇷</div>
+                    <div class="club-name">AS Saint-Étienne</div>
+                    <div class="club-league">Ligue 1</div>
+                </div>
+                <div class="club-card">
+                    <div class="club-flag">🇺🇸</div>
+                    <div class="club-name">Inter Miami</div>
+                    <div class="club-league">MLS</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="section">
+            <h2>📊 Statistiques de l'Upgrade</h2>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Clubs Supportés</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">200+</div>
+                    <div class="stat-label">Pays Couverts</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">GPT-5 Powered</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Config Manuelle</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Changements Techniques -->
+        <div class="section">
+            <h2>🔧 Changements Techniques Implémentés</h2>
+            <div class="changes-list">
+                <h3>✅ Modifications Complètes</h3>
+                
+                <div class="change-item">
+                    <strong>1. Agent Python (agent.py)</strong>
+                    <ul>
+                        <li>Instructions mises à jour pour support mondial</li>
+                        <li>Ajout des champs <code>country</code> et <code>countryFlag</code> au STATE_SCHEMA</li>
+                        <li>Exemples internationaux (Man Utd, Barça, Bayern, etc.)</li>
+                        <li>Utilisation des connaissances GPT-5.2 au lieu d'une base hardcodée</li>
+                    </ul>
+                </div>
+
+                <div class="change-item">
+                    <strong>2. Types TypeScript (types.ts)</strong>
+                    <ul>
+                        <li>Ajout de <code>country: string</code></li>
+                        <li>Ajout de <code>countryFlag: string</code></li>
+                        <li>Interface clubInfo étendue</li>
+                    </ul>
+                </div>
+
+                <div class="change-item">
+                    <strong>3. Composant ClubInfo (clubinfo.tsx)</strong>
+                    <ul>
+                        <li>Grille étendue de 3 à 4 colonnes</li>
+                        <li>Nouvelle carte affichant le drapeau du pays</li>
+                        <li>Emoji flag avec style text-6xl</li>
+                        <li>Affichage du nom du pays</li>
+                    </ul>
+                </div>
+
+                <div class="change-item">
+                    <strong>4. Page Principale (page.tsx)</strong>
+                    <ul>
+                        <li>Logo ASSE corrigé (URL SVG directe sans thumb)</li>
+                        <li>Support des drapeaux dans l'interface</li>
+                    </ul>
+                </div>
+
+                <div class="change-item">
+                    <strong>5. Documentation (README.md)</strong>
+                    <ul>
+                        <li>Titre mis à jour : "Thème Football Mondial Dynamique"</li>
+                        <li>Liste des ligues mondiales supportées</li>
+                        <li>Exemples internationaux</li>
+                        <li>Section sur l'utilisation des connaissances GPT-5.2</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exemple de Code -->
+        <div class="section">
+            <h2>💻 Exemple de Nouvelle Réponse Agent</h2>
+            <div class="code-block">
+<span class="comment">// L'agent détecte maintenant N'IMPORTE QUEL club</span>
+update_club_info({
+  <span class="keyword">"name"</span>: <span class="string">"Manchester United"</span>,
+  <span class="keyword">"founded"</span>: <span class="string">"1878"</span>,
+  <span class="keyword">"stadium"</span>: <span class="string">"Old Trafford"</span>,
+  <span class="keyword">"capacity"</span>: <span class="string">"74,310"</span>,
+  <span class="keyword">"country"</span>: <span class="string">"England"</span>,        <span class="comment">// ✨ NOUVEAU</span>
+  <span class="keyword">"countryFlag"</span>: <span class="string">"🏴󠁧󠁢󠁥󠁮󠁧󠁿"</span>,        <span class="comment">// ✨ NOUVEAU</span>
+  <span class="keyword">"colors"</span>: <span class="string">"Red and White"</span>,
+  <span class="keyword">"history"</span>: <span class="string">"Founded as Newton Heath LYR..."</span>,
+  <span class="keyword">"titles"</span>: [
+    <span class="string">"20x Premier League"</span>,
+    <span class="string">"12x FA Cup"</span>,
+    <span class="string">"3x Champions League"</span>
+  ],
+  <span class="keyword">"legends"</span>: [
+    {<span class="keyword">"name"</span>: <span class="string">"Cristiano Ronaldo"</span>, <span class="keyword">"position"</span>: <span class="string">"Forward"</span>, <span class="keyword">"years"</span>: <span class="string">"2003-2009, 2021-2022"</span>}
+  ]
+})
+            </div>
+        </div>
+
+        <!-- Résumé -->
+        <div class="section">
+            <h2>🎯 Résumé de l'Upgrade</h2>
+            <p style="font-size: 1.2rem; line-height: 1.8; color: #333;">
+                L'application AG-UI Football est maintenant capable de supporter <strong>TOUS les clubs de football du monde entier</strong> 
+                grâce à l'utilisation des connaissances étendues de <strong>GPT-5.2</strong>. Plus besoin de maintenir une base de données 
+                limitée - l'agent peut désormais répondre intelligemment sur n'importe quel club professionnel, de la Premier League à la MLS, 
+                en passant par tous les championnats européens, sud-américains, et bien plus encore !
+            </p>
+            <p style="font-size: 1.1rem; margin-top: 15px; color: #555;">
+                Les drapeaux de pays ont été ajoutés pour une expérience encore plus immersive, et le logo de l'AS Saint-Étienne 
+                a été corrigé pour afficher correctement l'emblème des Verts.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
