@@ -18,25 +18,33 @@ load_dotenv()
 
 def _build_chat_client() -> ChatClientProtocol:
     try:
-        if bool(os.getenv("AZURE_OPENAI_ENDPOINT")):
+        azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        openai_api_key = os.getenv("OPENAI_API_KEY")
+
+        if azure_endpoint:
             # Azure OpenAI setup - uses environment variables by default
             # Optionally can pass deployment_name explicitly
             deployment_name = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT_NAME", "gpt-4o-mini")
             return AzureOpenAIChatClient(
                 credential=DefaultAzureCredential(),
                 deployment_name=deployment_name,
-                endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+                endpoint=azure_endpoint,
             )
 
-        if bool(os.getenv("OPENAI_API_KEY")):
+        if openai_api_key:
             # OpenAI setup - requires explicit model_id and api_key
             return OpenAIChatClient(
                 model_id=os.getenv("OPENAI_CHAT_MODEL_ID", "gpt-4o-mini"),
-                api_key=os.getenv("OPENAI_API_KEY"),
+                api_key=openai_api_key,
             )
 
-        raise ValueError("Either AZURE_OPENAI_ENDPOINT or OPENAI_API_KEY environment variable is required")
+        raise ValueError(
+            "Missing required environment variable: set AZURE_OPENAI_ENDPOINT (for Azure OpenAI) "
+            "or OPENAI_API_KEY (for OpenAI). See .env.example for all available configuration options."
+        )
 
+    except ValueError:
+        raise
     except Exception as exc:  # pragma: no cover
         raise RuntimeError(
             "Unable to initialize the chat client. Double-check your API credentials as documented in README.md."
