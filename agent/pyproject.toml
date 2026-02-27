@@ -6,5 +6,6 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "agent-framework-ag-ui>=1.0.0b251117",
+    "github-copilot-sdk",
     "python-dotenv",
 ]
