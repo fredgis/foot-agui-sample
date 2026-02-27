@@ -1,8 +1,6 @@
 "use client";
 
 import { ClubInfoCard } from "@/components/clubinfo";
-import { WeatherCard } from "@/components/weather";
-import { MoonCard } from "@/components/moon";
 import { AgentState } from "@/lib/types";
 import { useCoAgent, useCopilotAction, useCopilotContext } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
@@ -248,29 +246,6 @@ function YourMainContent({
       clubInfo: null,
     },
   })
-
-  //🪁 Generative UI: https://docs.copilotkit.ai/microsoft-agent-framework/generative-ui
-  useCopilotAction({
-    name: "get_weather",
-    description: "Get the weather for a given location.",
-    available: "disabled",
-    parameters: [
-      { name: "location", type: "string", required: true },
-    ],
-    render: ({ args }) => {
-      return <WeatherCard location={args.location} themeColor={themeColor} />
-    },
-  }, [themeColor]);
-
-  // 🪁 Human In the Loop: https://docs.copilotkit.ai/microsoft-agent-framework/human-in-the-loop
-  useCopilotAction({
-    name: "go_to_moon",
-    description: "Go to the moon on request. This action requires human approval and will render the MoonCard UI for confirmation.",
-    available: "disabled",
-    renderAndWaitForResponse: ({ respond, status}) => {
-      return <MoonCard themeColor={themeColor} status={status} respond={respond} />
-    },
-  }, [themeColor]);
 
   // 🏟️ Action pour recevoir directement les infos de club depuis l'agent (100% dynamique)
   useCopilotAction({

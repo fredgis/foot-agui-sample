@@ -70,31 +70,6 @@ def update_club_info(
     return f"✅ Updated theme for {club_name}! The page will now show the club's colors, stadium, and history."
 
 
-@ai_function(
-    name="get_weather",
-    description="Share a quick weather update for a location. Use this to render the frontend weather card.",
-)
-def get_weather(
-    location: Annotated[str, Field(description="The city or region to describe. Use fully spelled out names.")],
-) -> str:
-    """Return a short natural language weather summary."""
-    normalized = location.strip().title() or "the requested location"
-    return (
-        f"The weather in {normalized} is mild with a light breeze. "
-        "Skies are mostly clear—perfect for planning something fun."
-    )
-
-
-@ai_function(
-    name="go_to_moon",
-    description="Request a playful human-in-the-loop confirmation before launching a mission to the moon.",
-    approval_mode="always_require",
-)
-def go_to_moon() -> str:
-    """Request human approval before continuing."""
-    return "Mission control requested. Awaiting human approval for the lunar launch."
-
-
 def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
     """Instantiate the CopilotKit demo agent backed by Microsoft Agent Framework."""
     base_agent = ChatAgent(
@@ -310,7 +285,7 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             """.strip()
         ),
         chat_client=chat_client,
-        tools=[update_club_info, get_weather, go_to_moon],
+        tools=[update_club_info],
     )
 
     return AgentFrameworkAgent(
