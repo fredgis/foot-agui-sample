@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+*.md
+*.png
+*.html
+agent/.venv
+agent/__pycache__
