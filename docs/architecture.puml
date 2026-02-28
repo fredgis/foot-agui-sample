@@ -1,0 +1,64 @@
+@startuml architecture
+!theme cerulean-outline
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 13
+skinparam roundCorner 12
+skinparam packageBorderColor #888888
+skinparam packageFontSize 14
+skinparam componentStyle rectangle
+skinparam ArrowThickness 2
+
+title ⚽ Copa — Architecture Overview
+
+package "👤 Browser" as browser #F0F4FF {
+  package "Next.js 16  +  React 19" as nextjs #FFFFFF {
+    component "CopilotKit React\n//useCoAgent · useCopilotAction//" as ck #E8F0FE
+    component "TeamCard" as tc #FFF3E0
+    component "VenueMap" as vm #FFF3E0
+    component "MatchSchedule" as ms #FFF3E0
+    component "GroupView" as gv #FFF3E0
+    component "TournamentBracket" as tb #FFF3E0
+    component "WeatherCard" as wc #FFF3E0
+  }
+}
+
+package "⚙️ Server  (Next.js API Route)" as server #F0FFF0 {
+  component "CopilotSDKAgent\n//AG-UI ↔ Copilot SDK bridge//" as agent #E8F5E9
+  component "Copa Tools (×6)\n//update_team · compare · bracket\nstadium · group · city guide//" as tools #C8E6C9
+}
+
+package "🤖 AI Runtime" as runtime #FFF8E1 {
+  component "GitHub Copilot SDK\n//@github/copilot-sdk//" as sdk #FFE0B2
+  component "LLM\n//GitHub Copilot\nvia gh auth//" as llm #FFCC80
+}
+
+package "🌐 External Services" as external #F3E5F5 {
+  component "MCP: open-meteo\n//Live weather//" as mcp #E1BEE7
+  component "flagcdn.com\n//Flag images//" as flags #E1BEE7
+}
+
+' Relationships
+tc -[hidden]right- vm
+vm -[hidden]right- ms
+ms -[hidden]right- gv
+gv -[hidden]right- tb
+tb -[hidden]right- wc
+
+ck -up-> tc : state
+ck -up-> vm : state
+ck -up-> ms : state
+ck -up-> gv : state
+ck -up-> tb : state
+ck -up-> wc : render
+
+ck -down-> agent : **AG-UI Protocol**\n//SSE: TEXT · TOOL_CALL · STATE_DELTA//
+
+agent -down-> tools
+agent -down-> sdk : session.sendAndWait()
+sdk -down-> llm : gh auth token
+agent -right-> mcp : **MCP Protocol**\n//SSE transport//
+tc -right-> flags : HTTP
+
+@enduml

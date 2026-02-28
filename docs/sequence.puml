@@ -1,0 +1,66 @@
+@startuml sequence
+!theme cerulean-outline
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam roundCorner 8
+skinparam sequenceArrowThickness 2
+skinparam sequenceParticipantBorderColor #888888
+skinparam sequenceLifeLineBorderColor #AAAAAA
+
+title ⚽ Data Flow — "Show me France"
+
+actor "👤 User" as U
+participant "🖥️ CopilotKit\n(React hooks)" as F #E8F0FE
+participant "⚙️ CopilotSDKAgent\n(AG-UI bridge)" as A #E8F5E9
+participant "🤖 Copilot SDK\n(CLI subprocess)" as C #FFE0B2
+participant "🌐 MCP Server\n(optional)" as M #E1BEE7
+
+U -> F : "Show me France"
+activate F
+F -> A : **AG-UI** RunAgent (SSE)
+activate A
+A --> F : //RUN_STARTED//
+
+A -> C : session.sendAndWait()
+activate C
+
+C --> A : tool.execution_start\n(update_team_info, {team_code: "FRA"})
+A --> F : //TOOL_CALL_START// → //TOOL_CALL_ARGS// → //TOOL_CALL_END//
+A --> F : **STATE_DELTA**\n[{op:"replace", path:"/teamInfo", value:{…France}}]
+
+note over F : useCoAgent receives patch\n→ TeamCard, theme, schedule\nall update instantly 🇫🇷
+
+C --> A : assistant.message_delta (streaming)
+A --> F : //TEXT_MESSAGE_CONTENT//\n(word by word)
+
+C --> A : session.idle
+deactivate C
+
+A --> F : //TEXT_MESSAGE_END// → //RUN_FINISHED//
+deactivate A
+
+note over F #E8F0FE : 🎨 Page is now fully French\nBlue theme · roster · map · schedule
+deactivate F
+
+== Optional: weather follow-up ==
+
+U -> F : "What's the weather in Paris?"
+activate F
+F -> A : **AG-UI** RunAgent (SSE)
+activate A
+A -> C : session.sendAndWait()
+activate C
+C -> M : **MCP** current_weather("Paris")
+activate M
+M --> C : {temp: 18°C, wind: 12km/h, …}
+deactivate M
+C --> A : tool.execution_complete
+A --> F : //TOOL_CALL// + //TEXT_MESSAGE_CONTENT//
+deactivate C
+A --> F : //RUN_FINISHED//
+deactivate A
+deactivate F
+
+@enduml

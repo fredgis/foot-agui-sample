@@ -39,69 +39,15 @@ Copa is a **conversational AI sports commentator** that turns the FIFA World Cup
 
 ## 🏗️ Architecture Overview
 
-Copa demonstrates a modern **AI-native frontend** pattern where a chat agent drives the entire UI. Here's the macro view:
+Copa demonstrates a modern **AI-native frontend** pattern where a chat agent drives the entire UI.
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                          👤  U S E R   B R O W S E R                       │
-│                                                                             │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │                     🖥️  Next.js 16 Application                      │   │
-│  │                                                                      │   │
-│  │   ┌─────────────┐  ┌──────────────┐  ┌───────────┐  ┌───────────┐  │   │
-│  │   │  TeamCard    │  │ MatchSchedule│  │  VenueMap  │  │  GroupView│  │   │
-│  │   │  (roster,    │  │ (104 matches │  │  (SVG map, │  │  (12 grps│  │   │
-│  │   │   colors)    │  │  by phase)   │  │  16 stads) │  │   A→L)   │  │   │
-│  │   └──────┬───────┘  └──────┬───────┘  └─────┬──────┘  └────┬─────┘  │   │
-│  │          │                 │                 │              │         │   │
-│  │   ┌──────┴─────────────────┴─────────────────┴──────────────┴─────┐  │   │
-│  │   │                  CopilotKit  React Hooks                      │  │   │
-│  │   │  useCoAgent · useCopilotAction · useCopilotReadable           │  │   │
-│  │   │  useCopilotChatSuggestions · CopilotSidebar / Popup           │  │   │
-│  │   └───────────────────────────┬───────────────────────────────────┘  │   │
-│  └───────────────────────────────┼──────────────────────────────────────┘   │
-│                                  │                                          │
-│                          AG-UI Protocol (SSE)                               │
-│                     ┌────────────┼────────────┐                             │
-│                     │ TEXT_MESSAGE_*           │                             │
-│                     │ TOOL_CALL_*              │                             │
-│                     │ STATE_DELTA / SNAPSHOT   │                             │
-│                     │ RUN_STARTED / FINISHED   │                             │
-│                     └────────────┼─────────────┘                            │
-└──────────────────────────────────┼──────────────────────────────────────────┘
-                                   │
-                    ┌──────────────┼──────────────┐
-                    │  🤖 CopilotSDKAgent         │
-                    │  (copilot-sdk-agent.ts)      │
-                    │                              │
-                    │  AbstractAgent → AG-UI       │
-                    │  6 custom WC2026 tools       │
-                    │  Copa system prompt 🎙️       │
-                    ├──────────────┬───────────────┤
-                    │              │               │
-            ┌───────┴──────┐ ┌────┴────────────┐  │
-            │ 🔧 GitHub    │ │ 🌐 MCP Servers  │  │
-            │ Copilot SDK  │ │                  │  │
-            │              │ │ open-meteo.com   │  │
-            │ @github/     │ │ (live weather)   │  │
-            │ copilot-sdk  │ │                  │  │
-            │              │ │ Extensible:      │  │
-            │ CLI subprocess│ │ add any MCP     │  │
-            │ via gh auth  │ │ server here      │  │
-            └───────┬──────┘ └─────────────────┘  │
-                    │                              │
-                    └──────────────────────────────┘
-                                   │
-                            ┌──────┴──────┐
-                            │  🧠 LLM     │
-                            │  GitHub     │
-                            │  Copilot    │
-                            │ (via gh     │
-                            │   auth)     │
-                            └─────────────┘
-```
+### Macro Architecture
 
-### The 4 layers in plain English
+![Architecture](https://www.plantuml.com/plantuml/svg/TLJ1Rjj64BqJu3zChKDj5x8aEtPj7GpB2kaObcF3Of82TM6ibcDo8tANs1rIJee0FVLKe2qGj6WkkUGVsailxP_u1vfFA7OfsR9bKnTovitRD_DcjMU8QIhp39ZcgI3aL6hqlIyenHo1eoupPBAfIig4HDypOo4BfbaE8yR7YLQbZFigKneQOM1_yn2JibXDX4pWacNcJdMCbwpCA5IIdhCSOMc8YK9uSRZq26eetY9qDkQpqyErH0sTzVbCmVYO9RYlT8nwAc_RFG-WRjcVp6UvoWibKTAGtcG86ZancMHtkkXfhIPHAlXOeZ6mxdk-Hu8oXEiFVqDV5GokVtWFlRdPmac5kX8uiTYf0bZw_F7NJx2lrSIWNW9cO5I_GoDiXq_24BxtFO0R-7EyehNN1ZfR05y1d27Z19qTLodnYbuRQ8JkgGlXjXjOwgj2P8gE1DM5vxBLAWtsLI-n-N_-1FVbG3rEGibMop7pCJI2xR1jJRx76I7B-qp73aVSdRuHj1TmBr6MUCmAXwloHt77Z7Wwv2d6POOEd9j7mGTQbSLBWHC7JAf7WP4gjMGvIjhNZ8-HQhcZHmjU8QCKzKrdapkTlVEzTtTSlFxmntz__Gn3r1LgWEMPJRtJGpXJ9U6AOp5rtbeRXktQeKL_Xa-Fd27Mdjv1yyKXNF_u7gP963uzWf4MSO9JSvWpp_gp6UmiCZA8bCeCBF_x-zQASxo86U458SkjvHRDDDhNKJsRSsc8nQ9qQNlH2uSJz0QIKiIpSydHDlhRmLP_v_v0Fd_yz1lq3k6ib2JosaXTlxj1RWUTXVOF13qhH_EDMhbxYQ2q7BLu7MwQU3mLOEAnvGhQ--ltc0Q3Orjwb_1SLe91aW8hAPrIP9dRn7v_kxtOmK-_G715g2NBdBE2et5LE8ismerWCznSwEIuVze5LQ1ivaYeh9Q1g10czLPD3yzv0OsWiny4Nz-hlynOmcEvnbLkQyEC9I1obg2Pbbg0kIrsoh-4CyoOlRKc5ONnFUBG_3OLSOpoEosIb9fGvRvNvGlXtFXURXR2IULxIRKGff7lqMWXFE5M1Hz3iooQk_Q_e0k66E5SiCeV2ERcWM1IFH2aqGF1YJr8eunHpmJ4QYARkzERqONLrVeQdMf5YgjiTTLETJWCkX05tqHskwEJay55lpSOs8zXr8k2YwV18EgrMfQp9fhHkiM_7xJBs0M3nWWbrmpAk2VZLqpGyehlsUGCQ5UkErj383L6USDLJtBNROQLVTm_NHGDf9aqXT9anLcJPsNrLdJXMHITMjbxAECoptplVm00)
+
+> 📐 PlantUML source: [`docs/architecture.puml`](docs/architecture.puml)
+
+### The 4 Layers
 
 | Layer | What | Why |
 |---|---|---|
@@ -138,28 +84,9 @@ session.error                  →  RUN_ERROR
 
 ### Data Flow — "Show me France"
 
-```mermaid
-sequenceDiagram
-    participant U as 👤 User
-    participant F as 🖥️ CopilotKit<br/>(React hooks)
-    participant A as 🤖 CopilotSDKAgent<br/>(AG-UI bridge)
-    participant C as 🔧 Copilot SDK<br/>(CLI subprocess)
-    participant M as 🌐 MCP Server<br/>(optional)
+![Sequence Diagram](https://www.plantuml.com/plantuml/svg/fLJFR-D45Bv7ol_mS0-a8QctbH35Kc5TrovHaxIA7IqIGT7KVeb77S-OcN53gIhrn5uGluHMOY-zB2iaBjoM2vVzK_8Fq3y1ZPEoSRP5IDW7M_RtllUzxxqtZvKcKXSP0uLV5CXZhDVUqIbc237AWY7XRL5eHZdMQ-gCyfn8ai4fYS-cKXGyyGGJ4ZO2tzoh49MIHCmedyA4C5M9Jd122gO3mNMVP0XMY5E1CEnO3w12-XN2zixgtsLooL72RYNliWvNIZ6BKXgVSLGATkx3d12fQKnpmlM-a0dAPJMxvNLVH9TEi4ivLk1kUTLhzPgccY7Cd_y91qGJ29YOmVpw9x32LCmWGmWauJ5Q1ajYBIHOjpS_l82XGca1KJ2ir_8teipVPx_yzSTtu8cSCg6Fg1xnnW19h24Luanjbb41RFYxmIFJW4hq_FdFAy7XmP4xHMuOtCFsi0EdaYPJN52u9SNx_eTl2NZnx8u0meEZ4MzutGweuZIN8aQrLE31HX3uZ_PttWh_vdleUISGeZn7EU8DaMigE66Bk1vi-Dlxll-1SMG8xOyW0ESUkqYiwJdH246z5XYO2muqcsKTpIOC2bwM1eqmz3TNu6wzva9xIMlRWs5_74Rk8F8FRDkaT0sN1mueL8eAlgMG9ovFdX2g6wj4da5x9PL9hOLWM_WbneMfPbnkqOWtYZmX6iSQIJQcV29QS5c-no911wnWu5fNcrL9qV5nT-ovtUv2c6t3_EiVAz_TmM5upsU_NzRmXglP32CtyiS7VZTocyqH_-nIv8ubCMSaHgi5ET6fOzb6KOTFXDM2Sy8AT2xdroyNJbzTVMxgv48ZY7EK9M-Xq1CBUoN6ICzH6Qeu7N6ZAKAIUKGcBIZFZHQeECMaO3ZYX35OM0AKAqsuPXTmU_FqjzkRfw-gXXAbQ8dOob0fCiLnWamJQ2WjaMIKJzTzyp-DnZq_3Dr3V-mTzoE_7zdsY3TcGYPmUW7ckLbDSjTacZ2irnAiTlT1zjBffVzcWe9ElnD-iXYX5H9ttRhbKe83jpVV_WedP8f05N0nWqd1s0K44hcnSPyLk70FNhy2APH6QTuoafl7dQ6LR879jhS7nyjzSc26HASeOI8O4xDsaSFUNdMjdgH4lwjCfd_0bCC9aLHz_B-Nx3_laMUmlPAwvvqqcn0NKYBNuwMcXbKgibR3UlLQhsoFoN6fCSiTsDvz_RlNWXdbYGFREsUPdRPWVltogk9Jxr_MDXPPpb3Z0njfs_3UWvEsFZ_hnyp3GxBUnCV8ao9ZzThV)
 
-    U->>F: "Show me France"
-    F->>A: AG-UI RunAgent (SSE)
-    A-->>F: RUN_STARTED
-    A->>C: session.sendAndWait()
-    C-->>A: tool.execution_start(update_team_info, {team_code: "FRA"})
-    A-->>F: TOOL_CALL_START → TOOL_CALL_ARGS → TOOL_CALL_END
-    A-->>F: STATE_DELTA [{op:"replace", path:"/teamInfo", value:{...France}}]
-    Note over F: useCoAgent receives state patch<br/>→ TeamCard, theme, schedule all update
-    C-->>A: assistant.message_delta (streaming)
-    A-->>F: TEXT_MESSAGE_CONTENT (word by word)
-    C-->>A: session.idle
-    A-->>F: TEXT_MESSAGE_END → RUN_FINISHED
-    Note over F: 🎨 Page is now fully French 🇫🇷<br/>Blue theme, roster, group matches, map
-```
+> 📐 PlantUML source: [`docs/sequence.puml`](docs/sequence.puml)
 
 ---
 
@@ -308,6 +235,9 @@ foot-agui-sample/
 │       ├── worldcup-data.ts            # 48 teams, 16 stadiums, 12 groups, 104 matches
 │       ├── flags.ts                    # FIFA code → ISO → flagcdn.com images
 │       └── copilot-sdk-agent.ts        # CopilotSDKAgent — AG-UI ↔ Copilot SDK bridge
+├── docs/
+│   ├── architecture.puml               # PlantUML — macro architecture diagram
+│   └── sequence.puml                   # PlantUML — data flow sequence diagram
 ├── scripts/
 │   ├── deploy.ps1                      # One-click Azure deploy (idempotent, PowerShell 7+)
 │   └── deploy-config.env.example       # Azure config template
