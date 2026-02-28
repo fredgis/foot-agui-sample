@@ -54,7 +54,7 @@ function getStadiumDetails(name: string) {
 
 function getDaysUntil(dateStr: string): number {
   const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const todayStr = `${today.getUTCFullYear()}-${String(today.getUTCMonth() + 1).padStart(2, "0")}-${String(today.getUTCDate()).padStart(2, "0")}`;
   if (dateStr === todayStr) return 0;
   const todayMidnight = new Date(todayStr);
   const matchDay = new Date(dateStr);
