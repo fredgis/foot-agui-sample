@@ -62,6 +62,12 @@ add_agent_framework_fastapi_endpoint(
 )
 
 
+@app.get("/healthz")
+async def healthz() -> dict:
+    """Health check endpoint for Azure Container Apps."""
+    return {"status": "ok"}
+
+
 if __name__ == "__main__":
     host = os.getenv("AGENT_HOST", "0.0.0.0")
     port = int(os.getenv("AGENT_PORT", "8000"))

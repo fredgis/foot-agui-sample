@@ -1,0 +1,70 @@
+name: Deploy to Azure
+
+on:
+  push:
+    branches:
+      - worldcup2026
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # 1. Deploy Next.js frontend to Azure Static Web Apps
+  # ─────────────────────────────────────────────────────────────────────────────
+  deploy-frontend:
+    name: Deploy Frontend (Azure Static Web Apps)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          # Root of the Next.js project
+          app_location: /
+          # No separate API folder (API routes are inside Next.js)
+          api_location: ""
+          # Next.js build output for SSR (not static export)
+          output_location: .next
+          app_build_command: npm run build
+        env:
+          # Injected at build time so the API route can reach the Container App
+          AGENT_URL: ${{ secrets.AGENT_URL }}
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # 2. Build Docker image, push to ACR, deploy to Azure Container Apps
+  # ─────────────────────────────────────────────────────────────────────────────
+  deploy-backend:
+    name: Deploy Backend (Azure Container Apps)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Build the image directly inside ACR (no local Docker daemon required)
+      - name: Build and push image to Azure Container Registry
+        run: |
+          az acr build \
+            --registry ${{ vars.ACR_NAME }} \
+            --image foot-agui-agent:${{ github.sha }} \
+            --file agent/Dockerfile \
+            agent/
+
+      # Update the running Container App to the new image
+      - name: Deploy new image to Azure Container Apps
+        run: |
+          az containerapp update \
+            --name ${{ vars.CONTAINER_APP_NAME }} \
+            --resource-group ${{ vars.RESOURCE_GROUP }} \
+            --image ${{ vars.ACR_NAME }}.azurecr.io/foot-agui-agent:${{ github.sha }}
