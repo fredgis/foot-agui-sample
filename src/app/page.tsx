@@ -9,6 +9,7 @@ import { MoonCard } from "@/components/moon";
 import { VenueMap } from "@/components/venue-map";
 import { AgentState, Confederation, MatchInfo, MatchPhase, StadiumInfo } from "@/lib/types";
 import { stadiums as allStadiums, groups, matches, teams } from "@/lib/worldcup-data";
+import { FlagImg } from "@/lib/flags";
 import { useCoAgent, useCopilotAction, useCopilotChat } from "@copilotkit/react-core";
 import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar } from "@copilotkit/react-ui";
@@ -31,7 +32,7 @@ const CONF_EMOJI: Record<Confederation, string> = {
   UEFA: "🏰", CONMEBOL: "🌎", CAF: "🌍", AFC: "🌏", CONCACAF: "🗽", OFC: "🌊",
 };
 const CONF_ORDER: Confederation[] = ["UEFA", "CONMEBOL", "CAF", "AFC", "CONCACAF", "OFC"];
-const HOST_FLAGS = ["🇺🇸", "🇲🇽", "🇨🇦"];
+const HOST_FLAGS = ["us", "mx", "ca"];
 const HOST_NAMES = ["États-Unis", "Mexique", "Canada"];
 const WC_TARGET_DATE = new Date("2026-06-11T18:00:00Z");
 
@@ -95,26 +96,32 @@ function WelcomeScreen({
   ];
 
   return (
-    <div className="welcome-fade-in min-h-screen pb-16 px-4 md:px-8">
+    <div className="welcome-fade-in min-h-screen pb-16 px-4 md:px-8" style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(200,16,46,0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 100%, rgba(0,122,61,0.06) 0%, transparent 50%)" }}>
       {/* ── Hero countdown ── */}
       <div className="text-center py-8 md:py-12">
-        <div className="text-3xl md:text-6xl font-black mb-4 wc-gradient-text tracking-tight">
-          FIFA WORLD CUP 2026 ⚽
+        <div className="text-4xl md:text-7xl font-black mb-2 wc-gradient-text tracking-tight" style={{ lineHeight: 1.1 }}>
+          FIFA WORLD CUP
         </div>
-        <div className="flex items-center justify-center gap-4 mb-3" style={{ fontSize: "2rem" }}>
-          {HOST_FLAGS.map((flag, i) => (
-            <span
-              key={i}
+        <div className="text-4xl md:text-7xl font-black mb-4 wc-gradient-text tracking-tight" style={{ lineHeight: 1.1 }}>
+          2026 ⚽
+        </div>
+        <div className="flex items-center justify-center gap-6 mb-3">
+          {HOST_FLAGS.map((iso, i) => (
+            <img
+              key={iso}
+              src={`https://flagcdn.com/w80/${iso}.png`}
+              alt={HOST_NAMES[i]}
+              width={60}
+              height={40}
               style={{
                 opacity: flagIndex === i ? 1 : 0.3,
-                transform: flagIndex === i ? "scale(1.4)" : "scale(1)",
+                transform: flagIndex === i ? "scale(1.3)" : "scale(1)",
                 transition: "all 0.5s ease",
-                display: "inline-block",
+                borderRadius: "4px",
+                boxShadow: flagIndex === i ? "0 4px 20px rgba(255,255,255,0.3)" : "none",
               }}
               title={HOST_NAMES[i]}
-            >
-              {flag}
-            </span>
+            />
           ))}
         </div>
         <p style={{ color: "#9ca3af", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1.5rem" }}>
@@ -132,8 +139,8 @@ function WelcomeScreen({
               <div
                 key={label}
                 style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: `2px solid ${themeColor}50`,
+                  background: `linear-gradient(135deg, ${themeColor}18, rgba(255,255,255,0.08))`,
+                  border: `2px solid ${themeColor}60`,
                   borderRadius: "1rem",
                   padding: "0.75rem 1rem",
                   minWidth: "72px",
@@ -208,12 +215,12 @@ function WelcomeScreen({
                 onClick={() => onTeamClick?.(team.fifaCode)}
                 className="stagger-item"
                 style={{
-                  background: `linear-gradient(135deg, ${team.primaryColor}20, ${team.primaryColor}08)`,
-                  border: `2px solid ${team.primaryColor}60`,
+                  background: `linear-gradient(135deg, ${team.primaryColor}25, ${team.primaryColor}10)`,
+                  border: `2px solid ${team.primaryColor}70`,
                   borderRadius: "1rem",
                   padding: "0.75rem 0.5rem",
                   cursor: "pointer",
-                  transition: "all 0.2s ease",
+                  transition: "all 0.25s ease",
                   animationDelay: `${i * 0.08}s`,
                   textAlign: "center",
                 }}
@@ -226,8 +233,8 @@ function WelcomeScreen({
                   (e.currentTarget as HTMLButtonElement).style.boxShadow = "";
                 }}
               >
-                <div style={{ fontSize: "2rem", marginBottom: "0.25rem" }}>{team.flag}</div>
-                <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "white", lineHeight: 1.2 }}>
+                <FlagImg fifaCode={team.fifaCode} width={48} height={32} style={{ borderRadius: "4px", margin: "0 auto 0.3rem", display: "block", boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }} />
+                <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "white", lineHeight: 1.2 }}>
                   {team.name}
                 </div>
                 <div style={{ fontSize: "0.65rem", color: "#9ca3af" }}>#{team.fifaRanking}</div>
@@ -243,9 +250,9 @@ function WelcomeScreen({
           <div key={conf} style={{ marginBottom: "2rem" }}>
             <h2
               style={{
-                fontSize: "0.875rem",
+                fontSize: "0.95rem",
                 fontWeight: 700,
-                color: "#d1d5db",
+                color: "#e5e7eb",
                 marginBottom: "0.75rem",
                 display: "flex",
                 alignItems: "center",
@@ -258,15 +265,15 @@ function WelcomeScreen({
                 ({confTeams.length} équipes)
               </span>
             </h2>
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 gap-2">
               {confTeams.map((team, ti) => (
                 <button
                   key={team.fifaCode}
                   onClick={() => onTeamClick?.(team.fifaCode)}
                   className="stagger-item"
                   style={{
-                    background: "rgba(255,255,255,0.04)",
-                    border: `1px solid ${team.primaryColor}40`,
+                    background: "rgba(255,255,255,0.05)",
+                    border: `1px solid ${team.primaryColor}50`,
                     borderRadius: "0.75rem",
                     padding: "0.5rem 0.35rem",
                     cursor: "pointer",
@@ -275,18 +282,20 @@ function WelcomeScreen({
                     textAlign: "center",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background = `${team.primaryColor}20`;
-                    (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.12)";
+                    (e.currentTarget as HTMLButtonElement).style.background = `${team.primaryColor}25`;
+                    (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.08)";
+                    (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 4px 16px ${team.primaryColor}40`;
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.04)";
+                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.05)";
                     (e.currentTarget as HTMLButtonElement).style.transform = "";
+                    (e.currentTarget as HTMLButtonElement).style.boxShadow = "";
                   }}
                   title={`${team.name} (${team.fifaCode})`}
                 >
-                  <div style={{ fontSize: "1.5rem", marginBottom: "0.1rem" }}>{team.flag}</div>
-                  <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "#e5e7eb", lineHeight: 1.2 }}>
-                    {team.fifaCode}
+                  <FlagImg fifaCode={team.fifaCode} width={40} height={28} style={{ borderRadius: "3px", margin: "0 auto 0.2rem", display: "block", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
+                  <div style={{ fontSize: "0.65rem", fontWeight: 600, color: "#e5e7eb", lineHeight: 1.2 }}>
+                    {team.name}
                   </div>
                 </button>
               ))}

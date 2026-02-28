@@ -2,7 +2,7 @@
 
 /* ── CSS Variables ─────────────────────────────────────────────────────────── */
 :root {
-  --background: #0a0a0a;
+  --background: #0d1117;
   --foreground: #f0f0f0;
 
   /* Dynamic theme variables */
@@ -19,6 +19,9 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  background-image: 
+    radial-gradient(ellipse at 20% 0%, rgba(99,102,241,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(16,185,129,0.06) 0%, transparent 60%);
 }
 
 body,
@@ -130,11 +133,17 @@ html {
 
 /* ── WC2026 gradient text ────────────────────────────────────────────────────── */
 .wc-gradient-text {
-  /* WC2026 colors: host countries USA (red), gold, Mexico/Canada (green) */
-  background: linear-gradient(135deg, #c8102e 0%, #f4d03f 40%, #007a3d 70%, #c8102e 100%);
+  background: linear-gradient(135deg, #c8102e 0%, #f4d03f 30%, #007a3d 55%, #0055a4 80%, #c8102e 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 4s ease-in-out infinite;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 /* ── Skeleton loaders ────────────────────────────────────────────────────────── */
