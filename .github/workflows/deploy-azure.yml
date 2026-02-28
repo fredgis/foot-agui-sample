@@ -32,7 +32,10 @@ jobs:
           output_location: .next
           app_build_command: npm run build
         env:
-          # Injected at build time so the API route can reach the Container App
+          # Build-time env var — also configure AGENT_URL as a runtime
+          # Application Setting in the Azure Static Web Apps portal
+          # (Configuration → Application settings) so the API route
+          # can reach the Container App at runtime.
           AGENT_URL: ${{ secrets.AGENT_URL }}
 
   # ─────────────────────────────────────────────────────────────────────────────
