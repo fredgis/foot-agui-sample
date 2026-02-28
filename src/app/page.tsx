@@ -5,8 +5,9 @@ import { TeamCard } from "@/components/team-card";
 import { MatchSchedule } from "@/components/match-schedule";
 import { WeatherCard } from "@/components/weather";
 import { MoonCard } from "@/components/moon";
-import { AgentState, MatchInfo } from "@/lib/types";
-import { stadiums } from "@/lib/worldcup-data";
+import { VenueMap } from "@/components/venue-map";
+import { AgentState, MatchInfo, StadiumInfo } from "@/lib/types";
+import { stadiums as allStadiums } from "@/lib/worldcup-data";
 import { useCoAgent, useCopilotAction, useCopilotChat } from "@copilotkit/react-core";
 import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
@@ -481,6 +482,20 @@ function YourMainContent({
           <div className="flex flex-col lg:flex-row gap-6 items-start w-full">
             <div className="flex-1 min-w-0">
               <TeamCard team={state.teamInfo} themeColor={themeColor} secondaryColor={secondaryColor} />
+              {/* VenueMap — affiché quand des matchs WorldCup sont disponibles */}
+              {state.matches && state.matches.length > 0 && (
+                <div className="mt-6">
+                  <VenueMap
+                    stadiums={allStadiums}
+                    teamMatches={state.matches}
+                    highlightedCity={state.highlightedCity}
+                    themeColor={themeColor}
+                    onStadiumClick={(stadium: StadiumInfo) => {
+                      setState({ ...state, selectedStadium: stadium });
+                    }}
+                  />
+                </div>
+              )}
             </div>
             {(state.matches.length > 0) && (
               <div
