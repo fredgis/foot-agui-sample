@@ -648,9 +648,9 @@ function YourMainContent({
 
   // Merged state: local team/matches win over agent state
   const state = useMemo(() => ({
-    ...agentState,
-    teamInfo: displayTeam ?? agentState.teamInfo,
-    matches: displayTeam ? displayMatches : (agentState.matches ?? []),
+    ...(agentState ?? { teamInfo: null, matches: [], selectedStadium: null, tournamentView: null, highlightedCity: null }),
+    teamInfo: displayTeam ?? agentState?.teamInfo ?? null,
+    matches: displayTeam ? displayMatches : (agentState?.matches ?? []),
   }), [agentState, displayTeam, displayMatches]);
 
   // Wrapper: sets both local display state and agent state
@@ -658,9 +658,9 @@ function YourMainContent({
     patchOrFn: Partial<AgentState> | ((prev: AgentState | undefined) => AgentState)
   ) => {
     if (typeof patchOrFn === "function") {
-      // Updater function — intercept result to sync local display state
-      setAgentState((prev) => {
-        const result = patchOrFn(prev);
+      setAgentState((prev: AgentState | undefined) => {
+        const safePrev = prev ?? { teamInfo: null, matches: [], selectedStadium: null, tournamentView: null, highlightedCity: null };
+        const result = patchOrFn(safePrev);
         if ("teamInfo" in result) setDisplayTeam(result.teamInfo ?? null);
         if ("matches" in result) setDisplayMatches(result.matches ?? []);
         return result;
