@@ -31,12 +31,15 @@ async function buildRuntime() {
           }
         : undefined;
 
+    const agent = new CopilotSDKAgent({
+      provider: providerConfig,
+      model: process.env.COPILOT_SDK_MODEL ?? process.env.AZURE_OPENAI_CHAT_DEPLOYMENT_NAME ?? "gpt-4o-mini",
+    });
+    console.log("[route] Using Copilot SDK backend");
     return new CopilotRuntime({
       agents: {
-        "my_agent": new CopilotSDKAgent({
-          provider: providerConfig,
-          model: process.env.COPILOT_SDK_MODEL ?? process.env.AZURE_OPENAI_CHAT_DEPLOYMENT_NAME ?? "gpt-4o-mini",
-        }),
+        "my_agent": agent,
+        "default": agent,
       },
     });
   } else {
@@ -45,6 +48,7 @@ async function buildRuntime() {
     return new CopilotRuntime({
       agents: {
         "my_agent": new HttpAgent({ url: agentUrl }),
+        "default": new HttpAgent({ url: agentUrl }),
       },
     });
   }

@@ -8,13 +8,20 @@
  *
  * Architecture:
  *   CopilotKit React → CopilotRuntime → CopilotSDKAgent → Copilot CLI → LLM
+ *
+ * Event mapping (Copilot SDK → AG-UI):
+ *   assistant.message_delta → TEXT_MESSAGE_CONTENT (streaming)
+ *   assistant.message       → TEXT_MESSAGE_CONTENT (fallback, non-streaming)
+ *   tool.execution_start    → TOOL_CALL_START + TOOL_CALL_ARGS
+ *   tool.execution_complete → TOOL_CALL_END
+ *   session.idle            → TEXT_MESSAGE_END + RUN_FINISHED
+ *   session.error           → RUN_ERROR
  */
 
 import { AbstractAgent, EventType } from "@ag-ui/client";
 import type { RunAgentInput, BaseEvent } from "@ag-ui/core";
 import { Observable } from "rxjs";
 import { CopilotClient, defineTool, approveAll } from "@github/copilot-sdk";
-import type { CopilotSession } from "@github/copilot-sdk";
 import { teams, matches, stadiums, groups } from "./worldcup-data";
 
 // ── WC2026 data helpers ─────────────────────────────────────────────────────
@@ -202,6 +209,41 @@ function buildCopaTools() {
         return `🌎 ${args.city}: Check FIFA website for official fan zones. Book transport early!`;
       },
     }),
+
+    defineTool("update_team_info", {
+      description: "Update the frontend to display a team's info, colors, and flag. Call this IMMEDIATELY when a team is mentioned.",
+      parameters: {
+        type: "object" as const,
+        properties: {
+          team_code: { type: "string", description: "FIFA three-letter country code (e.g. FRA, BRA, GER)" },
+        },
+        required: ["team_code"],
+      },
+      handler: (args: { team_code: string }) => {
+        const team = findTeam(args.team_code);
+        if (!team) return `Team '${args.team_code}' not found.`;
+        const teamMatches = matches.filter(
+          (m) => m.homeTeam === team.fifaCode || m.awayTeam === team.fifaCode
+        );
+        return JSON.stringify({
+          team: {
+            name: team.name,
+            fifaCode: team.fifaCode,
+            flag: team.flag,
+            coach: team.coach,
+            fifaRanking: team.fifaRanking,
+            confederation: team.confederation,
+            keyPlayers: team.keyPlayers,
+            worldCupHistory: team.worldCupHistory,
+          },
+          matches: teamMatches.map((m) => ({
+            id: m.id, date: m.date, time: m.time,
+            homeTeam: m.homeTeam, awayTeam: m.awayTeam,
+            stadiumName: m.stadiumName, group: m.group,
+          })),
+        });
+      },
+    }),
   ];
 }
 
@@ -239,24 +281,60 @@ When a national team is mentioned (name, nickname, FIFA code, flag):
 - Use emojis, catchphrases, fun facts > plain stats
 - End with proactive suggestion`;
 
+// ── Module-level CopilotClient singleton ────────────────────────────────────
+// The Copilot SDK spawns a CLI subprocess — we must share ONE client across
+// all agent instances and requests to avoid spawning dozens of processes.
+
+let _clientPromise: Promise<CopilotClient> | null = null;
+
+async function getSharedClient(): Promise<CopilotClient> {
+  if (!_clientPromise) {
+    _clientPromise = (async () => {
+      console.log("[CopilotSDKAgent] Starting shared Copilot CLI client…");
+      const path = await import("path");
+      // Turbopack doesn't support import.meta.resolve — resolve manually.
+      const cliPath = path.join(
+        process.cwd(), "node_modules", "@github", "copilot", "index.js"
+      );
+      console.log(`[CopilotSDKAgent] CLI path: ${cliPath}`);
+      const client = new CopilotClient({ cliPath });
+      await client.start();
+      console.log("[CopilotSDKAgent] Copilot CLI client ready ✓");
+      return client;
+    })();
+  }
+  return _clientPromise;
+}
+
+// Names of our custom tools — used to restrict the session to ONLY these
+// (the CLI has 50+ built-in tools we don't want the model to see).
+const CUSTOM_TOOL_NAMES = [
+  "get_stadium_info",
+  "get_group_standings",
+  "get_venue_weather",
+  "show_tournament_bracket",
+  "compare_teams",
+  "get_city_guide",
+  "update_team_info",
+];
+
 // ── CopilotSDKAgent — custom AG-UI agent ────────────────────────────────────
 
 interface CopilotSDKAgentConfig {
   agentId?: string;
-  /** Azure OpenAI or BYOK provider config */
+  /** BYOK provider config (Azure OpenAI, OpenAI, Anthropic) */
   provider?: {
-    type: "azure" | "openai";
+    type: "azure" | "openai" | "anthropic";
     baseUrl: string;
     apiKey?: string;
+    bearerToken?: string;
     azure?: { apiVersion?: string };
   };
-  /** Model name (required for BYOK) */
+  /** Model name */
   model?: string;
 }
 
 export class CopilotSDKAgent extends AbstractAgent {
-  private copilotClient: CopilotClient | null = null;
-  private session: CopilotSession | null = null;
   private providerConfig: CopilotSDKAgentConfig["provider"];
   private modelName: string;
 
@@ -272,6 +350,7 @@ export class CopilotSDKAgent extends AbstractAgent {
   run(input: RunAgentInput): Observable<BaseEvent> {
     return new Observable<BaseEvent>((subscriber) => {
       this.runCopilotSession(input, subscriber).catch((err) => {
+        console.error("[CopilotSDKAgent] Fatal error:", err);
         subscriber.next({
           type: EventType.RUN_ERROR,
           message: err instanceof Error ? err.message : String(err),
@@ -286,144 +365,132 @@ export class CopilotSDKAgent extends AbstractAgent {
     subscriber: import("rxjs").Subscriber<BaseEvent>,
   ) {
     const runId = input.runId ?? crypto.randomUUID();
+    const threadId = input.threadId ?? crypto.randomUUID();
+
+    // Helper to emit AG-UI events with all required fields
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const emit = (event: any) => {
+      event.timestamp ??= Date.now();
+      event.rawEvent ??= {};
+      console.log(`[AG-UI] ${event.type}`);
+      subscriber.next(event as BaseEvent);
+    };
 
     // 1. Emit RUN_STARTED
-    subscriber.next({ type: EventType.RUN_STARTED, runId } as BaseEvent);
+    emit({ type: EventType.RUN_STARTED, runId, threadId });
 
-    // 2. Emit STATE_SNAPSHOT with current state
-    subscriber.next({
-      type: EventType.STATE_SNAPSHOT,
-      snapshot: input.state ?? {},
-    } as BaseEvent);
+    // 2. Get the shared CopilotClient (singleton)
+    const client = await getSharedClient();
 
-    // 3. Start Copilot SDK client if not already running
-    if (!this.copilotClient) {
-      this.copilotClient = new CopilotClient();
-      await this.copilotClient.start();
-    }
-
-    // 4. Create session with tools and system prompt
-    const sessionConfig: Record<string, unknown> = {
+    // 3. Build session config
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sessionConfig: any = {
       model: this.modelName,
       tools: buildCopaTools(),
-      systemMessage: { content: COPA_SYSTEM_PROMPT },
+      availableTools: CUSTOM_TOOL_NAMES,
+      systemMessage: { mode: "replace" as const, content: COPA_SYSTEM_PROMPT },
       onPermissionRequest: approveAll,
+      streaming: true,
     };
     if (this.providerConfig) {
       sessionConfig.provider = this.providerConfig;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.session = await this.copilotClient.createSession(sessionConfig as any);
+    // 4. Create a session
+    console.log("[CopilotSDKAgent] Creating session…");
+    const session = await client.createSession(sessionConfig);
+    console.log(`[CopilotSDKAgent] Session created: ${session.sessionId}`);
 
-    // 5. Extract user message from input
+    // 5. Extract user message
     const userMessage = this.extractUserMessage(input);
+    console.log(`[CopilotSDKAgent] User message: "${userMessage.slice(0, 80)}…"`);
 
     // 6. Wire up event handlers to translate Copilot SDK → AG-UI events
     const messageId = crypto.randomUUID();
     let textStarted = false;
 
-    const done = new Promise<void>((resolve, reject) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      this.session!.on((event: any) => {
-        try {
-          switch (event.type?.value ?? event.type) {
-            case "assistant.message.delta":
-            case "assistant.message": {
-              const content = event.data?.delta ?? event.data?.content ?? "";
-              if (content && !textStarted) {
-                textStarted = true;
-                subscriber.next({
-                  type: EventType.TEXT_MESSAGE_START,
-                  messageId,
-                } as BaseEvent);
-              }
-              if (content) {
-                subscriber.next({
-                  type: EventType.TEXT_MESSAGE_CONTENT,
-                  messageId,
-                  delta: content,
-                } as BaseEvent);
-              }
-              break;
-            }
-
-            case "tool.invocation.start": {
-              const toolCallId = event.data?.invocationId ?? crypto.randomUUID();
-              const toolName = event.data?.toolName ?? "unknown";
-              subscriber.next({
-                type: EventType.TOOL_CALL_START,
-                toolCallId,
-                toolCallName: toolName,
-              } as BaseEvent);
-              if (event.data?.arguments) {
-                subscriber.next({
-                  type: EventType.TOOL_CALL_ARGS,
-                  toolCallId,
-                  delta: typeof event.data.arguments === "string"
-                    ? event.data.arguments
-                    : JSON.stringify(event.data.arguments),
-                } as BaseEvent);
-              }
-              break;
-            }
-
-            case "tool.invocation.result": {
-              const toolCallId = event.data?.invocationId ?? "";
-              subscriber.next({
-                type: EventType.TOOL_CALL_END,
-                toolCallId,
-              } as BaseEvent);
-              break;
-            }
-
-            case "session.idle": {
-              // End text message if started
-              if (textStarted) {
-                subscriber.next({
-                  type: EventType.TEXT_MESSAGE_END,
-                  messageId,
-                } as BaseEvent);
-              }
-              // Emit RUN_FINISHED
-              subscriber.next({
-                type: EventType.RUN_FINISHED,
-                runId,
-              } as BaseEvent);
-              resolve();
-              break;
-            }
-
-            case "error": {
-              subscriber.next({
-                type: EventType.RUN_ERROR,
-                message: event.data?.message ?? "Unknown Copilot SDK error",
-              } as BaseEvent);
-              reject(new Error(event.data?.message ?? "Copilot SDK error"));
-              break;
-            }
-          }
-        } catch (err) {
-          console.error("[CopilotSDKAgent] Event handling error:", err);
+    // Streaming text deltas
+    session.on("assistant.message_delta", (event) => {
+      const content = event.data.deltaContent;
+      if (content) {
+        if (!textStarted) {
+          textStarted = true;
+          emit({ type: EventType.TEXT_MESSAGE_START, messageId, role: "assistant" });
         }
-      });
+        emit({ type: EventType.TEXT_MESSAGE_CONTENT, messageId, delta: content });
+      }
     });
 
-    // 7. Send the user message
-    await this.session.send({ prompt: userMessage });
+    // Final complete message (fallback when streaming is off)
+    session.on("assistant.message", (event) => {
+      if (!textStarted && event.data.content) {
+        textStarted = true;
+        emit({ type: EventType.TEXT_MESSAGE_START, messageId, role: "assistant" });
+        emit({ type: EventType.TEXT_MESSAGE_CONTENT, messageId, delta: event.data.content });
+      }
+    });
 
-    // 8. Wait for session.idle
-    await done;
+    // Tool execution start → AG-UI TOOL_CALL_START + TOOL_CALL_ARGS
+    session.on("tool.execution_start", (event) => {
+      const toolCallId = event.data.toolCallId;
+      const toolName = event.data.toolName;
+      console.log(`[CopilotSDKAgent] Tool call: ${toolName} (${toolCallId})`);
+      emit({
+        type: EventType.TOOL_CALL_START,
+        toolCallId,
+        toolCallName: toolName,
+        parentMessageId: messageId,
+      });
+      if (event.data.arguments) {
+        emit({
+          type: EventType.TOOL_CALL_ARGS,
+          toolCallId,
+          delta: typeof event.data.arguments === "string"
+            ? event.data.arguments
+            : JSON.stringify(event.data.arguments),
+        });
+      }
+    });
 
-    // 9. Cleanup session
-    await this.session.destroy();
-    this.session = null;
+    // Tool execution complete → AG-UI TOOL_CALL_END
+    session.on("tool.execution_complete", (event) => {
+      emit({ type: EventType.TOOL_CALL_END, toolCallId: event.data.toolCallId });
+    });
+
+    // Errors
+    session.on("session.error", (event) => {
+      console.error(`[CopilotSDKAgent] Session error: ${event.data.message}`);
+      emit({ type: EventType.RUN_ERROR, message: event.data.message, code: "SDK_ERROR" });
+    });
+
+    // 7. Send message and wait for idle (timeout 2 min)
+    try {
+      await session.sendAndWait({ prompt: userMessage }, 120_000);
+    } catch (err) {
+      console.error("[CopilotSDKAgent] sendAndWait error:", err);
+      emit({
+        type: EventType.RUN_ERROR,
+        message: err instanceof Error ? err.message : String(err),
+        code: "SEND_ERROR",
+      });
+    }
+
+    // 8. Close text message if opened
+    if (textStarted) {
+      emit({ type: EventType.TEXT_MESSAGE_END, messageId });
+    }
+
+    // 9. Emit RUN_FINISHED
+    emit({ type: EventType.RUN_FINISHED, runId, threadId });
+
+    // 10. Cleanup session
+    await session.destroy();
+    console.log("[CopilotSDKAgent] Session destroyed ✓");
 
     subscriber.complete();
   }
 
   private extractUserMessage(input: RunAgentInput): string {
-    // Get the last user message from the messages array
     const messages = input.messages ?? [];
     for (let i = messages.length - 1; i >= 0; i--) {
       const msg = messages[i];

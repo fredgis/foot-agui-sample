@@ -829,6 +829,7 @@ function YourMainContent({
       { name: "team_code", type: "string", description: "FIFA three-letter code (e.g. 'FRA') or team name (e.g. 'France').", required: true },
     ],
     handler: async ({ team_code }: { team_code: string }) => {
+      if (!team_code) return "Missing team_code parameter.";
       const code = team_code.trim().toUpperCase();
       const team = teams.find(
         (t) => t.fifaCode.toUpperCase() === code || t.name.toLowerCase() === team_code.toLowerCase()
