@@ -1,13 +1,71 @@
 from __future__ import annotations
 
+import logging
 from textwrap import dedent
-from typing import Annotated
+from typing import Annotated, Any
 
 from agent_framework import ChatAgent, ChatClientProtocol, ai_function
+from agent_framework._types import ChatMessage
 from agent_framework_ag_ui import AgentFrameworkAgent
 from pydantic import Field
 
 from data.worldcup2026 import groups, matches, stadiums, teams
+
+logger = logging.getLogger(__name__)
+
+
+# ─── Sanitizing wrapper — strips orphaned tool_calls from conversation history ─
+class _SanitizingChatClient:
+    """Wraps a ChatClientProtocol to fix orphaned tool_calls before sending to the LLM."""
+
+    def __init__(self, inner: ChatClientProtocol):
+        self._inner = inner
+
+    @property
+    def additional_properties(self) -> dict[str, Any]:
+        return getattr(self._inner, "additional_properties", {})
+
+    @staticmethod
+    def _sanitize(messages: list[ChatMessage]) -> list[ChatMessage]:
+        """Remove tool_calls whose IDs have no matching tool-result message."""
+        tool_result_ids: set[str] = set()
+        for m in messages:
+            if getattr(m, "role", None) == "tool":
+                tid = getattr(m, "tool_call_id", None)
+                if tid:
+                    tool_result_ids.add(tid)
+
+        sanitized: list[ChatMessage] = []
+        for m in messages:
+            calls = getattr(m, "tool_calls", None)
+            if calls:
+                kept = [c for c in calls if getattr(c, "id", None) in tool_result_ids]
+                if len(kept) < len(calls):
+                    dropped = len(calls) - len(kept)
+                    logger.warning("Sanitized %d orphaned tool_call(s) from conversation history", dropped)
+                if kept:
+                    m.tool_calls = kept  # type: ignore[attr-defined]
+                    sanitized.append(m)
+                else:
+                    # All tool_calls orphaned — convert to plain assistant message
+                    if hasattr(m, "content") and m.content:
+                        m.tool_calls = None  # type: ignore[attr-defined]
+                        sanitized.append(m)
+                    # else drop entirely
+            else:
+                sanitized.append(m)
+        return sanitized
+
+    async def get_streaming_response(self, messages, **kwargs):
+        if isinstance(messages, list):
+            messages = self._sanitize(messages)
+        async for update in self._inner.get_streaming_response(messages, **kwargs):
+            yield update
+
+    async def get_response(self, messages, **kwargs):
+        if isinstance(messages, list):
+            messages = self._sanitize(messages)
+        return await self._inner.get_response(messages, **kwargs)
 
 # ─── State Schema — aligned with AgentState in src/lib/types.ts ───────────────
 
@@ -607,7 +665,7 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             7. "Show me team X", "Tell me about X", team names, FIFA codes → ALWAYS answer, NEVER refuse
             """.strip()
         ),
-        chat_client=chat_client,
+        chat_client=_SanitizingChatClient(chat_client),
         tools=[
             update_team_info,
             get_team_matches,

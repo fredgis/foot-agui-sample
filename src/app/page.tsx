@@ -770,6 +770,7 @@ function YourMainContent({
     handler({ team_code }) {
       console.log(`[Copa] navigate_to_team called with: ${team_code}`);
       loadTeamByCode(team_code);
+      return `Navigated to ${team_code}`;
     },
   }, [loadTeamByCode]);
 
