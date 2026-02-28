@@ -10,10 +10,10 @@ import { VenueMap } from "@/components/venue-map";
 import { AgentState, Confederation, MatchInfo, MatchPhase, StadiumInfo } from "@/lib/types";
 import { stadiums as allStadiums, groups, matches, teams } from "@/lib/worldcup-data";
 import { FlagImg, getFlagUrl } from "@/lib/flags";
-import { useCoAgent, useCopilotAction, useCopilotChat, useCopilotReadable } from "@copilotkit/react-core";
+import { useCoAgent, useCopilotAction, useCopilotChat, useCopilotMessagesContext, useCopilotReadable } from "@copilotkit/react-core";
 import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
 // ── Mobile detection ──────────────────────────────────────────────────────────
 function useIsMobile() {
@@ -702,7 +702,38 @@ function YourMainContent({
     });
   }, [setState]);
 
-  // NOTE: Text-based fallback removed — STATE_DELTA now handles team loading from server
+  // Known FIFA codes for team detection
+  const fifaCodesSet = useRef(new Set(teams.map((t) => t.fifaCode)));
+
+  // 🔄 Text-based fallback: detect team from agent response and load it
+  // STATE_DELTA from AG-UI doesn't reliably reach CopilotKit client, so we
+  // scan the latest assistant message for a FIFA code like "(FRA)".
+  const { messages: contextMessages } = useCopilotMessagesContext();
+
+  useEffect(() => {
+    if (!contextMessages || contextMessages.length === 0) return;
+    // Only scan the most recent assistant message
+    for (let i = contextMessages.length - 1; i >= 0; i--) {
+      const msg = contextMessages[i];
+      if (msg.isTextMessage() && (msg as TextMessage).role === MessageRole.Assistant) {
+        const content = (msg as TextMessage).content;
+        if (!content || content.length < 20) break;
+        const codeMatches = content.match(/\(([A-Z]{3})\)/g);
+        if (codeMatches) {
+          for (const m of codeMatches) {
+            const code = m.slice(1, 4);
+            // Guard: only load if the code is valid AND different from current team
+            if (fifaCodesSet.current.has(code) && code !== state.teamInfo?.fifaCode) {
+              console.log(`[Copa] Text fallback: loading ${code} (current: ${state.teamInfo?.fifaCode ?? "none"})`);
+              loadTeamByCode(code);
+              return;
+            }
+          }
+        }
+        break;
+      }
+    }
+  }, [contextMessages, loadTeamByCode, state.teamInfo?.fifaCode]);
 
   // 🏠 Return to welcome screen
   const goHome = useCallback(() => {
@@ -932,19 +963,16 @@ function YourMainContent({
 
   // 🆚 Opponent flag click → compare_teams in chat
   const handleOpponentClick = useCallback((opponentCode: string) => {
-    setState((prev) => {
-      const teamCode = prev?.teamInfo?.fifaCode ?? "";
-      if (teamCode) {
-        appendMessage(
-          new TextMessage({
-            role: MessageRole.User,
-            content: `Compare the teams: ${teamCode} vs ${opponentCode}`,
-          })
-        );
-      }
-      return prev!;
-    });
-  }, [setState, appendMessage]);
+    const teamCode = state.teamInfo?.fifaCode ?? "";
+    if (teamCode) {
+      appendMessage(
+        new TextMessage({
+          role: MessageRole.User,
+          content: `Compare the teams: ${teamCode} vs ${opponentCode}`,
+        })
+      );
+    }
+  }, [state.teamInfo?.fifaCode, appendMessage]);
 
   // Mobile tab change handler (syncs with tournamentView state)
   const handleMobileTabChange = useCallback((tab: MobileTab) => {
