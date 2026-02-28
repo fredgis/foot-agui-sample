@@ -334,6 +334,9 @@ interface CopilotSDKAgentConfig {
   model?: string;
 }
 
+// Track already-processed message content to avoid re-answering
+const _processedMessages = new Set<string>();
+
 export class CopilotSDKAgent extends AbstractAgent {
   private providerConfig: CopilotSDKAgentConfig["provider"];
   private modelName: string;
@@ -349,18 +352,26 @@ export class CopilotSDKAgent extends AbstractAgent {
 
   run(input: RunAgentInput): Observable<BaseEvent> {
     return new Observable<BaseEvent>((subscriber) => {
-      // Check if this is a suggestion request — skip it to avoid loops
       const userMsg = this.extractUserMessage(input);
-      if (userMsg.startsWith("Suggest what the user could say next")) {
-        console.log("[CopilotSDKAgent] Skipping suggestion request");
-        const runId = input.runId ?? crypto.randomUUID();
-        const threadId = input.threadId ?? crypto.randomUUID();
-        const ts = Date.now();
+      const runId = input.runId ?? crypto.randomUUID();
+      const threadId = input.threadId ?? crypto.randomUUID();
+      const ts = Date.now();
+
+      // Skip suggestion requests and duplicate/already-processed messages
+      const shouldSkip =
+        userMsg.startsWith("Suggest what the user could say next") ||
+        _processedMessages.has(userMsg);
+
+      if (shouldSkip) {
+        console.log(`[CopilotSDKAgent] Skipping: "${userMsg.slice(0, 50)}…"`);
         subscriber.next({ type: EventType.RUN_STARTED, runId, threadId, timestamp: ts, rawEvent: {} } as BaseEvent);
         subscriber.next({ type: EventType.RUN_FINISHED, runId, threadId, timestamp: ts, rawEvent: {} } as BaseEvent);
         subscriber.complete();
         return;
       }
+
+      // Mark as processed before running
+      _processedMessages.add(userMsg);
 
       this.runCopilotSession(input, subscriber).catch((err) => {
         console.error("[CopilotSDKAgent] Fatal error:", err);
