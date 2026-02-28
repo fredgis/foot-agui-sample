@@ -291,6 +291,29 @@ def get_team_matches(
 
 
 @ai_function(
+    name="navigate_to_team",
+    description=(
+        "Navigate the frontend page to show a specific WC2026 team. "
+        "MUST be called whenever a national team is mentioned. "
+        "Accepts the FIFA three-letter code (e.g. 'FRA', 'BRA', 'ENG')."
+    ),
+)
+def navigate_to_team(
+    team_code: Annotated[
+        str,
+        Field(description="FIFA three-letter code of the team, e.g. 'FRA', 'BRA', 'ENG'."),
+    ],
+) -> str:
+    """Signal the frontend to display the specified team page."""
+    code = team_code.strip().upper()
+    team = _TEAMS_BY_CODE.get(code)
+    if team:
+        print(f"✅ navigate_to_team({code}) → {team['name']}")
+        return f"Navigated to {team['name']} ({code})"
+    return f"Team '{code}' not found, navigation skipped."
+
+
+@ai_function(
     name="get_stadium_info",
     description=(
         "Show details about a WC2026 host stadium and update selectedStadium in the frontend. "
@@ -673,6 +696,7 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
         ),
         chat_client=_SanitizingChatClient(chat_client),
         tools=[
+            navigate_to_team,
             update_team_info,
             get_team_matches,
             get_stadium_info,

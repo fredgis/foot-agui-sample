@@ -698,17 +698,17 @@ function YourMainContent({
     }
   }, [contextMessages, loadTeamByCode]);
 
-  // Backup: also watch for ActionExecution messages with update_team_info
+  // Watch for server-side tool calls that should trigger page navigation
   useEffect(() => {
     if (!contextMessages || contextMessages.length === 0) return;
     for (let i = contextMessages.length - 1; i >= 0; i--) {
       const msg = contextMessages[i];
       if (msg.isActionExecutionMessage()) {
         const actionMsg = msg as ActionExecutionMessage;
-        if (actionMsg.name === "update_team_info") {
+        if (actionMsg.name === "navigate_to_team" || actionMsg.name === "update_team_info") {
           const teamCode = String(actionMsg.arguments?.team_code ?? "").toUpperCase();
           if (teamCode && fifaCodesSet.current.has(teamCode) && teamCode !== lastDetectedTeam.current) {
-            console.log(`[Copa] Team switch via tool: ${lastDetectedTeam.current} → ${teamCode}`);
+            console.log(`[Copa] Team switch via ${actionMsg.name}: ${lastDetectedTeam.current} → ${teamCode}`);
             lastDetectedTeam.current = teamCode;
             loadTeamByCode(teamCode);
           }
@@ -763,16 +763,7 @@ function YourMainContent({
   }, [state.teamInfo, setThemeColor, setSecondaryColor, setClubName, setCountryFlag]);
 
   // 🪁 Generative UI
-  useCopilotAction({
-    name: "navigate_to_team",
-    description: "Navigate the main page to show a specific WC2026 team. Call this whenever a team is discussed.",
-    parameters: [{ name: "team_code", type: "string", description: "FIFA three-letter code (e.g. FRA, BRA, ENG)", required: true }],
-    handler({ team_code }) {
-      console.log(`[Copa] navigate_to_team called with: ${team_code}`);
-      loadTeamByCode(team_code);
-      return `Navigated to ${team_code}`;
-    },
-  }, [loadTeamByCode]);
+  // navigate_to_team is handled server-side; frontend reacts via ActionExecution message watcher above
 
   useCopilotAction({
     name: "get_weather",
