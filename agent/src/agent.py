@@ -57,7 +57,7 @@ STATE_SCHEMA: dict[str, object] = {
                 "awayTeam": {"type": ["string", "null"]},
                 "stadiumName": {"type": "string"},
                 "phase": {"type": "string"},
-                "group": {"type": "string"},
+                "group": {"type": ["string", "null"]},
             },
         },
         "description": "List of World Cup 2026 matches for the selected team or group.",
@@ -91,14 +91,6 @@ PREDICT_STATE_CONFIG: dict[str, dict[str, str]] = {
     "teamInfo": {
         "tool": "update_team_info",
         "tool_argument": "team_info",
-    },
-    "matches": {
-        "tool": "get_team_matches",
-        "tool_argument": "team_code",
-    },
-    "selectedStadium": {
-        "tool": "get_stadium_info",
-        "tool_argument": "stadium_name",
     },
 }
 
