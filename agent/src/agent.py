@@ -609,9 +609,15 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             the user sees the correct team page.
 
             Data available in the WC2026 database (use it as priority):
-            - 48 national teams with FIFA code, flag, coach, FIFA ranking, key players
-            - 16 host stadiums (USA, Canada, Mexico)
-            - 12 groups (A through L), 104 scheduled matches
+            - 48+ national teams with FIFA code, flag, coach, FIFA ranking, key players
+            - 16 host stadiums (USA, Canada, Mexico) with video links
+            - 12 groups (A through L), 104 scheduled matches (official FIFA draw Dec 2025)
+            - All times in ET (Eastern Time)
+
+            IMPORTANT: The database tools (update_team_info, get_team_matches) contain
+            the OFFICIAL FIFA data. ALWAYS call them — they WILL return correct data.
+            NEVER say "my database failed" or "tool feed failed" — the tools work.
+            If a tool call fails, retry it once before giving up.
 
             The `navigate_to_team` tool takes a single `team_code` string parameter (FIFA code like "FRA").
             The `update_team_info` tool takes a single `team_code` string parameter (FIFA code).
