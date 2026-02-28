@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { TeamInfo, PlayerInfo } from "@/lib/types";
 import { groups } from "@/lib/worldcup-data";
 import { FlagImg } from "@/lib/flags";
@@ -158,7 +158,7 @@ function SkeletonLoader() {
 }
 
 // ── TeamCard ───────────────────────────────────────────────────────────────────
-export function TeamCard({ team, themeColor, secondaryColor }: TeamCardProps) {
+export const TeamCard = memo(function TeamCard({ team, themeColor, secondaryColor }: TeamCardProps) {
   const [visible, setVisible] = useState(false);
   const [fading, setFading] = useState(false);
   const prevTeamRef = useRef<TeamInfo | null>(null);
@@ -394,4 +394,4 @@ export function TeamCard({ team, themeColor, secondaryColor }: TeamCardProps) {
       `}</style>
     </div>
   );
-}
+});

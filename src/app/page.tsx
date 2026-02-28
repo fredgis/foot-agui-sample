@@ -951,7 +951,7 @@ function YourMainContent({
   function handleMatchClick(match: MatchInfo) {
     const stadiumDetails = allStadiums.find((s) => s.name === match.stadiumName);
     if (stadiumDetails) {
-      setState({ ...state, highlightedCity: stadiumDetails.city });
+      setState((prev) => ({ ...(prev ?? state), highlightedCity: stadiumDetails.city }));
     }
   }
 
@@ -972,11 +972,11 @@ function YourMainContent({
   const handleMobileTabChange = (tab: MobileTab) => {
     setActiveTab(tab);
     if (tab === "group") {
-      setState({ ...state, tournamentView: "group" });
+      setState((prev) => ({ ...(prev ?? state), tournamentView: "group" as const }));
     } else if (tab === "bracket") {
-      setState({ ...state, tournamentView: "bracket" });
+      setState((prev) => ({ ...(prev ?? state), tournamentView: "bracket" as const }));
     } else if (state.tournamentView) {
-      setState({ ...state, tournamentView: null });
+      setState((prev) => ({ ...(prev ?? state), tournamentView: null }));
     }
   };
 
@@ -1251,7 +1251,7 @@ function YourMainContent({
                   teamMatches={safeMatches}
                   highlightedCity={state.highlightedCity}
                   themeColor={themeColor}
-                  onStadiumClick={(stadium: StadiumInfo) => setState({ ...state, selectedStadium: stadium })}
+                  onStadiumClick={(stadium: StadiumInfo) => setState((prev) => ({ ...(prev ?? state), selectedStadium: stadium }))}
                 />
               )}
             </div>
@@ -1267,7 +1267,7 @@ function YourMainContent({
                       teamMatches={safeMatches}
                       highlightedCity={state.highlightedCity}
                       themeColor={themeColor}
-                      onStadiumClick={(stadium: StadiumInfo) => setState({ ...state, selectedStadium: stadium })}
+                      onStadiumClick={(stadium: StadiumInfo) => setState((prev) => ({ ...(prev ?? state), selectedStadium: stadium }))}
                     />
                   </div>
                 )}
