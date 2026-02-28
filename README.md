@@ -1,31 +1,129 @@
-# ⚽🏆 FIFA World Cup 2026 — Copa, Immersive AI Assistant
+# ⚽🏆 Copa — FIFA World Cup 2026 AI Assistant
 
-> AI-powered conversational app to explore the 2026 FIFA World Cup: 48 teams, 104 matches, 16 stadiums — built with AG-UI + CopilotKit + Microsoft Agent Framework.
+> Immersive AI-powered experience to explore the 2026 FIFA World Cup: 48 teams, 104 matches, 16 stadiums — built on the **AG-UI Protocol** with **GitHub Copilot SDK (CopilotKit)** and **Microsoft Agent Framework**.
+
+![Copa Welcome Screen](screenshot.png)
+![Copa — AS Saint-Étienne (club mode)](screenshot-asse.png)
 
 ---
 
-## 🌟 Overview
+## 🎯 What Copa Can Do
 
-**Copa** is an AI assistant specialized in the **2026 FIFA World Cup** 🇺🇸🇲🇽🇨🇦.
+Copa is a **conversational AI assistant** that transforms the FIFA World Cup 2026 into an interactive, dynamic experience. The entire page adapts in real time as you talk to the agent:
 
-It combines an **intelligent conversational agent** (Python + Microsoft Agent Framework) with an **immersive UI** (Next.js + React 19) that dynamically adapts to each selected team — national colors, flags, match schedule, stadium map, group standings and tournament bracket.
-
-The **AG-UI** (Agent-Generated UI) protocol lets the backend drive the frontend in real time via SSE events, with bidirectional state synchronization between the Python agent and React components.
-
-### ✨ Key Features
-
-| Feature | Description |
+| Ask Copa… | What happens |
 |---|---|
-| 🗣️ **Copa Agent** | WC2026 expert chatbot with 8 AI tools (team info, matches, stadiums, comparisons, weather, bracket, city guide) |
-| 🏳️ **48 teams** | Full profiles with real flag images, key players, honors, FIFA ranking, national colors |
-| 📅 **104 matches** | Complete schedule: group stage (72) → R32 (16) → R16 (8) → QF (4) → SF (2) → 3rd place → Final |
-| 🗺️ **Interactive SVG map** | 16 stadiums across USA / Canada / Mexico with clickable pins |
-| 🌍 **12 groups** | Responsive group view with inter-team navigation |
-| 🏆 **Tournament bracket** | Visual tree R32 → Final with phase selection |
-| 🎨 **Fully dynamic theme** | Entire UI changes colors based on the selected team |
-| 📱 **Mobile-first** | Mobile tabs + CopilotPopup / Desktop sidebar + multi-panel grid |
-| ⏱️ **Live countdown** | Real-time countdown to June 11, 2026 |
-| 🔗 **Cross-component** | Click match → highlight stadium on map; click opponent → comparison in chat |
+| 🗣️ *"Show me France"* | The full page switches to France: 🇫🇷 blue theme, team card, match schedule, stadiums on the map |
+| ⚔️ *"Compare Brazil vs Argentina"* | Side-by-side rich comparison card rendered **inside the chat** (Generative UI) |
+| 🏟️ *"Tell me about MetLife Stadium"* | Interactive stadium card with capacity, city, description — rendered in chat |
+| 🌍 *"Show Group C standings"* | Group view with all 4 teams, clickable for navigation |
+| 🏆 *"Show the tournament bracket"* | Full R32 → Final bracket view with phase selection |
+| 🌤️ *"Weather in Houston?"* | Live weather card for host city |
+| 🌙 *"Moon phase on June 11?"* | Fun moon phase card for match day (human-in-the-loop confirmation) |
+| 🏙️ *"City guide for Miami"* | Fun facts, food, and transport tips for host city |
+| 🔄 *"Now show me Germany"* | Page instantly switches — green theme, new team card, new matches |
+
+The agent suggests follow-up questions dynamically based on what you're viewing — opponents to compare, stadiums to explore, groups to check.
+
+---
+
+## 🧩 AG-UI Protocol — Features Used
+
+This project is a comprehensive implementation of the [AG-UI Protocol](https://docs.ag-ui.com/introduction) (Agent-Generated User Interface). AG-UI enables agents to drive rich, interactive frontends via Server-Sent Events (SSE).
+
+| AG-UI Feature | Status | How We Use It |
+|---|---|---|
+| **Lifecycle Events** | ✅ Used | `RUN_STARTED`, `RUN_FINISHED`, `RUN_ERROR` — manage agent run lifecycle |
+| **Text Message Streaming** | ✅ Used | `TEXT_MESSAGE_START/CONTENT/END` — Copa's passionate football commentary streams word by word |
+| **Tool Call Events** | ✅ Used | `TOOL_CALL_START/ARGS/END` — 7 tools declared (client + server side) |
+| **State Management** | ✅ Used | `STATE_SNAPSHOT` + `STATE_DELTA` events synchronize `AgentState` (team, matches, stadium, tournament view) between Python agent and React |
+| **Shared State Schema** | ✅ Used | `STATE_SCHEMA` defines the full `AgentState` shape — validated on both sides |
+| **Frontend-Defined Tools** | ✅ Used | `update_team_info` is a **client-side tool** — agent calls it, CopilotKit executes the handler in the browser, React state updates immediately |
+| **Server-Defined Tools** | ✅ Used | 6 `@ai_function` tools run on the Python backend: `get_stadium_info`, `get_group_standings`, `get_venue_weather`, `show_tournament_bracket`, `compare_teams`, `get_city_guide` |
+| **Custom Events** | ✅ Used | Weather and Moon cards use custom event rendering |
+| **SSE Transport** | ✅ Used | All agent↔frontend communication uses Server-Sent Events via `ag-ui-protocol` |
+
+> **Architecture insight**: Client-side and server-side tools **cannot be mixed in the same LLM turn** (causes orphaned `tool_call_id` errors). The system prompt enforces tool isolation via a `TOOL ISOLATION RULE`.
+
+### AG-UI Data Flow
+
+```mermaid
+sequenceDiagram
+    participant U as 👤 User
+    participant F as 🖥️ Frontend<br/>(React + CopilotKit)
+    participant R as 🔀 API Route<br/>(/api/copilotkit)
+    participant A as 🐍 Copa Agent<br/>(FastAPI + AG-UI)
+    participant L as 🧠 Azure OpenAI
+
+    U->>F: "Show me France"
+    F->>R: POST /api/copilotkit
+    R->>A: AG-UI RunAgent (SSE)
+    A-->>F: RUN_STARTED
+    A-->>F: STATE_SNAPSHOT (initial state)
+    A->>L: Chat completion + tools
+    L-->>A: tool_call: update_team_info("FRA")
+    A-->>F: TOOL_CALL_START → TOOL_CALL_ARGS → TOOL_CALL_END
+    Note over F: CopilotKit executes client handler<br/>→ setState({teamInfo: France, matches: [...]})
+    Note over F: 🎨 UI transforms: blue theme,<br/>TeamCard, MatchSchedule, VenueMap
+    F-->>A: Tool result (team + matches JSON)
+    A->>L: Continue with tool result
+    L-->>A: TextMessageContent (Copa commentary)
+    A-->>F: TEXT_MESSAGE_START → CONTENT (streaming) → END
+    A-->>F: RUN_FINISHED
+    F-->>U: UI fully updated + Copa reply in chat
+```
+
+---
+
+## 🛠️ GitHub Copilot SDK (CopilotKit) — Features Used
+
+The frontend uses the full [CopilotKit](https://docs.copilotkit.ai) SDK to build a deeply integrated AI UX:
+
+| CopilotKit Feature | Hook / Component | How We Use It |
+|---|---|---|
+| **Co-Agent State** | `useCoAgent<AgentState>` | Bidirectional state sync: `teamInfo`, `matches`, `selectedStadium`, `tournamentView`, `highlightedCity` |
+| **Frontend Actions** | `useCopilotAction` | `update_team_info` — client-side tool with handler that directly updates React state |
+| **Generative UI** | `useCopilotAction` with `render` | Rich in-chat rendering for `get_stadium_info` (stadium card) and `compare_teams` (comparison grid) |
+| **Copilot Readable** | `useCopilotReadable` | Provides current team context to the agent — team name, group, ranking, matches — so it knows what the user is viewing |
+| **Chat Suggestions** | `useCopilotChatSuggestions` | Dynamic follow-up prompts based on current state: compare with opponent, check group standings, switch to another team |
+| **Chat Management** | `useCopilotChat` | Programmatic message injection: click opponent flag → `appendMessage("Compare X vs Y")` |
+| **Message Context** | `useCopilotMessagesContext` | Access full conversation history for text-based team detection fallback |
+| **Sidebar UI** | `CopilotSidebar` | Desktop: persistent chat sidebar with custom theme colors |
+| **Popup UI** | `CopilotPopup` | Mobile: floating chat bubble that adapts to team theme |
+| **CSS Theming** | `CopilotKitCSSProperties` | Dynamic `--copilot-kit-primary-color` based on selected team's national colors |
+| **Human-in-the-Loop** | Custom confirmation card | Moon phase card asks user confirmation before rendering |
+
+### CopilotKit Integration Architecture
+
+```mermaid
+graph TB
+    subgraph "CopilotKit Hooks (page.tsx)"
+        CoAgent["useCoAgent&lt;AgentState&gt;<br/>state + setState"]
+        Action1["useCopilotAction<br/>update_team_info (handler)"]
+        Action2["useCopilotAction<br/>get_stadium_info (render only)"]
+        Action3["useCopilotAction<br/>compare_teams (render only)"]
+        Readable["useCopilotReadable<br/>current team context"]
+        Suggestions["useCopilotChatSuggestions<br/>dynamic follow-ups"]
+        Chat["useCopilotChat<br/>appendMessage"]
+    end
+
+    subgraph "React Components"
+        TeamCard["TeamCard"]
+        Schedule["MatchSchedule"]
+        VenueMap["VenueMap"]
+        GroupView["GroupView"]
+        Bracket["TournamentBracket"]
+    end
+
+    CoAgent -->|"state.teamInfo"| TeamCard
+    CoAgent -->|"state.matches"| Schedule
+    CoAgent -->|"state.matches"| VenueMap
+    CoAgent -->|"state.tournamentView"| GroupView
+    CoAgent -->|"state.tournamentView"| Bracket
+    Action1 -->|"setState()"| CoAgent
+    Readable -->|"provides context"| Action1
+    Suggestions -->|"based on state"| CoAgent
+```
 
 ---
 
@@ -42,13 +140,15 @@ graph TB
         Page["page.tsx<br/>Main orchestration"]
         API["api/copilotkit/route.ts<br/>HttpAgent → Backend"]
         
-        subgraph "📦 Components"
+        subgraph "📦 Components (9)"
             Welcome["WelcomeScreen<br/>Countdown + 48 teams"]
             TeamCard["TeamCard<br/>Full team profile"]
             Schedule["MatchSchedule<br/>104 matches + filters"]
             VenueMap["VenueMap<br/>SVG map — 16 stadiums"]
             GroupView["GroupView<br/>12 groups"]
             Bracket["TournamentBracket<br/>R32 → Final"]
+            Weather["WeatherCard"]
+            Moon["MoonCard"]
         end
 
         subgraph "📚 Data & Utils"
@@ -56,52 +156,35 @@ graph TB
             Data["worldcup-data.ts<br/>48 teams, 104 matches, 16 stadiums"]
             Flags["flags.ts<br/>FIFA → flag images CDN"]
         end
+
+        subgraph "🔌 CopilotKit Hooks"
+            UseCoAgent["useCoAgent — state sync"]
+            UseAction["useCopilotAction — client tools + Generative UI"]
+            UseReadable["useCopilotReadable — context"]
+            UseSuggestions["useCopilotChatSuggestions"]
+        end
     end
 
     subgraph "🐍 Backend — Python 3.12 + FastAPI"
         Main["main.py<br/>FastAPI + LLM client"]
-        Agent["agent.py<br/>Copa Agent + 8 tools"]
+        Agent["agent.py<br/>Copa Agent + 6 server tools"]
         PyData["data/worldcup2026.py<br/>Mirror of TS data"]
     end
 
     subgraph "🧠 LLM"
-        AzureOAI["Azure OpenAI<br/>gpt-4o-mini"]
+        AzureOAI["Azure OpenAI<br/>gpt-5.2"]
     end
 
     Browser -->|"HTTP"| Layout
     Layout --> Page
     Page --> Welcome & TeamCard & Schedule & VenueMap & GroupView & Bracket
-    Page -->|"useCoAgent<br/>state sync"| API
+    Page --> UseCoAgent & UseAction & UseReadable & UseSuggestions
+    Page -->|"useCoAgent"| API
     API -->|"AG-UI Protocol<br/>(SSE events)"| Main
     Main --> Agent
     Agent --> PyData
     Agent -->|"API call"| AzureOAI
     Page --> Types & Data & Flags
-```
-
-### Data Flow
-
-```mermaid
-sequenceDiagram
-    participant U as 👤 User
-    participant F as 🖥️ Frontend<br/>(React + CopilotKit)
-    participant R as 🔀 API Route<br/>(/api/copilotkit)
-    participant A as 🐍 Copa Agent<br/>(FastAPI)
-    participant L as 🧠 Azure OpenAI
-
-    U->>F: "Show me France"
-    F->>R: POST /api/copilotkit
-    R->>A: AG-UI RunAgent (SSE)
-    A->>L: Chat completion + tools
-    L-->>A: tool_call: update_team_info({FRA data})
-    A-->>F: StateSnapshotEvent (teamInfo = France)
-    Note over F: useCoAgent → state.teamInfo changes<br/>→ blue/red theme, TeamCard renders
-    L-->>A: tool_call: get_team_matches("FRA")
-    A-->>F: StateSnapshotEvent (matches = [...])
-    Note over F: MatchSchedule + VenueMap render
-    L-->>A: TextMessageContent (Copa response)
-    A-->>F: SSE text stream
-    F-->>U: UI updated + Copa reply in chat
 ```
 
 ### Azure Deployment Architecture
@@ -116,7 +199,7 @@ graph LR
     subgraph "Azure"
         SWA["🌐 Azure Static Web Apps<br/>Frontend Next.js SSR"]
         ACA["🐳 Azure Container Apps<br/>Backend FastAPI<br/>(scale-to-zero)"]
-        AOAI["🧠 Azure OpenAI<br/>gpt-4o-mini"]
+        AOAI["🧠 Azure OpenAI<br/>gpt-5.2"]
     end
 
     Repo -->|"push main"| Actions
@@ -129,6 +212,25 @@ graph LR
     style ACA fill:#0078d4,color:#fff
     style AOAI fill:#10b981,color:#fff
 ```
+
+---
+
+## ✨ Key Features
+
+| Feature | Description |
+|---|---|
+| 🗣️ **Copa Agent** | WC2026 expert chatbot — passionate commentator persona, 7 AI tools (client + server) |
+| 🏳️ **48 national teams** | Full profiles: real flag images, key players, honors, FIFA ranking, national colors |
+| 📅 **104 matches** | Complete schedule: group stage (72) → R32 (16) → R16 (8) → QF (4) → SF (2) → 3rd place → Final |
+| 🗺️ **Interactive SVG map** | 16 stadiums across USA / Canada / Mexico with clickable pins |
+| 🌍 **12 groups** | Responsive group view (A→L) with inter-team navigation |
+| 🏆 **Tournament bracket** | Visual tree R32 → Final with phase selection |
+| 🎨 **Fully dynamic theme** | Entire UI changes colors based on the selected team's national colors |
+| 💬 **Generative UI** | Rich cards rendered inside the chat (stadiums, comparisons) |
+| 💡 **Smart suggestions** | AI-driven follow-up questions based on current context |
+| 📱 **Mobile-first** | Mobile tabs + CopilotPopup / Desktop sidebar + multi-panel grid |
+| ⏱️ **Live countdown** | Real-time countdown to June 11, 2026 |
+| 🔗 **Cross-component** | Click match → highlight stadium on map; click opponent → comparison in chat |
 
 ---
 
@@ -241,11 +343,12 @@ npm run dev:agent # → http://localhost:8000
 
 Open **http://localhost:3000**:
 
-- 🏳️ Click a team flag → the agent shows the full team profile
+- 🏳️ Click a team flag → the page transforms with national colors and full team profile
 - 💬 Type: *"Show me France's matches"*
-- ⚔️ Try: *"Compare Brazil vs Argentina"*
-- 🏟️ Ask: *"Tell me about MetLife Stadium"*
+- ⚔️ Try: *"Compare Brazil vs Argentina"* → rich comparison card in chat
+- 🏟️ Ask: *"Tell me about MetLife Stadium"* → interactive stadium card in chat
 - 🌍 Navigate between Groups and Bracket views
+- 💡 Click suggested follow-up questions to explore more
 
 ---
 
@@ -255,7 +358,7 @@ Open **http://localhost:3000**:
 foot-agui-sample/
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx                    # Orchestration — WelcomeScreen, routing, cross-component
+│   │   ├── page.tsx                    # Main orchestration — all CopilotKit hooks + components
 │   │   ├── globals.css                 # Dark theme, 8 animations, CopilotKit styles
 │   │   ├── layout.tsx                  # CopilotKit Provider + metadata
 │   │   └── api/copilotkit/route.ts     # Next.js API → HttpAgent(AGENT_URL) → backend
@@ -264,14 +367,16 @@ foot-agui-sample/
 │   │   ├── match-schedule.tsx          # 104 matches with phase/group filters + countdown
 │   │   ├── venue-map.tsx               # Interactive SVG map — 16 stadiums across 3 countries
 │   │   ├── group-view.tsx              # 12 groups (A→L) responsive grid
-│   │   └── tournament-bracket.tsx      # Bracket R32 → Final with phase selection
+│   │   ├── tournament-bracket.tsx      # Bracket R32 → Final with phase selection
+│   │   ├── weather.tsx                 # Weather card for host cities
+│   │   └── moon.tsx                    # Moon phase card (human-in-the-loop)
 │   └── lib/
 │       ├── types.ts                    # Types: TeamInfo, MatchInfo, StadiumInfo, AgentState
 │       ├── worldcup-data.ts            # 48 teams, 16 stadiums, 12 groups, 104 matches
 │       └── flags.ts                    # FIFA code → ISO → flagcdn.com images
 ├── agent/
 │   ├── src/
-│   │   ├── agent.py                    # Copa agent: system prompt + 8 @ai_function tools
+│   │   ├── agent.py                    # Copa agent: system prompt + 6 server @ai_function tools
 │   │   ├── main.py                     # FastAPI + _build_chat_client() (Azure/OpenAI)
 │   │   └── data/worldcup2026.py        # Python mirror of TS data
 │   ├── .env.example                    # LLM config template — COPY to .env
@@ -284,41 +389,47 @@ foot-agui-sample/
 ├── .github/workflows/
 │   └── deploy-azure.yml                # CI/CD GitHub Actions → Azure SWA + Container Apps
 ├── docs/
-│   └── worldcup2026-development-plan.md  # Full development plan (1470+ lines, 9 workstreams)
+│   └── worldcup2026-development-plan.md  # Full development plan (1760+ lines, 9 workstreams)
 ├── package.json
 └── README.md                           # ← You are here
 ```
 
 ---
 
-## 🤖 Copa Agent — 8 AI Tools
+## 🤖 Copa Agent — 7 AI Tools
 
-The Copa agent is defined in `agent/src/agent.py` with a passionate commentator system prompt and 8 AI functions:
+The Copa agent is defined in `agent/src/agent.py` with a passionate commentator system prompt. Tools are split between **client-side** (executed in the browser) and **server-side** (executed in the Python backend):
+
+### Client-Side Tool (via `useCopilotAction`)
 
 | Tool | Description | UI Effect |
 |---|---|---|
-| `update_team_info` | Load a team into the shared state | Renders TeamCard, changes theme colors |
-| `get_team_matches` | Return a team's group-stage matches | Renders MatchSchedule + VenueMap |
-| `get_stadium_info` | Stadium details | Highlights stadium on map |
-| `get_group_standings` | Group standings | Switches to GroupView |
-| `get_venue_weather` | Host city weather | Renders WeatherCard |
+| `update_team_info` | Load a national team — called as a **frontend action** | Updates React state → renders TeamCard, changes theme colors, populates MatchSchedule + VenueMap |
+
+### Server-Side Tools (via `@ai_function`)
+
+| Tool | Description | UI Effect |
+|---|---|---|
+| `get_stadium_info` | Stadium details (capacity, city, description) | Generative UI: rich stadium card in chat |
+| `get_group_standings` | Group standings with team details | Switches to GroupView |
+| `get_venue_weather` | Host city weather forecast | Renders WeatherCard component |
 | `show_tournament_bracket` | Activate bracket view | Switches to TournamentBracket |
-| `compare_teams` | Compare two teams | Shows both team profiles |
-| `get_city_guide` | Host city fun facts | Text response in chat |
+| `compare_teams` | Compare two teams head-to-head | Generative UI: side-by-side comparison grid in chat |
+| `get_city_guide` | Host city fun facts & travel tips | Text response in chat |
 
 ### Shared State (AgentState)
 
 ```typescript
 type AgentState = {
   teamInfo: TeamInfo | null;           // Selected team → TeamCard
-  matches: MatchInfo[];                // Filtered matches → MatchSchedule
+  matches: MatchInfo[];                // Filtered matches → MatchSchedule + VenueMap
   selectedStadium: StadiumInfo | null; // Selected stadium → VenueMap highlight
-  tournamentView: "group" | "bracket" | null; // Active view
+  tournamentView: "group" | "bracket" | null; // Active view mode
   highlightedCity: string | null;      // Highlighted city on map
 };
 ```
 
-This state is synchronized in real time between Python (`predict_state` + `STATE_SCHEMA`) and React (`useCoAgent`).
+State is synchronized in real time between the Python agent (`STATE_SCHEMA`) and React (`useCoAgent`) via AG-UI `STATE_SNAPSHOT` events.
 
 ---
 
@@ -336,11 +447,14 @@ This state is synchronized in real time between Python (`predict_state` + `STATE
 
 ## 🎨 Everything is Dynamic
 
-- **Colors** — When a team is selected, the entire UI changes: header, borders, sidebar, countdown, buttons, background gradient
+- **Colors** — When a team is selected, the entire UI changes: header, borders, sidebar, countdown, buttons, background gradient, CopilotKit theme
 - **Content** — The LLM agent generates responses via real-time AG-UI streaming (SSE events)
-- **State sync** — The Python state (`teamInfo`, `matches`, `selectedStadium`, `tournamentView`, `highlightedCity`) is synchronized with React via `useCoAgent` / `predict_state`
-- **UI routing** — The page dynamically renders the right component: WelcomeScreen → TeamCard+Schedule+Map → GroupView → Bracket
-- **Flags** — Images loaded on demand from CDN (flagcdn.com)
+- **State sync** — `AgentState` is synchronized between Python and React via `useCoAgent` + `STATE_SNAPSHOT`
+- **Generative UI** — Stadium cards and comparison grids are rendered as rich React components inside the chat conversation
+- **Smart suggestions** — `useCopilotChatSuggestions` generates contextual follow-up prompts based on the currently viewed team
+- **Agent context** — `useCopilotReadable` feeds the agent live information about what the user is viewing
+- **UI routing** — Dynamic rendering: WelcomeScreen → TeamCard+Schedule+Map → GroupView → Bracket
+- **Flags** — Real flag images loaded from CDN (flagcdn.com)
 - **Cross-component** — Click match → highlight stadium; click opponent → comparison in chat; click group team → navigate
 
 ---
@@ -438,28 +552,46 @@ Required GitHub secrets:
 
 ---
 
-## 📚 Additional Documentation
-
-| Document | Content |
-|---|---|
-| [`docs/worldcup2026-development-plan.md`](docs/worldcup2026-development-plan.md) | Full development plan: 9 workstreams, Mermaid diagrams, acceptance criteria, risks, detailed architecture |
-| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Original technical architecture |
-| [`DEBUG.md`](DEBUG.md) | Debugging guide |
-
----
-
 ## 🔧 Tech Stack
 
 | Layer | Technology | Version |
 |---|---|---|
 | Frontend | Next.js + React + TailwindCSS | 16 + 19 + 4 |
-| Chat UI | CopilotKit (Sidebar + Popup) | 1.52.1 |
+| Chat UI | CopilotKit / GitHub Copilot SDK (Sidebar + Popup) | 1.52.1 |
 | Protocol | AG-UI (SSE events) | 0.0.46 |
 | Backend | Python + FastAPI + Microsoft Agent Framework | 3.12 |
-| LLM | Azure OpenAI / OpenAI | gpt-4o-mini |
+| LLM | Azure OpenAI / OpenAI | gpt-5.2 / gpt-4o-mini |
 | Deployment | Azure Static Web Apps + Container Apps | — |
 | CI/CD | GitHub Actions | — |
 | Flags | flagcdn.com (CDN) | — |
+
+---
+
+## 📚 Additional Documentation
+
+| Document | Content |
+|---|---|
+| [`docs/worldcup2026-development-plan.md`](docs/worldcup2026-development-plan.md) | Full development plan: 9 workstreams, Mermaid diagrams, acceptance criteria, risks, detailed architecture |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Original technical architecture (club mode) |
+| [`DEBUG.md`](DEBUG.md) | Debugging guide |
+
+---
+
+## 📊 Development Stats
+
+| Metric | Value |
+|---|---|
+| **Development period** | January 8 → February 28, 2026 (~52 days) |
+| **Total commits** | 73 (72 on `worldcup2026` branch) |
+| **Copilot-assisted commits** | 50 (68% of all commits) |
+| **Lines of code** | ~7,200 (TypeScript: 5,000 · Python: 1,900 · CSS: 300) |
+| **React components** | 9 |
+| **AI tools** | 7 (1 client-side + 6 server-side) |
+| **WC2026 data** | 48 teams · 104 matches · 16 stadiums · 12 groups |
+| **Development plan** | 1,760+ lines across 9 workstreams |
+| **Agent framework** | GitHub Copilot CLI (Copilot Agent) used throughout for code, architecture, and debugging |
+
+> 🤖 This project was developed collaboratively with **GitHub Copilot Agent** — from initial planning and issue creation through architecture decisions, implementation, debugging, and documentation. The agent handled complex AG-UI protocol debugging, tool pipeline fixes, and full-stack TypeScript/Python development.
 
 ---
 
@@ -470,4 +602,4 @@ MIT — see [LICENSE](LICENSE)
 ---
 
 **⚽ Built for the 2026 FIFA World Cup 🇺🇸🇲🇽🇨🇦**
-**Powered by [CopilotKit](https://copilotkit.ai) · [Microsoft Agent Framework](https://aka.ms/agent-framework) · [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service)**
+**Powered by [AG-UI Protocol](https://docs.ag-ui.com) · [CopilotKit](https://copilotkit.ai) · [Microsoft Agent Framework](https://aka.ms/agent-framework) · [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service)**
