@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 
 import uvicorn
@@ -14,6 +15,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from agent import create_agent
 
 load_dotenv()
+
+logging.basicConfig(level=logging.INFO)
 
 def _build_chat_client() -> ChatClientProtocol:
     try:
