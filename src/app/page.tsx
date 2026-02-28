@@ -689,10 +689,11 @@ function YourMainContent({
     const team = teams.find(
       (t) => t.fifaCode.toUpperCase() === code.toUpperCase() || t.name.toLowerCase() === code.toLowerCase()
     );
-    if (!team) return;
+    if (!team) { console.warn(`[Copa] loadTeamByCode: team not found for "${code}"`); return; }
     const teamMatches = matches.filter(
       (m) => m.homeTeam === team.fifaCode || m.awayTeam === team.fifaCode
     );
+    console.log(`[Copa] loadTeamByCode(${team.fifaCode}) → ${team.name}, ${teamMatches.length} matches`);
     setState({
       teamInfo: team,
       matches: teamMatches,
@@ -704,6 +705,7 @@ function YourMainContent({
 
   // Known FIFA codes for team detection
   const fifaCodesSet = useRef(new Set(teams.map((t) => t.fifaCode)));
+  const lastDetectedTeam = useRef<string | null>(null);
 
   // 🔄 Text-based fallback: detect team from agent response and load it
   // STATE_DELTA from AG-UI doesn't reliably reach CopilotKit client, so we
@@ -722,9 +724,9 @@ function YourMainContent({
         if (codeMatches) {
           for (const m of codeMatches) {
             const code = m.slice(1, 4);
-            // Guard: only load if the code is valid AND different from current team
-            if (fifaCodesSet.current.has(code) && code !== state.teamInfo?.fifaCode) {
-              console.log(`[Copa] Text fallback: loading ${code} (current: ${state.teamInfo?.fifaCode ?? "none"})`);
+            if (fifaCodesSet.current.has(code) && code !== lastDetectedTeam.current) {
+              console.log(`[Copa] Text fallback: ${lastDetectedTeam.current} → ${code}`);
+              lastDetectedTeam.current = code;
               loadTeamByCode(code);
               return;
             }
@@ -733,7 +735,7 @@ function YourMainContent({
         break;
       }
     }
-  }, [contextMessages, loadTeamByCode, state.teamInfo?.fifaCode]);
+  }, [contextMessages, loadTeamByCode]);
 
   // 🏠 Return to welcome screen
   const goHome = useCallback(() => {
@@ -743,6 +745,7 @@ function YourMainContent({
     setThemeColor("#6366f1");
     setSecondaryColor("#ffffff");
     setBackgroundImage("");
+    lastDetectedTeam.current = null;
   }, [setState, setClubName, setCountryFlag, setThemeColor, setSecondaryColor, setBackgroundImage]);
 
   // Cross-component: clicking a team in GroupView triggers compare_teams in chat
