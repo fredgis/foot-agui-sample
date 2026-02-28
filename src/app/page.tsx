@@ -705,10 +705,10 @@ function YourMainContent({
       const msg = contextMessages[i];
       if (msg.isActionExecutionMessage()) {
         const actionMsg = msg as ActionExecutionMessage;
-        if (actionMsg.name === "navigate_to_team" || actionMsg.name === "update_team_info") {
+        if (actionMsg.name === "update_team_info") {
           const teamCode = String(actionMsg.arguments?.team_code ?? "").toUpperCase();
           if (teamCode && fifaCodesSet.current.has(teamCode) && teamCode !== lastDetectedTeam.current) {
-            console.log(`[Copa] Team switch via ${actionMsg.name}: ${lastDetectedTeam.current} → ${teamCode}`);
+            console.log(`[Copa] Team switch via update_team_info: ${lastDetectedTeam.current} → ${teamCode}`);
             lastDetectedTeam.current = teamCode;
             loadTeamByCode(teamCode);
           }
@@ -763,8 +763,6 @@ function YourMainContent({
   }, [state.teamInfo, setThemeColor, setSecondaryColor, setClubName, setCountryFlag]);
 
   // 🪁 Generative UI
-  // navigate_to_team is handled server-side; frontend reacts via ActionExecution message watcher above
-
   useCopilotAction({
     name: "get_weather",
     description: "Get the weather for a given location.",

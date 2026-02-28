@@ -2,70 +2,15 @@ from __future__ import annotations
 
 import logging
 from textwrap import dedent
-from typing import Annotated, Any
+from typing import Annotated
 
 from agent_framework import ChatAgent, ChatClientProtocol, ai_function
-from agent_framework._types import ChatMessage
 from agent_framework_ag_ui import AgentFrameworkAgent
 from pydantic import Field
 
 from data.worldcup2026 import groups, matches, stadiums, teams
 
 logger = logging.getLogger(__name__)
-
-
-# ─── Sanitizing wrapper — strips orphaned tool_calls from conversation history ─
-class _SanitizingChatClient:
-    """Wraps a ChatClientProtocol to fix orphaned tool_calls before sending to the LLM."""
-
-    def __init__(self, inner: ChatClientProtocol):
-        self._inner = inner
-
-    @property
-    def additional_properties(self) -> dict[str, Any]:
-        return getattr(self._inner, "additional_properties", {})
-
-    @staticmethod
-    def _sanitize(messages: list[ChatMessage]) -> list[ChatMessage]:
-        """Remove tool_calls whose IDs have no matching tool-result message."""
-        tool_result_ids: set[str] = set()
-        for m in messages:
-            if getattr(m, "role", None) == "tool":
-                tid = getattr(m, "tool_call_id", None)
-                if tid:
-                    tool_result_ids.add(tid)
-
-        sanitized: list[ChatMessage] = []
-        for m in messages:
-            calls = getattr(m, "tool_calls", None)
-            if calls:
-                kept = [c for c in calls if getattr(c, "id", None) in tool_result_ids]
-                if len(kept) < len(calls):
-                    dropped = len(calls) - len(kept)
-                    logger.warning("Sanitized %d orphaned tool_call(s) from conversation history", dropped)
-                if kept:
-                    m.tool_calls = kept  # type: ignore[attr-defined]
-                    sanitized.append(m)
-                else:
-                    # All tool_calls orphaned — convert to plain assistant message
-                    if hasattr(m, "content") and m.content:
-                        m.tool_calls = None  # type: ignore[attr-defined]
-                        sanitized.append(m)
-                    # else drop entirely
-            else:
-                sanitized.append(m)
-        return sanitized
-
-    async def get_streaming_response(self, messages, **kwargs):
-        if isinstance(messages, list):
-            messages = self._sanitize(messages)
-        async for update in self._inner.get_streaming_response(messages, **kwargs):
-            yield update
-
-    async def get_response(self, messages, **kwargs):
-        if isinstance(messages, list):
-            messages = self._sanitize(messages)
-        return await self._inner.get_response(messages, **kwargs)
 
 # ─── State Schema — aligned with AgentState in src/lib/types.ts ───────────────
 
@@ -288,29 +233,6 @@ def get_team_matches(
         lines.append(f"  [{m['id']}] {m['date']} {m['time']}  {home} vs {away}  @ {m['stadiumName']}  (Group {m.get('group','')})")
     print(f"✅ get_team_matches({code}) → {len(team_matches)} matches")
     return "\n".join(lines)
-
-
-@ai_function(
-    name="navigate_to_team",
-    description=(
-        "Navigate the frontend page to show a specific WC2026 team. "
-        "MUST be called whenever a national team is mentioned. "
-        "Accepts the FIFA three-letter code (e.g. 'FRA', 'BRA', 'ENG')."
-    ),
-)
-def navigate_to_team(
-    team_code: Annotated[
-        str,
-        Field(description="FIFA three-letter code of the team, e.g. 'FRA', 'BRA', 'ENG'."),
-    ],
-) -> str:
-    """Signal the frontend to display the specified team page."""
-    code = team_code.strip().upper()
-    team = _TEAMS_BY_CODE.get(code)
-    if team:
-        print(f"✅ navigate_to_team({code}) → {team['name']}")
-        return f"Navigated to {team['name']} ({code})"
-    return f"Team '{code}' not found, navigation skipped."
 
 
 @ai_function(
@@ -622,14 +544,12 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             ⚽ AUTO-BEHAVIOR — TEAM MENTIONED
             ═══════════════════════════════════════════════════════
             As soon as a national team is mentioned (by name, nickname, FIFA code, or flag):
-            1. IMMEDIATELY call `navigate_to_team` with the team's FIFA three-letter code
-            2. IMMEDIATELY call `update_team_info` with the same FIFA code
-            3. IMMEDIATELY call `get_team_matches` with the same FIFA code
-            4. Send your enthusiastic message IN THE SAME RESPONSE
+            1. IMMEDIATELY call `update_team_info` with the team's FIFA three-letter code
+            2. IMMEDIATELY call `get_team_matches` with the same FIFA code
+            3. Send your enthusiastic message IN THE SAME RESPONSE
 
-            CRITICAL: Always call `navigate_to_team` FIRST — this updates the page display.
-            Even if update_team_info or get_team_matches fail, navigate_to_team ensures
-            the user sees the correct team page.
+            CRITICAL: `update_team_info` updates the page display automatically.
+            ALWAYS call it for EVERY team mention — even when switching teams.
 
             Data available in the WC2026 database (use it as priority):
             - 48+ national teams with FIFA code, flag, coach, FIFA ranking, key players
@@ -642,9 +562,8 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             NEVER say "my database failed" or "tool feed failed" — the tools work.
             If a tool call fails, retry it once before giving up.
 
-            The `navigate_to_team` tool takes a single `team_code` string parameter (FIFA code like "FRA").
-            The `update_team_info` tool takes a single `team_code` string parameter (FIFA code).
-            The frontend will look up all the team data automatically.
+            The `update_team_info` tool takes a single `team_code` string parameter (FIFA code like "FRA").
+            The frontend will look up all the team data and navigate automatically.
 
             ═══════════════════════════════════════════════════════
             🔮 PROACTIVE COPA BEHAVIOR
@@ -684,8 +603,8 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             ═══════════════════════════════════════════════════════
             ⚡ CRITICAL RULES
             ═══════════════════════════════════════════════════════
-            1. ALWAYS call navigate_to_team + update_team_info + get_team_matches when a team is mentioned
-            2. navigate_to_team MUST be called for EVERY team mention (it controls the page)
+            1. ALWAYS call update_team_info + get_team_matches when a team is mentioned
+            2. update_team_info MUST be called for EVERY team mention (it controls the page)
             3. Function calls and text message in THE SAME RESPONSE (no separate turn)
             3. PASSIONATE messages, with emojis, Copa catchphrases
             4. Unexpected fun facts > plain stats
@@ -694,9 +613,8 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             7. "Show me team X", "Tell me about X", team names, FIFA codes → ALWAYS answer, NEVER refuse
             """.strip()
         ),
-        chat_client=_SanitizingChatClient(chat_client),
+        chat_client=chat_client,
         tools=[
-            navigate_to_team,
             update_team_info,
             get_team_matches,
             get_stadium_info,
