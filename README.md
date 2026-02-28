@@ -142,6 +142,7 @@ graph LR
 | Python | 3.12+ | [python.org](https://python.org) |
 | uv | latest | `pip install uv` |
 | API Key | Azure OpenAI or OpenAI | See Configuration below |
+| Azure CLI | latest (for `az login` auth) | `winget install Microsoft.AzureCLI` |
 
 ### 1. Clone & install
 
@@ -159,7 +160,7 @@ uv sync
 cd ..
 ```
 
-### 2. ⚙️ Configure the LLM API key
+### 2. ⚙️ Configure LLM authentication
 
 ```bash
 cp agent/.env.example agent/.env
@@ -167,7 +168,7 @@ cp agent/.env.example agent/.env
 
 Edit `agent/.env` with **one** of these options:
 
-#### Option A — Azure OpenAI with API key ✅ (recommended)
+#### Option A — Azure OpenAI with API key
 
 ```env
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
@@ -175,22 +176,54 @@ AZURE_OPENAI_API_KEY=your-api-key
 AZURE_OPENAI_CHAT_DEPLOYMENT_NAME=gpt-4o-mini
 ```
 
-> No `az login` needed — the API key is used directly.
+> Direct key auth — no `az login` needed.
 
-#### Option B — Azure OpenAI with Managed Identity
+#### Option B — Azure OpenAI with `az login` (no key needed) ✅ recommended
 
 ```env
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
 AZURE_OPENAI_CHAT_DEPLOYMENT_NAME=gpt-4o-mini
 ```
 
-> Without `AZURE_OPENAI_API_KEY`, the code uses `DefaultAzureCredential` (requires `az login` locally, Managed Identity in prod).
+Then authenticate:
+
+```bash
+az login
+```
+
+The code uses `DefaultAzureCredential` which picks up your `az login` session automatically.
+
+> ⚠️ **Required IAM role**: your Azure AD account must have **"Cognitive Services OpenAI User"** (or Contributor) on the Azure OpenAI resource. If you get 403 errors, add the role:
+>
+> Azure Portal → your OpenAI resource → **Access control (IAM)** → **Add role assignment** → "Cognitive Services OpenAI User" → assign to your account.
 
 #### Option C — OpenAI directly
 
 ```env
 OPENAI_API_KEY=sk-proj-...your-key...
 OPENAI_CHAT_MODEL_ID=gpt-4o-mini
+```
+
+#### How authentication works (`agent/src/main.py`)
+
+```mermaid
+flowchart TD
+    Start["_build_chat_client()"] --> CheckAzure{"AZURE_OPENAI_ENDPOINT<br/>set?"}
+    CheckAzure -->|Yes| CheckKey{"AZURE_OPENAI_API_KEY<br/>set?"}
+    CheckKey -->|Yes| KeyAuth["AzureKeyCredential<br/>(direct API key)"]
+    CheckKey -->|No| DefaultCred["DefaultAzureCredential<br/>(az login / Managed Identity)"]
+    CheckAzure -->|No| CheckOpenAI{"OPENAI_API_KEY<br/>set?"}
+    CheckOpenAI -->|Yes| OpenAI["OpenAIChatClient<br/>(OpenAI API)"]
+    CheckOpenAI -->|No| Error["❌ Error: no credentials"]
+    
+    KeyAuth --> Client["AzureOpenAIChatClient"]
+    DefaultCred --> Client
+    OpenAI --> ClientOAI["OpenAIChatClient"]
+
+    style KeyAuth fill:#0078d4,color:#fff
+    style DefaultCred fill:#10b981,color:#fff
+    style OpenAI fill:#6366f1,color:#fff
+    style Error fill:#dc2626,color:#fff
 ```
 
 ### 3. Run
@@ -318,7 +351,61 @@ This state is synchronized in real time between Python (`predict_state` + `STATE
 |---|---|---|
 | Frontend (SSR) | Azure Static Web Apps | Next.js hybrid rendering, API routes included |
 | Backend (API) | Azure Container Apps | Scale-to-zero, Docker, health check at `/healthz` |
-| LLM | Azure OpenAI | API key or Managed Identity |
+| LLM | Azure OpenAI | Managed Identity (zero secrets) |
+
+### Authentication in production: Managed Identity
+
+In production, **no API keys are needed**. The Container App authenticates to Azure OpenAI using its **System-Assigned Managed Identity** — zero secrets, zero rotation.
+
+```mermaid
+graph LR
+    subgraph "Local Dev"
+        Dev["💻 Developer"] -->|"az login"| DAC["DefaultAzureCredential<br/>(user token)"]
+    end
+
+    subgraph "Production (Azure)"
+        ACA2["🐳 Container App"] -->|"Managed Identity<br/>(automatic)"| DAC2["DefaultAzureCredential<br/>(MI token)"]
+    end
+
+    DAC -->|"same code path"| AOAI2["🧠 Azure OpenAI"]
+    DAC2 -->|"same code path"| AOAI2
+
+    style Dev fill:#f59e0b,color:#000
+    style ACA2 fill:#0078d4,color:#fff
+    style AOAI2 fill:#10b981,color:#fff
+```
+
+#### Setup steps for production
+
+```bash
+# 1. Enable System-Assigned Managed Identity on your Container App
+az containerapp identity assign \
+  --name <your-container-app> \
+  --resource-group <your-rg> \
+  --system-assigned
+
+# 2. Get the Managed Identity's principal ID
+PRINCIPAL_ID=$(az containerapp show \
+  --name <your-container-app> \
+  --resource-group <your-rg> \
+  --query identity.principalId -o tsv)
+
+# 3. Get your Azure OpenAI resource ID
+OPENAI_ID=$(az cognitiveservices account show \
+  --name <your-openai-resource> \
+  --resource-group <your-rg> \
+  --query id -o tsv)
+
+# 4. Assign the "Cognitive Services OpenAI User" role
+az role assignment create \
+  --role "Cognitive Services OpenAI User" \
+  --assignee $PRINCIPAL_ID \
+  --scope $OPENAI_ID
+```
+
+That's it. The Container App's `DefaultAzureCredential()` automatically picks up the Managed Identity token. **No `AZURE_OPENAI_API_KEY` env var needed in production.**
+
+> The same Python code works in both dev (`az login` token) and prod (Managed Identity token) — `DefaultAzureCredential` handles both transparently.
 
 ### One-click deploy (idempotent)
 
