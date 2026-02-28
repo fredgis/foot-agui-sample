@@ -920,13 +920,14 @@ function YourMainContent({
     description: "Switch frontend to the tournament bracket (knockout stage) view.",
     available: "disabled",
     parameters: [],
-    render: ({ status }) => {
-      if (status === "complete" && state.tournamentView !== "bracket") {
-        setState({ ...state, teamInfo: null, matches: [], selectedStadium: null, tournamentView: "bracket", highlightedCity: null });
-      }
-      return <div className="p-2 text-sm">🏆 {status === "inProgress" ? "Loading bracket..." : "Bracket view activated!"}</div>;
+    handler: async () => {
+      setState({ teamInfo: null, matches: [], selectedStadium: null, tournamentView: "bracket", highlightedCity: null });
+      return "Bracket view activated";
     },
-  }, [state, setState]);
+    render: ({ status }) => (
+      <div className="p-2 text-sm">🏆 {status === "inProgress" ? "Loading bracket..." : "Bracket view activated!"}</div>
+    ),
+  }, [setState]);
 
   // 🌍 Frontend handler: get_group_standings → switch UI to group view
   useCopilotAction({
@@ -936,13 +937,14 @@ function YourMainContent({
     parameters: [
       { name: "group", type: "string", description: "Group letter A–L", required: true },
     ],
-    render: ({ status }) => {
-      if (status === "complete" && state.tournamentView !== "group") {
-        setState({ ...state, teamInfo: null, matches: [], selectedStadium: null, tournamentView: "group", highlightedCity: null });
-      }
-      return <div className="p-2 text-sm">🌍 {status === "inProgress" ? "Loading groups..." : "Group view activated!"}</div>;
+    handler: async () => {
+      setState({ teamInfo: null, matches: [], selectedStadium: null, tournamentView: "group", highlightedCity: null });
+      return "Group view activated";
     },
-  }, [state, setState]);
+    render: ({ status }) => (
+      <div className="p-2 text-sm">🌍 {status === "inProgress" ? "Loading groups..." : "Group view activated!"}</div>
+    ),
+  }, [setState]);
 
   // 📅 Match click → highlight city on map
   function handleMatchClick(match: MatchInfo) {
