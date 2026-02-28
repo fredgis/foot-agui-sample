@@ -10,9 +10,9 @@ import { VenueMap } from "@/components/venue-map";
 import { AgentState, Confederation, MatchInfo, MatchPhase, StadiumInfo } from "@/lib/types";
 import { stadiums as allStadiums, groups, matches, teams } from "@/lib/worldcup-data";
 import { FlagImg, getFlagUrl } from "@/lib/flags";
-import { useCoAgent, useCopilotAction, useCopilotChat, useCopilotMessagesContext } from "@copilotkit/react-core";
+import { useCoAgent, useCopilotAction, useCopilotChat, useCopilotMessagesContext, useCopilotReadable } from "@copilotkit/react-core";
 import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
-import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar } from "@copilotkit/react-ui";
+import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
 // ── Mobile detection ──────────────────────────────────────────────────────────
@@ -645,6 +645,44 @@ function YourMainContent({
   const [activeTab, setActiveTab] = useState<MobileTab>("team");
   const [selectedPhase, setSelectedPhase] = useState<MatchPhase | null>(null);
 
+  // 📖 AG-UI: Provide app context to the agent via useCopilotReadable
+  const currentTeamSummary = useMemo(() => {
+    if (!state.teamInfo) return "No team selected. User is on the welcome screen.";
+    const t = state.teamInfo;
+    const group = groups.find((g) => g.teams.includes(t.fifaCode));
+    const teamMatches = state.matches
+      .filter((m) => m.phase === "group")
+      .map((m) => `${m.homeTeam} vs ${m.awayTeam} on ${m.date} at ${m.stadiumName}`)
+      .join("; ");
+    return `Currently viewing: ${t.name} (${t.fifaCode}), Group ${group?.name ?? "?"}, Ranking #${t.fifaRanking}, Coach: ${t.coach}. Group matches: ${teamMatches}`;
+  }, [state.teamInfo, state.matches]);
+
+  useCopilotReadable({
+    description: "Current WC2026 app state — which team the user is viewing",
+    value: currentTeamSummary,
+  });
+
+  // 💡 AG-UI: Dynamic chat suggestions based on current state
+  const suggestionsContext = useMemo(() => {
+    if (!state.teamInfo) {
+      return "The user is on the welcome screen. Suggest asking about a specific team (e.g. 'Show me Brazil', 'Tell me about France'), viewing the tournament bracket, or comparing two teams.";
+    }
+    const t = state.teamInfo;
+    const group = groups.find((g) => g.teams.includes(t.fifaCode));
+    const opponents = group?.teams.filter((c) => c !== t.fifaCode) ?? [];
+    const firstMatch = state.matches.find((m) => m.phase === "group");
+    const firstOpponent = firstMatch
+      ? (firstMatch.homeTeam === t.fifaCode ? firstMatch.awayTeam : firstMatch.homeTeam)
+      : opponents[0];
+    return `The user is viewing ${t.name} (${t.fifaCode}) in Group ${group?.name ?? "?"}. Suggest: comparing with opponent '${firstOpponent}', showing Group ${group?.name} standings, asking about their stadium, or switching to another popular team. Keep suggestions short and football-focused.`;
+  }, [state.teamInfo, state.matches]);
+
+  useCopilotChatSuggestions({
+    instructions: suggestionsContext,
+    minSuggestions: 2,
+    maxSuggestions: 3,
+  }, [suggestionsContext]);
+
   // Known FIFA codes for team detection
   const fifaCodesSet = useRef(new Set(teams.map((t) => t.fifaCode)));
 
@@ -813,6 +851,66 @@ function YourMainContent({
       return JSON.stringify({ team, matches: teamMatches });
     },
   }, [setState]);
+
+  // 🏟️ Generative UI: render rich stadium card in chat when agent calls get_stadium_info
+  useCopilotAction({
+    name: "get_stadium_info",
+    description: "Show details about a WC2026 host stadium.",
+    available: "disabled",
+    parameters: [
+      { name: "stadium_name", type: "string", description: "Stadium name", required: true },
+    ],
+    render: ({ args, status }) => {
+      const stadium = allStadiums.find(
+        (s) => s.name.toLowerCase().includes((args.stadium_name ?? "").toLowerCase())
+      );
+      if (!stadium) return <div className="p-2 text-sm opacity-60">Looking up stadium…</div>;
+      return (
+        <div className="rounded-lg border p-3 my-2 text-sm" style={{ borderColor: themeColor }}>
+          <div className="font-bold text-base">🏟️ {stadium.name}</div>
+          <div className="opacity-80">{stadium.city}, {stadium.country} • Capacity: {stadium.capacity.toLocaleString()}</div>
+          {stadium.description && <div className="mt-1 italic opacity-70">{stadium.description}</div>}
+          {status === "inProgress" && <div className="mt-1 animate-pulse text-xs opacity-50">Loading details…</div>}
+        </div>
+      );
+    },
+  }, [themeColor]);
+
+  // 🆚 Generative UI: render comparison card when agent calls compare_teams
+  useCopilotAction({
+    name: "compare_teams",
+    description: "Compare two national teams side by side.",
+    available: "disabled",
+    parameters: [
+      { name: "team_a", type: "string", description: "First team FIFA code", required: true },
+      { name: "team_b", type: "string", description: "Second team FIFA code", required: true },
+    ],
+    render: ({ args, status }) => {
+      const a = teams.find((t) => t.fifaCode === (args.team_a ?? "").toUpperCase());
+      const b = teams.find((t) => t.fifaCode === (args.team_b ?? "").toUpperCase());
+      if (!a || !b) return <div className="p-2 text-sm opacity-60">Loading comparison…</div>;
+      return (
+        <div className="rounded-lg border p-3 my-2 text-sm">
+          <div className="font-bold text-base mb-2">⚔️ {a.name} vs {b.name}</div>
+          <div className="grid grid-cols-3 gap-1 text-center text-xs">
+            <div className="font-semibold">{a.flag} {a.fifaCode}</div>
+            <div className="opacity-50">vs</div>
+            <div className="font-semibold">{b.flag} {b.fifaCode}</div>
+            <div>#{a.fifaRanking}</div>
+            <div className="opacity-50">Ranking</div>
+            <div>#{b.fifaRanking}</div>
+            <div>{a.worldCupHistory.titles}🏆</div>
+            <div className="opacity-50">Titles</div>
+            <div>{b.worldCupHistory.titles}🏆</div>
+            <div>{a.coach}</div>
+            <div className="opacity-50">Coach</div>
+            <div>{b.coach}</div>
+          </div>
+          {status === "inProgress" && <div className="mt-1 animate-pulse text-xs opacity-50">Analyzing matchup…</div>}
+        </div>
+      );
+    },
+  }, []);
 
   // 📅 Match click → highlight city on map
   function handleMatchClick(match: MatchInfo) {
