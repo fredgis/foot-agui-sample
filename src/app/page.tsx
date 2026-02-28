@@ -9,7 +9,7 @@ import { MoonCard } from "@/components/moon";
 import { VenueMap } from "@/components/venue-map";
 import { AgentState, Confederation, MatchInfo, MatchPhase, StadiumInfo } from "@/lib/types";
 import { stadiums as allStadiums, groups, matches, teams } from "@/lib/worldcup-data";
-import { FlagImg } from "@/lib/flags";
+import { FlagImg, getFlagUrl } from "@/lib/flags";
 import { useCoAgent, useCopilotAction, useCopilotChat } from "@copilotkit/react-core";
 import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar } from "@copilotkit/react-ui";
@@ -208,36 +208,46 @@ function WelcomeScreen({
           <h2 style={{ fontSize: "0.875rem", fontWeight: 700, color: "#d1d5db", marginBottom: "0.75rem" }}>
             ⭐ Favoris du tournoi
           </h2>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+          <div className="flex flex-wrap gap-3 justify-center">
             {favorites.map((team, i) => (
               <button
                 key={team.fifaCode}
                 onClick={() => onTeamClick?.(team.fifaCode)}
                 className="stagger-item"
                 style={{
-                  background: `linear-gradient(135deg, ${team.primaryColor}25, ${team.primaryColor}10)`,
+                  background: `linear-gradient(135deg, ${team.primaryColor}30, ${team.primaryColor}12)`,
                   border: `2px solid ${team.primaryColor}70`,
-                  borderRadius: "1rem",
-                  padding: "0.75rem 0.5rem",
+                  borderRadius: "2rem",
+                  padding: "0.5rem 1.2rem 0.5rem 0.5rem",
                   cursor: "pointer",
                   transition: "all 0.25s ease",
                   animationDelay: `${i * 0.08}s`,
-                  textAlign: "center",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.6rem",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.08)";
-                  (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 4px 20px ${team.primaryColor}60`;
+                  (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.06) translateY(-2px)";
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 6px 24px ${team.primaryColor}50`;
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLButtonElement).style.transform = "";
                   (e.currentTarget as HTMLButtonElement).style.boxShadow = "";
                 }}
               >
-                <FlagImg fifaCode={team.fifaCode} width={48} height={32} style={{ borderRadius: "4px", margin: "0 auto 0.3rem", display: "block", boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }} />
-                <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "white", lineHeight: 1.2 }}>
-                  {team.name}
+                <img
+                  src={getFlagUrl(team.fifaCode, 80)}
+                  alt=""
+                  width={36}
+                  height={24}
+                  style={{ borderRadius: "4px", boxShadow: "0 2px 8px rgba(0,0,0,0.4)", flexShrink: 0 }}
+                />
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "white", lineHeight: 1.1 }}>
+                    {team.name}
+                  </div>
+                  <div style={{ fontSize: "0.6rem", color: "#9ca3af" }}>#{team.fifaRanking} FIFA</div>
                 </div>
-                <div style={{ fontSize: "0.65rem", color: "#9ca3af" }}>#{team.fifaRanking}</div>
               </button>
             ))}
           </div>
