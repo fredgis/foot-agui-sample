@@ -135,16 +135,39 @@ import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
 
 Quand l'utilisateur mentionne une équipe (ex: « Parle-moi de la France »), l'interface se transforme dynamiquement :
 
-- 🎨 **Thème dynamique** — Le thème complet passe aux couleurs de l'équipe (bleu-blanc-rouge pour la France)
+- 🎨 **Thème dynamique** — Le thème complet passe aux couleurs de l'équipe avec **color morph** animé (CSS transition sur les variables)
 - 🏟️ **Carte d'identité** — Drapeau, confédération, classement FIFA, sélectionneur, joueurs stars
 - 📅 **Calendrier des matchs** — Dates, adversaires, stades, compte à rebours
 - 📍 **Carte interactive** — Les 16 villes hôtes avec les stades où l'équipe joue en surbrillance
 - 🏆 **Vue du groupe** — Les 4 équipes du groupe avec le calendrier croisé
 - 📊 **Bracket du tournoi** — L'arbre complet avec la branche de l'équipe mise en avant
 - 🌦️ **Météo enrichie** — Météo des villes de match contextualisée
-- 🎙️ **Mode commentateur** — L'agent a une personnalité de commentateur sportif passionné
+- 🎙️ **Agent « Copa »** — Un vrai personnage avec nom, tics de langage, et adaptation linguistique par équipe
+- ⏳ **Loading progressif** — Skeleton loaders + staggered reveal (TeamCard d'abord, puis matchs en cascade, puis carte)
+- 🔗 **Composants interconnectés** — Clic sur un match → highlight stade + météo ; clic adversaire → compare_teams automatique
+- 🔄 **Transitions fluides** — Fade-out/slide-in au changement d'équipe, animation de déplacement sur la carte
 
-### Layout Dynamique (Team Active)
+### Layout Dynamique — Mobile-First
+
+**Mobile** (prioritaire — majorité du trafic World Cup) :
+
+```
+┌────────────────────────────┐
+│  🏆 TeamCard (collapsible) │
+├────────────────────────────┤
+│  [Matchs] [Carte] [Groupe] │  ← Tabs navigation
+├────────────────────────────┤
+│                            │
+│   Contenu du tab actif     │
+│   (MatchSchedule OU        │
+│    VenueMap OU GroupView)  │
+│                            │
+├────────────────────────────┤
+│  💬 Chat toggle (bottom)   │  ← Bouton flottant → chat plein écran
+└────────────────────────────┘
+```
+
+**Desktop** :
 
 ```
 ┌──────────────────────────────────┬────────────────┐
@@ -152,10 +175,10 @@ Quand l'utilisateur mentionne une équipe (ex: « Parle-moi de la France »), l'
 │   TeamCard (WS3) — Haut         │   CopilotKit   │
 │                                  │   Sidebar      │
 ├──────────────┬───────────────────│   Chat         │
-│              │                   │   (commentateur│
-│ MatchSchedule│   VenueMap (WS5)  │    sportif)   │
-│   (WS4)      │                   │                │
-│              │                   │                │
+│              │                   │   (Copa 🎙️)   │
+│ MatchSchedule│   VenueMap (WS5)  │                │
+│   (WS4)      │                   │   Suggestions  │
+│              │                   │   proactives   │
 ├──────────────┴───────────────────│                │
 │                                  │                │
 │  GroupView / TournamentBracket   │                │
@@ -421,11 +444,26 @@ PREDICT_STATE_CONFIG = {
 }
 ```
 
-### Nouveau System Prompt
+### Nouveau System Prompt — Agent « Copa » 🎙️
 
-- **Personnalité** : Commentateur sportif passionné, expert tactique
-- **Langue** : Répond en français par défaut, supporte anglais et espagnol
+L'agent a une **vraie identité** :
+
+- **Nom** : « Copa » — guide officieux de la World Cup 2026
+- **Personnalité** : Commentateur sportif passionné, expert tactique, chaleureux
+- **Tics de langage** : « *Et c'est le but !* », « *Quelle équipe !* », « *Attention, ça va être du lourd...* »
+- **Langue** : Français par défaut, mais **s'adapte à l'équipe** :
+  - France → français pur : « *Allez les Bleus !* »
+  - Brésil → mots portugais : « *A Seleção, que saudade do jogo bonito !* »
+  - Angleterre → anglais : « *It's coming home!* »
+  - Argentine → espagnol : « *¡Vamos la Albiceleste!* »
+  - Retour au français pour l'explication détaillée
+- **Comportement proactif** (CRITIQUE pour l'immersion) :
+  - Après avoir parlé d'une équipe → suggère l'adversaire du 1er match : « *Tu veux voir leur adversaire du 11 juin, le Mexique ? 🇲🇽* »
+  - Après un `compare_teams` → rebondit : « *Ils se croisent en poule le 15 juin à Dallas — je te montre le stade ?* »
+  - En fin de conversation → propose : « *Tu veux que je te fasse le pronostic de leur parcours dans le tournoi ?* »
+  - Utilise les `suggestions` CopilotKit pour afficher des boutons de relance dans le chat
 - **Comportement automatique** : Appelle TOUJOURS `update_team_info` + `get_team_matches` quand une équipe est mentionnée
+- **Anecdotes** : Pas juste des stats — des histoires inattendues sur les stades, les villes, les joueurs
 - **Restriction** : UNIQUEMENT la Coupe du Monde 2026 et le football (décline poliment les autres sujets)
 
 ### Fichier inchangé
@@ -438,7 +476,9 @@ PREDICT_STATE_CONFIG = {
 - [ ] Les 8 `@ai_function` sont implémentées et fonctionnelles
 - [ ] L'agent répond correctement quand on mentionne une équipe (appel automatique)
 - [ ] Le `PREDICT_STATE_CONFIG` synchronise correctement le state frontend
-- [ ] Le system prompt est centré World Cup 2026
+- [ ] Le system prompt donne à l'agent l'identité « Copa » avec tics de langage
+- [ ] L'agent est **proactif** : suggère l'adversaire, le stade, le pronostic après chaque réponse
+- [ ] L'agent **adapte sa langue** aux couleurs de l'équipe mentionnée (mots portugais pour le Brésil, etc.)
 - [ ] L'agent refuse poliment les sujets hors football/WC2026
 - [ ] `agent/src/main.py` reste fonctionnel avec Azure OpenAI
 
@@ -464,10 +504,12 @@ Remplacer `ClubInfoCard` (`src/components/clubinfo.tsx`) par un composant immers
   - Groupe WC2026
   - Titres World Cup
   - Participations World Cup
-- **Section « Stars »** : 5 joueurs clés avec nom, poste, club — style cartes de joueur
+- **Section « Stars »** : 5 joueurs clés avec nom, poste, club — style cartes de joueur avec hover → mini-popup stats
 - **Section « Historique WC »** : frise des participations passées avec le meilleur résultat en highlight
 - **Thème dynamique** : toute la card prend `primaryColor` / `secondaryColor` de l'équipe
-- **Animations** : `slideIn 0.6s ease-out` à l'apparition, transition fluide au changement d'équipe
+- **Skeleton loader** : quand `team` est en cours de chargement, afficher un squelette animé (pulsing gray blocks) à la place des données — donne la sensation que l'agent construit l'expérience en temps réel
+- **Transition inter-équipes** : fade-out (300ms) de l'ancienne card → slide-in (400ms) de la nouvelle avec color morph progressif
+- **Animations** : `slideIn 0.6s ease-out` à l'apparition, staggered reveal des sections (header → stats → stars → historique)
 
 ### Props
 
@@ -507,7 +549,11 @@ interface TeamCardProps {
   - Badge de phase (Groupe, R32, R16, QF, SF, Final) avec couleur
 - **Compte à rebours** « Dans X jours » pour les matchs futurs (basé sur la date du 11 juin 2026)
 - **Séparateurs visuels** entre phase de groupe et phases à élimination directe
-- **Interaction** : clic sur un match → envoie `highlightedCity` au state AG-UI pour synchroniser la carte (WS5)
+- **Skeleton loader** : les matchs apparaissent un par un en cascade (staggered 100ms) quand le state AG-UI les reçoit
+- **Interactions cross-composants** (via state AG-UI partagé) :
+  - Clic sur un match → envoie `highlightedCity` au state → highlight du stade sur la carte (WS5) + affiche la météo
+  - Clic sur le drapeau adversaire → l'agent lance automatiquement un `compare_teams` dans le chat
+  - Hover sur le nom du stade → tooltip avec capacité + photo/icône
 - **Animations** : apparition progressive au scroll (staggered animation)
 
 ### Props
@@ -518,6 +564,7 @@ interface MatchScheduleProps {
   teamCode: string;
   themeColor: string;
   onMatchClick?: (match: MatchInfo) => void;
+  onOpponentClick?: (opponentCode: string) => void;  // → déclenche compare_teams
 }
 ```
 
@@ -526,9 +573,11 @@ interface MatchScheduleProps {
 - [ ] Affiche correctement tous les matchs d'une équipe
 - [ ] Le compte à rebours est fonctionnel
 - [ ] Les badges de phase sont correctement colorés
-- [ ] Le clic sur un match émet un event (pour WS5/WS7)
+- [ ] Le clic sur un match highlight le stade sur la carte (cross-composant)
+- [ ] Le clic sur un adversaire déclenche une interaction agent
 - [ ] Les séparateurs entre phases sont visibles
-- [ ] Responsive
+- [ ] Skeleton loader avec staggered reveal fonctionne
+- [ ] Responsive (stack vertical sur mobile)
 
 ---
 
@@ -549,6 +598,11 @@ interface MatchScheduleProps {
 - **Tooltip au hover** : nom du stade, capacité, date du prochain match
 - **Mini-card au clic** : icône du stade + infos détaillées + lien vers la météo
 - **3 zones visuelles** : USA (11 villes), Canada (2), Mexique (3) avec séparation légère
+- **Interactions cross-composants** (via state AG-UI partagé) :
+  - Réagit au `highlightedCity` envoyé par MatchSchedule (WS4) — zoom + pulse sur le stade concerné
+  - Clic sur un stade → scroll automatique vers le match dans MatchSchedule + l'agent déclenche `get_stadium_info`
+  - **Animation de voyage** : quand on change d'équipe, les highlights se déplacent en animation du parcours de l'ancienne équipe vers la nouvelle
+- **Transition inter-équipes** : les pins de l'ancienne équipe fade-out, ceux de la nouvelle pulse-in avec la nouvelle couleur
 
 ### Villes hôtes (16)
 
@@ -577,6 +631,9 @@ interface VenueMapProps {
 - [ ] Le highlight dynamique fonctionne quand une équipe est sélectionnée
 - [ ] Les tooltips s'affichent au hover
 - [ ] Les lignes de parcours d'équipe se dessinent
+- [ ] Réagit au `highlightedCity` provenant de MatchSchedule (cross-composant)
+- [ ] Le clic sur un stade déclenche une interaction avec l'agent
+- [ ] Transition animée au changement d'équipe
 - [ ] Responsive
 
 ---
@@ -599,12 +656,14 @@ interface VenueMapProps {
 - **Highlight du groupe de l'équipe sélectionnée** (bordure + glow aux couleurs de l'équipe)
 - Mini-calendrier des 6 matchs du groupe intégré
 - Clic sur un groupe → zoom/expand pour voir les détails
+- **Interaction cross-composant** : clic sur une autre équipe du groupe → l'agent lance `compare_teams` automatiquement dans le chat
 
 ### TournamentBracket UX
 
 - **Arbre SVG complet** : R32 → R16 → QF → SF → 3e place → Finale
 - **Bracket interactif** : la branche de l'équipe sélectionnée est mise en surbrillance
 - Animation de révélation progressive (de gauche à droite)
+- **Interaction cross-composant** : clic sur une phase → filtre MatchSchedule (WS4) pour ne montrer que cette phase
 - Responsive : scroll horizontal sur mobile
 
 ### Props
@@ -616,6 +675,7 @@ interface GroupViewProps {
   selectedTeamCode?: string;
   themeColor: string;
   onGroupClick?: (group: GroupInfo) => void;
+  onTeamClick?: (teamCode: string) => void;  // → déclenche compare_teams ou switch équipe
 }
 
 // tournament-bracket.tsx
@@ -623,6 +683,7 @@ interface TournamentBracketProps {
   matches: MatchInfo[];
   selectedTeamCode?: string;
   themeColor: string;
+  onPhaseClick?: (phase: MatchPhase) => void;  // → filtre MatchSchedule
 }
 ```
 
@@ -630,8 +691,10 @@ interface TournamentBracketProps {
 
 - [ ] Les 12 groupes s'affichent correctement
 - [ ] Le highlight de groupe fonctionne
+- [ ] Clic sur une équipe du groupe déclenche une interaction agent
 - [ ] Le bracket du tournoi est complet et lisible
 - [ ] La surbrillance de branche fonctionne
+- [ ] Clic sur une phase filtre les matchs (cross-composant)
 - [ ] Les deux composants sont responsive
 
 ---
@@ -646,11 +709,22 @@ interface TournamentBracketProps {
 
 ### Welcome Screen World Cup 2026
 
-- Logo/branding WC 2026 avec les 3 drapeaux 🇺🇸🇲🇽🇨🇦
-- **Compte à rebours dynamique** jusqu'au 11 juin 2026 (ouverture)
-- **Grille des 48 équipes** qualifiées avec drapeaux cliquables (envoie au chat)
-- Section « Favoris » : France, Brésil, Argentine, Allemagne, Angleterre, USA...
-- Suggestions de questions : « Parle-moi de la France », « Compare Brésil vs Argentine », « Montre-moi le stade de Dallas »
+- **Héro visuel** : compte à rebours géant animé (jours / heures / minutes / secondes) jusqu'au 11 juin 2026 avec les 3 drapeaux hôtes 🇺🇸🇲🇽🇨🇦 en rotation lente
+- **Barre de recherche/filtre** en haut — taper « Fr... » filtre les équipes en temps réel avec auto-complete
+- **48 équipes regroupées par confédération** (pas une grille plate) :
+  - UEFA 🇪🇺 (16 équipes), CONMEBOL 🌎 (6), CAF 🌍 (9), AFC 🌏 (8), CONCACAF 🌎 (6), OFC 🌊 (1+2 barrages)
+  - Chaque section avec header coloré + drapeaux animés en cascade (staggered 50ms)
+- Section **« Favoris du tournoi »** en haut : France, Brésil, Argentine, Allemagne, Angleterre, USA — cartes plus grandes avec mini-stats
+- **Suggestions de Copa** : bulles de chat pré-remplies « Parle-moi de la France 🇫🇷 », « Compare Brésil vs Argentine 🔥 », « Montre-moi le stade de Dallas 🏟️ »
+- **Transition welcome → team view** : le compte à rebours shrink en haut, la grille d'équipes fait un slide-down, les composants team apparaissent en staggered reveal
+
+### Layout Mobile-First
+
+**Principe** : la sidebar `CopilotSidebar` avec `defaultOpen={true}` écrase tout sur mobile. Solution :
+- **Mobile** : chat en mode **popover/bottom-sheet** (bouton flottant 💬 en bas à droite → overlay plein écran)
+- **Desktop** : sidebar classique à droite (comportement actuel)
+- Composants en **tabs navigables** sur mobile (Matchs | Carte | Groupe | Bracket)
+- TeamCard **collapsible** sur mobile (header toujours visible, contenu toggle)
 
 ### Intégration CopilotKit + CoAgent
 
@@ -682,24 +756,40 @@ useCopilotAction({
   name: "get_stadium_info",
   // ... render StadiumCard
 });
+
+// Suggestions proactives de Copa (après chaque réponse)
+useCopilotAction({
+  name: "suggest_next",
+  description: "Copa suggests what to explore next",
+  // ... affiche des boutons de suggestion dans le chat
+});
 ```
 
 ### Refonte `globals.css`
 
-- **Animations** : `slideIn`, `fadeIn`, `pulse`, `glow`, `staggeredReveal`
+- **Animations** : `slideIn`, `fadeIn`, `pulse`, `glow`, `staggeredReveal`, `colorMorph`
 - **Thème sombre** par défaut avec gradient WC2026 (bleu foncé → violet)
 - **CSS variables dynamiques** pour les couleurs d'équipe via le state
-- Sidebar chat : personnalité commentateur sportif
+- **Color morph transition** : `transition: --copilot-kit-primary-color 0.6s ease` pour les changements d'équipe fluides
+- **Skeleton loaders** : classes utilitaires `.skeleton-pulse` pour le loading progressif
+- Sidebar chat : personnalité Copa avec avatar custom
+- **Media queries** : breakpoints mobile-first (`min-width: 768px` pour desktop)
 
 ### Critères d'acceptation
 
-- [ ] Le Welcome Screen s'affiche avec le compte à rebours
+- [ ] Le Welcome Screen s'affiche avec le compte à rebours héro animé
+- [ ] La recherche/filtre d'équipes fonctionne en temps réel
+- [ ] Les 48 équipes sont regroupées par confédération avec animations staggered
 - [ ] La grille des 48 équipes est interactive
 - [ ] Le layout dynamique se transforme quand une équipe est active
 - [ ] Tous les composants (WS3-WS6) sont correctement intégrés
-- [ ] Le thème CopilotKit change dynamiquement avec l'équipe
-- [ ] La transition welcome → team view est fluide
+- [ ] Les interactions cross-composants fonctionnent (match→carte, adversaire→compare, phase→filtre)
+- [ ] Le thème CopilotKit change dynamiquement avec color morph fluide
+- [ ] La transition welcome → team view est fluide (shrink + slide + staggered)
+- [ ] La transition inter-équipes est animée (fade-out → color morph → slide-in)
 - [ ] Le state AG-UI est correctement synchronisé
+- [ ] **Mobile** : chat en popover, composants en tabs, TeamCard collapsible
+- [ ] **Desktop** : layout grille avec sidebar
 
 ---
 
@@ -1407,14 +1497,19 @@ WS9 1-CLICK                                                             │ Depl
 
 | Idée | Description |
 |------|-------------|
-| 🎙️ Mode Commentateur Live | L'agent génère un commentaire fictif d'un match à venir |
-| 🆚 Comparateur d'équipes | « Compare France vs Brazil » → card comparative côte à côte |
+| 🎙️ Mode Commentateur Live | Copa génère un commentaire fictif d'un match à venir en temps réel |
 | 🎫 Fan Zone Guide | Infos pratiques par ville (visa, transport, hébergement, zones de fans) |
-| 📱 Mode Mobile | Layout responsive en accordion/tabs |
 | 🔔 Notifications Countdown | « Le prochain match de la France est dans X jours à Dallas ! » |
-| 🌐 Multi-langue | FR/EN/ES (3 pays hôtes) |
-| 🗳️ Pronostics | L'utilisateur peut pronostiquer les matchs (human-in-the-loop) |
-| 📈 Stats avancées | Graphiques radar de comparaison d'équipes |
+| 🗳️ Pronostics | L'utilisateur peut pronostiquer les matchs (human-in-the-loop style go_to_moon) |
+| 📈 Stats avancées | Graphiques radar de comparaison d'équipes (Chart.js / Recharts) |
+| 🔊 Sound design | Sons subtils au changement d'équipe, au countdown, au clic sur un match |
+| 🌙 Light/Dark toggle | Option de basculer entre thème sombre (défaut) et clair |
+| 📤 Partage social | Bouton « Partager cette équipe » → lien direct vers la vue d'une équipe |
+
+> **Note** : Les éléments suivants étaient précédemment en « bonus » et sont maintenant **intégrés au plan core** :
+> - ✅ 🆚 Comparateur d'équipes → intégré dans WS2 (`compare_teams`) + WS4/WS6 (clic adversaire)
+> - ✅ 📱 Mode Mobile → intégré dans WS7 (layout mobile-first)
+> - ✅ 🌐 Multi-langue (adaptation par équipe) → intégré dans WS2 (system prompt Copa)
 
 ---
 
