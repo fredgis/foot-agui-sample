@@ -2,10 +2,13 @@
 
 import { ClubInfoCard } from "@/components/clubinfo";
 import { TeamCard } from "@/components/team-card";
+import { MatchSchedule } from "@/components/match-schedule";
 import { WeatherCard } from "@/components/weather";
 import { MoonCard } from "@/components/moon";
-import { AgentState } from "@/lib/types";
-import { useCoAgent, useCopilotAction } from "@copilotkit/react-core";
+import { AgentState, MatchInfo } from "@/lib/types";
+import { stadiums } from "@/lib/worldcup-data";
+import { useCoAgent, useCopilotAction, useCopilotChat } from "@copilotkit/react-core";
+import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
 import { useState, useEffect } from "react";
 
@@ -237,6 +240,9 @@ function YourMainContent({
     }
   }, [state.teamInfo, setThemeColor, setSecondaryColor, setClubName, setCountryFlag]);
 
+  // 💬 Chat hook to send programmatic messages (compare_teams trigger)
+  const { appendMessage } = useCopilotChat();
+
   //🪁 Generative UI: https://docs.copilotkit.ai/microsoft-agent-framework/generative-ui
   useCopilotAction({
     name: "get_weather",
@@ -290,6 +296,27 @@ function YourMainContent({
       }
     },
   }, [setThemeColor, setSecondaryColor, setClubName, setClubLogo, setBackgroundImage, setCountryFlag, setState]);
+
+  // 📅 Handler: match click → highlight city on map via shared state
+  function handleMatchClick(match: MatchInfo) {
+    const stadiumDetails = stadiums.find((s) => s.name === match.stadiumName);
+    if (stadiumDetails) {
+      setState({ ...state, highlightedCity: stadiumDetails.city });
+    }
+  }
+
+  // 🆚 Handler: opponent flag click → trigger compare_teams in chat
+  function handleOpponentClick(opponentCode: string) {
+    const teamCode = state.teamInfo?.fifaCode ?? "";
+    if (teamCode) {
+      appendMessage(
+        new TextMessage({
+          role: MessageRole.User,
+          content: `Compare the teams: ${teamCode} vs ${opponentCode}`,
+        })
+      );
+    }
+  }
 
   return (
     <div
@@ -451,9 +478,33 @@ function YourMainContent({
       {/* Carte des infos du club OU Page d'accueil attractive */}
       <div style={{ position: 'relative', zIndex: 10, width: '90%', maxWidth: '1400px', marginTop: clubName ? '200px' : '0' }}>
         {state.teamInfo ? (
-          <TeamCard team={state.teamInfo} themeColor={themeColor} secondaryColor={secondaryColor} />
-        ) : clubName ? (
-          <ClubInfoCard clubData={null} themeColor={themeColor} />
+          <div className="flex flex-col lg:flex-row gap-6 items-start w-full">
+            <div className="flex-1 min-w-0">
+              <TeamCard team={state.teamInfo} themeColor={themeColor} secondaryColor={secondaryColor} />
+            </div>
+            {(state.matches.length > 0) && (
+              <div
+                className="w-full lg:w-80 shrink-0"
+                style={{
+                  background: "rgba(255,255,255,0.08)",
+                  backdropFilter: "blur(12px)",
+                  borderRadius: "1rem",
+                  padding: "1.25rem",
+                  border: `1px solid ${themeColor}30`,
+                  maxHeight: "80vh",
+                  overflowY: "auto",
+                }}
+              >
+                <MatchSchedule
+                  matches={state.matches}
+                  teamCode={state.teamInfo?.fifaCode ?? ""}
+                  themeColor={themeColor}
+                  onMatchClick={handleMatchClick}
+                  onOpponentClick={handleOpponentClick}
+                />
+              </div>
+            )}
+          </div>
         ) : (
           <WelcomeScreen />
         )}
