@@ -52,6 +52,233 @@ dependencies = [
 
 ## 🏗️ Architecture Technique
 
+### Schéma d'Architecture Global
+
+```mermaid
+graph TB
+    subgraph USER["🧑 Utilisateur"]
+        BROWSER["🌐 Navigateur<br/>(Desktop / Mobile)"]
+    end
+
+    subgraph AZURE_SWA["☁️ Azure Static Web Apps"]
+        subgraph NEXTJS["⚛️ Next.js 16 (SSR Hybrid)"]
+            LAYOUT["layout.tsx<br/>CopilotKit Provider"]
+            PAGE["page.tsx<br/>Orchestration WS7"]
+            API_ROUTE["API Route<br/>/api/copilotkit<br/>CopilotRuntime + HttpAgent"]
+            
+            subgraph COMPONENTS["📦 Composants React"]
+                SIDEBAR["💬 CopilotSidebar<br/>(Copa 🎙️)"]
+                TEAMCARD["🏟️ TeamCard<br/>WS3"]
+                MATCHSCHED["📅 MatchSchedule<br/>WS4"]
+                VENUEMAP["📍 VenueMap<br/>WS5"]
+                GROUPVIEW["🏆 GroupView<br/>WS6"]
+                BRACKET["📊 TournamentBracket<br/>WS6"]
+            end
+
+            subgraph HOOKS["🪝 CopilotKit Hooks"]
+                USECOAGENT["useCoAgent&lt;AgentState&gt;<br/>State bidirectionnel"]
+                USEACTION["useCopilotAction<br/>Generative UI"]
+                USECONTEXT["useCopilotContext<br/>State global"]
+            end
+
+            subgraph DATA_FE["📚 Données Frontend"]
+                TYPES["types.ts<br/>Types World Cup 2026"]
+                WCDATA["worldcup-data.ts<br/>48 équipes, 16 stades,<br/>12 groupes, 104 matchs"]
+            end
+        end
+    end
+
+    subgraph AZURE_CA["☁️ Azure Container Apps (scale-to-zero)"]
+        subgraph FASTAPI["🐍 FastAPI (Python 3.12)"]
+            MAIN["main.py<br/>_build_chat_client()<br/>AG-UI endpoint"]
+            AGENT["agent.py<br/>Copa Agent 🎙️<br/>STATE_SCHEMA<br/>PREDICT_STATE_CONFIG"]
+
+            subgraph TOOLS["🔧 @ai_function (8 tools)"]
+                T1["update_team_info"]
+                T2["get_team_matches"]
+                T3["get_stadium_info"]
+                T4["get_group_standings"]
+                T5["get_venue_weather"]
+                T6["show_tournament_bracket"]
+                T7["compare_teams"]
+                T8["get_city_guide"]
+            end
+
+            subgraph DATA_BE["📚 Données Backend"]
+                WCPY["worldcup2026.py<br/>Données Python miroir"]
+            end
+        end
+    end
+
+    subgraph AZURE_OAI["☁️ Azure OpenAI Service"]
+        LLM["🧠 GPT-4o / GPT-5<br/>(Deployment provisionné)"]
+    end
+
+    %% Flux utilisateur
+    BROWSER -->|"HTTPS"| LAYOUT
+    LAYOUT --> PAGE
+    PAGE --> SIDEBAR
+    PAGE --> COMPONENTS
+    PAGE --> HOOKS
+
+    %% Flux AG-UI
+    HOOKS -->|"Chat messages<br/>Tool renders"| API_ROUTE
+    API_ROUTE -->|"AG-UI Protocol<br/>(SSE Events)"| MAIN
+    MAIN --> AGENT
+    AGENT --> TOOLS
+    AGENT -->|"StateSnapshotEvent<br/>ToolCallStart/End<br/>TextMessageContent"| API_ROUTE
+    API_ROUTE -->|"State sync<br/>predict_state"| HOOKS
+
+    %% Flux LLM
+    AGENT -->|"Azure OpenAI API<br/>(Managed Identity<br/>ou clé API)"| LLM
+    LLM -->|"Completions<br/>Tool calls"| AGENT
+
+    %% Flux données
+    WCDATA -->|"Import direct"| COMPONENTS
+    WCPY -->|"Import direct"| TOOLS
+
+    %% Cross-component interactions
+    MATCHSCHED <-->|"highlightedCity<br/>(AG-UI state)"| VENUEMAP
+    MATCHSCHED -->|"opponentClick<br/>→ compare_teams"| SIDEBAR
+    GROUPVIEW -->|"teamClick<br/>→ compare_teams"| SIDEBAR
+    BRACKET -->|"phaseClick<br/>→ filtre matchs"| MATCHSCHED
+
+    %% Styles
+    classDef azure fill:#0078D4,stroke:#005A9E,color:#fff
+    classDef react fill:#61DAFB,stroke:#21A1C9,color:#000
+    classDef python fill:#3776AB,stroke:#2B5F8A,color:#fff
+    classDef oai fill:#412991,stroke:#2E1A66,color:#fff
+    classDef user fill:#FFB900,stroke:#E6A700,color:#000
+
+    class AZURE_SWA,AZURE_CA azure
+    class AZURE_OAI oai
+    class USER user
+```
+
+### Schéma du Flux AG-UI (Sequence)
+
+```mermaid
+sequenceDiagram
+    actor User as 🧑 Utilisateur
+    participant Chat as 💬 CopilotSidebar<br/>(Copa)
+    participant Runtime as ⚛️ CopilotKit Runtime<br/>(/api/copilotkit)
+    participant Agent as 🐍 Agent Python<br/>(FastAPI + AG-UI)
+    participant LLM as 🧠 Azure OpenAI
+    participant UI as 📦 Composants React<br/>(TeamCard, Map...)
+
+    User->>Chat: "Parle-moi de la France"
+    Chat->>Runtime: Message utilisateur
+    Runtime->>Agent: AG-UI Protocol (HTTPS)
+    Agent->>LLM: Chat completion request
+    LLM-->>Agent: Tool calls: update_team_info + get_team_matches
+
+    par Appels tools parallèles
+        Agent->>Agent: update_team_info(France data)
+        Agent-->>Runtime: StateSnapshotEvent {teamInfo: {...}}
+        Runtime-->>UI: useCoAgent → TeamCard se met à jour
+        Note over UI: 🎨 Skeleton → données<br/>Color morph bleu-blanc-rouge
+    and
+        Agent->>Agent: get_team_matches("FRA")
+        Agent-->>Runtime: StateSnapshotEvent {matches: [...]}
+        Runtime-->>UI: useCoAgent → MatchSchedule se met à jour
+        Note over UI: 📅 Matchs apparaissent<br/>en cascade (staggered)
+    end
+
+    Agent->>LLM: Générer réponse texte
+    LLM-->>Agent: "Ah, les Bleus ! 🇫🇷⚽..."
+    Agent-->>Runtime: TextMessageContent (streaming)
+    Runtime-->>Chat: Message Copa affiché en streaming
+
+    Note over Chat: 💡 Copa ajoute des suggestions :<br/>"Voir le stade de Dallas ?"<br/>"Comparer avec le Brésil ?"
+
+    User->>UI: Clic sur un match (France vs Mexique)
+    UI->>UI: highlightedCity = "Dallas"<br/>(state AG-UI partagé)
+    Note over UI: 📍 VenueMap highlight Dallas<br/>📅 MatchSchedule scroll au match
+    UI->>Chat: Agent déclenche get_stadium_info("Dallas")
+```
+
+### Schéma de Déploiement Azure
+
+```mermaid
+graph LR
+    subgraph GH["🐙 GitHub"]
+        REPO["fredgis/foot-agui-sample<br/>branche worldcup2026"]
+        GHA["⚙️ GitHub Actions<br/>deploy-azure.yml"]
+        SECRETS["🔒 GitHub Secrets<br/>AZURE_SWA_DEPLOYMENT_TOKEN<br/>AZURE_CREDENTIALS"]
+    end
+
+    subgraph AZURE["☁️ Azure (rg-worldcup2026)"]
+        ACR["📦 Container Registry<br/>wc2026acr<br/>wc2026-agent:latest"]
+        
+        subgraph SWA["Azure Static Web Apps"]
+            FE["⚛️ Next.js SSR<br/>+ API Routes<br/>wc2026.azurestaticapps.net"]
+        end
+        
+        subgraph CA["Azure Container Apps"]
+            BE["🐍 FastAPI Agent<br/>Docker container<br/>Scale-to-zero<br/>wc2026-agent.azurecontainerapps.io"]
+        end
+        
+        OAI["🧠 Azure OpenAI<br/>Managed Identity"]
+    end
+
+    subgraph LOCAL["💻 Dev Local"]
+        SCRIPT["🖱️ deploy.sh<br/>One-click deploy<br/>(idempotent)"]
+    end
+
+    REPO -->|"push"| GHA
+    GHA -->|"npm ci && npm run build"| FE
+    GHA -->|"docker build && push"| ACR
+    ACR -->|"image pull"| BE
+    SECRETS -->|"tokens"| GHA
+    FE -->|"AGENT_URL<br/>(/api/copilotkit → HTTPS)"| BE
+    BE -->|"DefaultAzureCredential()"| OAI
+    SCRIPT -->|"az CLI<br/>check-then-create"| AZURE
+
+    classDef gh fill:#24292E,stroke:#1B1F23,color:#fff
+    classDef azure fill:#0078D4,stroke:#005A9E,color:#fff
+    classDef local fill:#2ECC71,stroke:#27AE60,color:#fff
+
+    class GH gh
+    class AZURE,SWA,CA azure
+    class LOCAL local
+```
+
+### Schéma des Workstreams & Dépendances
+
+```mermaid
+graph TD
+    WS1["📦 WS1<br/>Data Layer & Types<br/>🔴 Critique"]
+    WS2["🤖 WS2<br/>Agent Copa (Python)<br/>🔴 Critique"]
+    WS3["🏟️ WS3<br/>TeamCard<br/>🔴 Critique"]
+    WS4["📅 WS4<br/>MatchSchedule<br/>🟠 Haute"]
+    WS5["📍 WS5<br/>VenueMap<br/>🟠 Haute"]
+    WS6["🏆 WS6<br/>GroupView + Bracket<br/>🟡 Moyenne"]
+    WS7["🎪 WS7<br/>Page + Orchestration<br/>🔴 Critique"]
+    WS8["🚀 WS8<br/>Azure Deploy<br/>🟡 Moyenne"]
+    WS9["🖱️ WS9<br/>One-Click Deploy<br/>🟠 Haute"]
+
+    WS1 -->|"types & données"| WS2
+    WS1 -.->|"types mockés OK"| WS3
+    WS1 -.->|"types mockés OK"| WS4
+    WS1 -.->|"types mockés OK"| WS5
+    WS1 -.->|"types mockés OK"| WS6
+    WS2 -->|"agent fonctionnel"| WS7
+    WS3 -->|"composant prêt"| WS7
+    WS4 -->|"composant prêt"| WS7
+    WS5 -->|"composant prêt"| WS7
+    WS6 -->|"composant prêt"| WS7
+    WS7 -->|"app complète"| WS8
+    WS8 -->|"infra définie"| WS9
+
+    classDef critical fill:#DC2626,stroke:#B91C1C,color:#fff
+    classDef high fill:#EA580C,stroke:#C2410C,color:#fff
+    classDef medium fill:#CA8A04,stroke:#A16207,color:#fff
+
+    class WS1,WS2,WS3,WS7 critical
+    class WS4,WS5,WS9 high
+    class WS6,WS8 medium
+```
+
 ### Prérequis Techniques Garantis
 
 | Prérequis | Statut | Détail |
