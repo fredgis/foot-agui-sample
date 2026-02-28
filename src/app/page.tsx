@@ -11,7 +11,7 @@ import { AgentState, Confederation, MatchInfo, MatchPhase, StadiumInfo } from "@
 import { stadiums as allStadiums, groups, matches, teams } from "@/lib/worldcup-data";
 import { FlagImg, getFlagUrl } from "@/lib/flags";
 import { useCoAgent, useCopilotAction, useCopilotChat, useCopilotMessagesContext, useCopilotReadable } from "@copilotkit/react-core";
-import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
+import { TextMessage, MessageRole, ActionExecutionMessage } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
@@ -715,24 +715,66 @@ function YourMainContent({
   // Guard for render-based team loading (setTimeout from useCopilotAction render)
   const lastRenderLoadedTeam = useRef<string | null>(null);
 
-  // 🔄 Text-based fallback: detect team from agent response and load it
-  // STATE_DELTA from AG-UI doesn't reliably reach CopilotKit client, so we
-  // scan the latest assistant message for a standalone FIFA code (e.g. "FRA", "CIV").
+  // 🔄 Detect team from agent messages and load it into UI.
+  // Three strategies in priority order:
+  //   1. ActionExecutionMessage for "update_team_info" (tool call args)
+  //   2. Team name detection in assistant text (earliest mention)
+  //   3. Standalone FIFA code regex (fallback)
   const { messages: contextMessages } = useCopilotMessagesContext();
 
   useEffect(() => {
     if (!contextMessages || contextMessages.length === 0) return;
+
+    // Strategy 1: Look for update_team_info action execution in recent messages
     for (let i = contextMessages.length - 1; i >= 0; i--) {
       const msg = contextMessages[i];
-      if (msg.isTextMessage() && (msg as TextMessage).role === MessageRole.Assistant) {
+      if (msg.isActionExecutionMessage?.()) {
+        const action = msg as ActionExecutionMessage;
+        if (action.name === "update_team_info") {
+          const code = (action.arguments as Record<string, string>)?.team_code;
+          if (code && code !== lastDetectedTeam.current) {
+            console.log(`[Copa] ActionExec detect: ${lastDetectedTeam.current} → ${code}`);
+            lastDetectedTeam.current = code;
+            loadTeamByCode(code);
+            return;
+          }
+        }
+        break; // only check most recent action
+      }
+      if (msg.isTextMessage?.()) break; // stop at first text message
+    }
+
+    // Strategy 2 & 3: Scan most recent assistant text for team names / FIFA codes
+    for (let i = contextMessages.length - 1; i >= 0; i--) {
+      const msg = contextMessages[i];
+      if (msg.isTextMessage?.() && (msg as TextMessage).role === MessageRole.Assistant) {
         const content = (msg as TextMessage).content;
-        if (!content || content.length < 20) break;
-        // Match standalone 3-letter uppercase words (FIFA codes)
+        if (!content || content.length < 30) break;
+        const contentLower = content.toLowerCase();
+
+        // Strategy 2: Find the team NAME that appears earliest in the text
+        let earliestPos = Infinity;
+        let earliestCode: string | null = null;
+        for (const t of teams) {
+          const pos = contentLower.indexOf(t.name.toLowerCase());
+          if (pos !== -1 && pos < earliestPos) {
+            earliestPos = pos;
+            earliestCode = t.fifaCode;
+          }
+        }
+        if (earliestCode && earliestCode !== lastDetectedTeam.current) {
+          console.log(`[Copa] Name detect: ${lastDetectedTeam.current} → ${earliestCode} (pos ${earliestPos})`);
+          lastDetectedTeam.current = earliestCode;
+          loadTeamByCode(earliestCode);
+          return;
+        }
+
+        // Strategy 3: Match standalone 3-letter uppercase FIFA codes
         const codeMatches = content.match(/\b[A-Z]{3}\b/g);
         if (codeMatches) {
           for (const code of codeMatches) {
             if (fifaCodesSet.current.has(code) && code !== lastDetectedTeam.current) {
-              console.log(`[Copa] Text fallback: ${lastDetectedTeam.current} → ${code}`);
+              console.log(`[Copa] Code detect: ${lastDetectedTeam.current} → ${code}`);
               lastDetectedTeam.current = code;
               loadTeamByCode(code);
               return;
