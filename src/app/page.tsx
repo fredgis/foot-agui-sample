@@ -10,10 +10,10 @@ import { VenueMap } from "@/components/venue-map";
 import { AgentState, Confederation, MatchInfo, MatchPhase, StadiumInfo } from "@/lib/types";
 import { stadiums as allStadiums, groups, matches, teams } from "@/lib/worldcup-data";
 import { FlagImg, getFlagUrl } from "@/lib/flags";
-import { useCoAgent, useCopilotAction, useCopilotChat, useCopilotMessagesContext, useCopilotReadable } from "@copilotkit/react-core";
+import { useCoAgent, useCopilotAction, useCopilotChat, useCopilotReadable } from "@copilotkit/react-core";
 import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 // ── Mobile detection ──────────────────────────────────────────────────────────
 function useIsMobile() {
@@ -684,9 +684,6 @@ function YourMainContent({
     maxSuggestions: 3,
   }, [suggestionsContext]);
 
-  // Known FIFA codes for team detection
-  const fifaCodesSet = useRef(new Set(teams.map((t) => t.fifaCode)));
-
   // 🏳️ Helper: load a team by code into state
   const loadTeamByCode = useCallback((code: string) => {
     const team = teams.find(
@@ -705,33 +702,7 @@ function YourMainContent({
     });
   }, [setState]);
 
-  // 🔄 Text-based fallback: detect team from agent messages (backup for client-side update_team_info)
-  const lastDetectedTeam = useRef<string | null>(null);
-  const { messages: contextMessages } = useCopilotMessagesContext();
-
-  useEffect(() => {
-    if (!contextMessages || contextMessages.length === 0) return;
-    for (let i = contextMessages.length - 1; i >= 0; i--) {
-      const msg = contextMessages[i];
-      if (msg.isTextMessage() && (msg as TextMessage).role === MessageRole.Assistant) {
-        const content = (msg as TextMessage).content;
-        if (!content || content.length < 20) break;
-        const codeMatches = content.match(/\(([A-Z]{3})\)/g);
-        if (codeMatches) {
-          for (const m of codeMatches) {
-            const code = m.slice(1, 4);
-            if (fifaCodesSet.current.has(code) && code !== lastDetectedTeam.current) {
-              console.log(`[Copa] Text fallback team switch: ${lastDetectedTeam.current} → ${code}`);
-              lastDetectedTeam.current = code;
-              loadTeamByCode(code);
-              return;
-            }
-          }
-        }
-        break;
-      }
-    }
-  }, [contextMessages, loadTeamByCode]);
+  // NOTE: Text-based fallback removed — STATE_DELTA now handles team loading from server
 
   // 🏠 Return to welcome screen
   const goHome = useCallback(() => {
@@ -741,7 +712,6 @@ function YourMainContent({
     setThemeColor("#6366f1");
     setSecondaryColor("#ffffff");
     setBackgroundImage("");
-    lastDetectedTeam.current = null;
   }, [setState, setClubName, setCountryFlag, setThemeColor, setSecondaryColor, setBackgroundImage]);
 
   // Cross-component: clicking a team in GroupView triggers compare_teams in chat
@@ -948,37 +918,48 @@ function YourMainContent({
   }, [setState]);
 
   // 📅 Match click → highlight city on map
-  function handleMatchClick(match: MatchInfo) {
+  const handleMatchClick = useCallback((match: MatchInfo) => {
     const stadiumDetails = allStadiums.find((s) => s.name === match.stadiumName);
     if (stadiumDetails) {
-      setState((prev) => ({ ...(prev ?? state), highlightedCity: stadiumDetails.city }));
+      setState((prev) => ({ ...prev!, highlightedCity: stadiumDetails.city }));
     }
-  }
+  }, [setState]);
+
+  // 🏟️ Stadium dot click → select stadium
+  const handleStadiumClick = useCallback((stadium: StadiumInfo) => {
+    setState((prev) => ({ ...prev!, selectedStadium: stadium }));
+  }, [setState]);
 
   // 🆚 Opponent flag click → compare_teams in chat
-  function handleOpponentClick(opponentCode: string) {
-    const teamCode = state.teamInfo?.fifaCode ?? "";
-    if (teamCode) {
-      appendMessage(
-        new TextMessage({
-          role: MessageRole.User,
-          content: `Compare the teams: ${teamCode} vs ${opponentCode}`,
-        })
-      );
-    }
-  }
+  const handleOpponentClick = useCallback((opponentCode: string) => {
+    setState((prev) => {
+      const teamCode = prev?.teamInfo?.fifaCode ?? "";
+      if (teamCode) {
+        appendMessage(
+          new TextMessage({
+            role: MessageRole.User,
+            content: `Compare the teams: ${teamCode} vs ${opponentCode}`,
+          })
+        );
+      }
+      return prev!;
+    });
+  }, [setState, appendMessage]);
 
   // Mobile tab change handler (syncs with tournamentView state)
-  const handleMobileTabChange = (tab: MobileTab) => {
+  const handleMobileTabChange = useCallback((tab: MobileTab) => {
     setActiveTab(tab);
     if (tab === "group") {
-      setState((prev) => ({ ...(prev ?? state), tournamentView: "group" as const }));
+      setState((prev) => ({ ...prev!, tournamentView: "group" as const }));
     } else if (tab === "bracket") {
-      setState((prev) => ({ ...(prev ?? state), tournamentView: "bracket" as const }));
-    } else if (state.tournamentView) {
-      setState((prev) => ({ ...(prev ?? state), tournamentView: null }));
+      setState((prev) => ({ ...prev!, tournamentView: "bracket" as const }));
+    } else {
+      setState((prev) => {
+        if (prev?.tournamentView) return { ...prev, tournamentView: null };
+        return prev!;
+      });
     }
-  };
+  }, [setState]);
 
   const showGroupView = state.tournamentView === "group";
   const showBracket = state.tournamentView === "bracket";
@@ -1251,7 +1232,7 @@ function YourMainContent({
                   teamMatches={safeMatches}
                   highlightedCity={state.highlightedCity}
                   themeColor={themeColor}
-                  onStadiumClick={(stadium: StadiumInfo) => setState((prev) => ({ ...(prev ?? state), selectedStadium: stadium }))}
+                  onStadiumClick={handleStadiumClick}
                 />
               )}
             </div>
@@ -1267,7 +1248,7 @@ function YourMainContent({
                       teamMatches={safeMatches}
                       highlightedCity={state.highlightedCity}
                       themeColor={themeColor}
-                      onStadiumClick={(stadium: StadiumInfo) => setState((prev) => ({ ...(prev ?? state), selectedStadium: stadium }))}
+                      onStadiumClick={handleStadiumClick}
                     />
                   </div>
                 )}

@@ -161,31 +161,32 @@ function SkeletonLoader() {
 export const TeamCard = memo(function TeamCard({ team, themeColor, secondaryColor }: TeamCardProps) {
   const [visible, setVisible] = useState(false);
   const [fading, setFading] = useState(false);
-  const prevTeamRef = useRef<TeamInfo | null>(null);
+  const prevTeamCodeRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (team === prevTeamRef.current) return;
+    const currentCode = team?.fifaCode ?? null;
+    if (currentCode === prevTeamCodeRef.current) return;
 
-    if (prevTeamRef.current && team) {
+    if (prevTeamCodeRef.current && currentCode) {
       // Transition between teams: fade out → slide in
       setFading(true);
       setVisible(false);
       const t = setTimeout(() => {
-        prevTeamRef.current = team;
+        prevTeamCodeRef.current = currentCode;
         setFading(false);
         setVisible(true);
       }, 320);
       return () => clearTimeout(t);
-    } else if (team) {
-      prevTeamRef.current = team;
+    } else if (currentCode) {
+      prevTeamCodeRef.current = currentCode;
       // Small delay to trigger entrance animation
       const t = setTimeout(() => setVisible(true), 30);
       return () => clearTimeout(t);
     } else {
-      prevTeamRef.current = null;
+      prevTeamCodeRef.current = null;
       setVisible(false);
     }
-  }, [team]);
+  }, [team?.fifaCode]);
 
   if (!team) {
     return <SkeletonLoader />;
@@ -394,4 +395,8 @@ export const TeamCard = memo(function TeamCard({ team, themeColor, secondaryColo
       `}</style>
     </div>
   );
-});
+}, (prev, next) =>
+  prev.team?.fifaCode === next.team?.fifaCode &&
+  prev.themeColor === next.themeColor &&
+  prev.secondaryColor === next.secondaryColor
+);
