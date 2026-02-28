@@ -6,7 +6,7 @@ import "@copilotkit/react-ui/styles.css";
 
 export const metadata: Metadata = {
   title: "FIFA World Cup 2026 — Copa Expert ⚽",
-  description: "Explorez les 48 équipes, stades et matchs de la Coupe du Monde 2026 avec Copa, votre assistant IA AG-UI.",
+  description: "Explore all 48 teams, stadiums and matches of the 2026 FIFA World Cup with Copa, your AG-UI AI assistant.",
 };
 
 export default function RootLayout({

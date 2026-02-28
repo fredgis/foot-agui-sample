@@ -33,7 +33,7 @@ const CONF_EMOJI: Record<Confederation, string> = {
 };
 const CONF_ORDER: Confederation[] = ["UEFA", "CONMEBOL", "CAF", "AFC", "CONCACAF", "OFC"];
 const HOST_FLAGS = ["us", "mx", "ca"];
-const HOST_NAMES = ["États-Unis", "Mexique", "Canada"];
+const HOST_NAMES = ["United States", "Mexico", "Canada"];
 const WC_TARGET_DATE = new Date("2026-06-11T18:00:00Z");
 
 function WelcomeScreen({
@@ -87,18 +87,28 @@ function WelcomeScreen({
 
   const favorites = [...teams].sort((a, b) => a.fifaRanking - b.fifaRanking).slice(0, 6);
   const copaSuggestions = [
-    "🇫🇷 Montre-moi les matchs de la France",
-    "⚽ Compare Brésil vs Argentine",
-    "🏟️ Quels stades accueillent la compétition ?",
-    "🌍 Affiche le tableau des groupes",
-    "🏆 Montre le bracket du tournoi",
-    "📊 Quelles équipes sont favorites ?",
+    "🇫🇷 Show me France's matches",
+    "⚽ Compare Brazil vs Argentina",
+    "🏟️ What stadiums host the tournament?",
+    "🌍 Show the group standings",
+    "🏆 Show the tournament bracket",
+    "📊 Which teams are favorites?",
   ];
 
   return (
-    <div className="welcome-fade-in min-h-screen pb-16 px-4 md:px-8" style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(200,16,46,0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 100%, rgba(0,122,61,0.06) 0%, transparent 50%)" }}>
-      {/* ── Hero countdown ── */}
+    <div className="welcome-fade-in min-h-screen pb-16 px-4 md:px-8" style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(200,16,46,0.08) 0%, transparent 50%), radial-gradient(ellipse at 50% 100%, rgba(0,122,61,0.08) 0%, transparent 50%)" }}>
+      {/* ── Hero ── */}
       <div className="text-center py-8 md:py-12">
+        {/* WC2026 Official Logo */}
+        <div style={{ marginBottom: "1.5rem" }}>
+          <img
+            src="https://digitalhub.fifa.com/transform/3b120024-a9e9-48a0-8a34-4afec1e8dfd0/FIFA26-Landscape-Color"
+            alt="FIFA World Cup 2026 Logo"
+            width={320}
+            height={120}
+            style={{ margin: "0 auto", display: "block", maxWidth: "80%", height: "auto" }}
+          />
+        </div>
         <div className="text-4xl md:text-7xl font-black mb-2 wc-gradient-text tracking-tight" style={{ lineHeight: 1.1 }}>
           FIFA WORLD CUP
         </div>
@@ -125,16 +135,16 @@ function WelcomeScreen({
           ))}
         </div>
         <p style={{ color: "#9ca3af", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1.5rem" }}>
-          {HOST_NAMES[flagIndex]} · 11 juin – 19 juillet 2026
+          {HOST_NAMES[flagIndex]} · June 11 – July 19, 2026
         </p>
         {/* Countdown */}
         {mounted && (
           <div className="flex gap-3 md:gap-5 justify-center flex-wrap mb-8">
             {[
-              { label: "Jours", value: timeLeft.days },
-              { label: "Heures", value: timeLeft.hours },
+              { label: "Days", value: timeLeft.days },
+              { label: "Hours", value: timeLeft.hours },
               { label: "Minutes", value: timeLeft.minutes },
-              { label: "Secondes", value: timeLeft.seconds },
+              { label: "Seconds", value: timeLeft.seconds },
             ].map(({ label, value }) => (
               <div
                 key={label}
@@ -156,7 +166,7 @@ function WelcomeScreen({
                     color: themeColor,
                     fontVariantNumeric: "tabular-nums",
                     textShadow: `0 0 20px ${themeColor}60`,
-                    animation: label === "Secondes" ? "countdownPulse 1s ease-in-out infinite" : undefined,
+                    animation: label === "Seconds" ? "countdownPulse 1s ease-in-out infinite" : undefined,
                   }}
                 >
                   {String(value).padStart(2, "0")}
@@ -182,7 +192,7 @@ function WelcomeScreen({
       <div style={{ maxWidth: "42rem", margin: "0 auto 2rem" }}>
         <input
           type="text"
-          placeholder="🔍 Filtrer les équipes... (ex: Fra, BRA, UEFA)"
+          placeholder="🔍 Filter teams... (e.g. France, BRA, UEFA)"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{
@@ -206,7 +216,7 @@ function WelcomeScreen({
       {!search && (
         <div style={{ maxWidth: "64rem", margin: "0 auto 2.5rem" }}>
           <h2 style={{ fontSize: "0.875rem", fontWeight: 700, color: "#d1d5db", marginBottom: "0.75rem" }}>
-            ⭐ Favoris du tournoi
+            ⭐ Tournament Favorites
           </h2>
           <div className="flex flex-wrap gap-3 justify-center">
             {favorites.map((team, i) => (
@@ -272,7 +282,7 @@ function WelcomeScreen({
               <span>{CONF_EMOJI[conf]}</span>
               <span>{conf}</span>
               <span style={{ fontSize: "0.75rem", color: "#6b7280", fontWeight: 400 }}>
-                ({confTeams.length} équipes)
+                ({confTeams.length} teams)
               </span>
             </h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 gap-2">
@@ -318,7 +328,7 @@ function WelcomeScreen({
       {onSuggestionClick && (
         <div style={{ maxWidth: "42rem", margin: "2rem auto 0" }}>
           <h2 style={{ fontSize: "0.875rem", fontWeight: 700, color: "#d1d5db", marginBottom: "0.75rem" }}>
-            💬 Suggestions Copa
+            💬 Copa Suggestions
           </h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
             {copaSuggestions.map((s, i) => (
@@ -419,7 +429,7 @@ export default function CopilotKitPage() {
 
   const chatLabels = {
     title: "⚽ Copa — Expert WC2026",
-    initial: "Salut ! Je suis Copa, ton expert de la Coupe du Monde 2026 🏆. Parle-moi d'une équipe, d'un stade, ou demande-moi de comparer des équipes ! 🌍⚽",
+    initial: "Hey there! I'm Copa, your World Cup 2026 expert 🏆. Ask me about any team, stadium, or matchup! 🌍⚽",
   };
 
   const contentProps = {
@@ -677,10 +687,10 @@ function YourMainContent({
         >
           {(
             [
-              { id: "team", label: "Équipe", icon: "🏳️" },
-              { id: "matches", label: "Matchs", icon: "📅", hidden: !hasMatches },
-              { id: "map", label: "Carte", icon: "🗺️", hidden: !hasMatches },
-              { id: "group", label: "Groupe", icon: "🌍" },
+              { id: "team", label: "Team", icon: "🏳️" },
+              { id: "matches", label: "Matches", icon: "📅", hidden: !hasMatches },
+              { id: "map", label: "Map", icon: "🗺️", hidden: !hasMatches },
+              { id: "group", label: "Groups", icon: "🌍" },
               { id: "bracket", label: "Bracket", icon: "🏆" },
             ] as { id: MobileTab; label: string; icon: string; hidden?: boolean }[]
           )
@@ -857,7 +867,7 @@ function YourMainContent({
               const team = teams.find((t) => t.fifaCode === fifaCode);
               const teamName = team?.name ?? fifaCode;
               appendMessage(
-                new TextMessage({ role: MessageRole.User, content: `Montre-moi les informations sur l'équipe ${teamName}` })
+                new TextMessage({ role: MessageRole.User, content: `Show me the team ${teamName}` })
               );
             }}
             themeColor={themeColor}

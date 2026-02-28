@@ -178,10 +178,10 @@ export function VenueMap({
         style={{ background: "rgba(0,0,0,0.6)", color: "#e0e8f0", borderBottom: `2px solid ${themeColor}40` }}
       >
         <span>🗺️</span>
-        <span>Carte des stades — Coupe du Monde 2026</span>
+        <span>Stadium Map — FIFA World Cup 2026</span>
         {teamMatches && teamMatches.length > 0 && (
           <span className="ml-auto text-xs" style={{ color: themeColor }}>
-            {teamStadiumNames.size} stade{teamStadiumNames.size > 1 ? "s" : ""} sélectionné{teamStadiumNames.size > 1 ? "s" : ""}
+            {teamStadiumNames.size} stadium{teamStadiumNames.size > 1 ? "s" : ""} selected
           </span>
         )}
       </div>
