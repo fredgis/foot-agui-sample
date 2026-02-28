@@ -45,6 +45,7 @@ export type StadiumInfo = {
   lng: number;
   timezone: string;
   description: string;
+  videoUrl?: string;
 };
 
 export type MatchInfo = {

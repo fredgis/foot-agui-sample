@@ -893,16 +893,18 @@ export const stadiums: StadiumInfo[] = [
     lng: -74.0745,
     timezone: "America/New_York",
     description: "Home of the NFL Giants and Jets, hosting the World Cup Final.",
+    videoUrl: "https://www.youtube.com/watch?v=lihd-uM2Muc",
   },
   {
-    name: "Rose Bowl Stadium",
-    city: "Los Angeles",
+    name: "Hard Rock Stadium",
+    city: "Miami",
     country: "USA",
-    capacity: 92542,
-    lat: 34.1614,
-    lng: -118.1676,
-    timezone: "America/Los_Angeles",
-    description: "Iconic Pasadena stadium that hosted the 1994 World Cup Final.",
+    capacity: 65326,
+    lat: 25.958,
+    lng: -80.2389,
+    timezone: "America/New_York",
+    description: "Home of the NFL Dolphins. Hosts group matches, a quarter-final, and the 3rd-place match.",
+    videoUrl: "https://www.youtube.com/watch?v=P-iW_7sWD3w",
   },
   {
     name: "AT&T Stadium",
@@ -913,6 +915,7 @@ export const stadiums: StadiumInfo[] = [
     lng: -97.0945,
     timezone: "America/Chicago",
     description: "State-of-the-art NFL Cowboys stadium in Arlington, Texas.",
+    videoUrl: "https://www.youtube.com/watch?v=U68zeHJYu7Y",
   },
   {
     name: "SoFi Stadium",
@@ -923,6 +926,7 @@ export const stadiums: StadiumInfo[] = [
     lng: -118.3392,
     timezone: "America/Los_Angeles",
     description: "Modern open-air stadium in Inglewood home to the Rams and Chargers.",
+    videoUrl: "https://www.youtube.com/watch?v=jfJILuSZFIY",
   },
   {
     name: "Levi's Stadium",
@@ -933,6 +937,7 @@ export const stadiums: StadiumInfo[] = [
     lng: -121.9694,
     timezone: "America/Los_Angeles",
     description: "Home of the NFL San Francisco 49ers in Santa Clara.",
+    videoUrl: "https://www.youtube.com/watch?v=1S5KVr8Vz44",
   },
   {
     name: "Mercedes-Benz Stadium",
@@ -943,6 +948,7 @@ export const stadiums: StadiumInfo[] = [
     lng: -84.4008,
     timezone: "America/New_York",
     description: "Multi-purpose retractable-roof stadium home to Atlanta United FC.",
+    videoUrl: "https://www.youtube.com/watch?v=26kWnXFWqRU",
   },
   {
     name: "Arrowhead Stadium",
@@ -953,6 +959,7 @@ export const stadiums: StadiumInfo[] = [
     lng: -94.4839,
     timezone: "America/Chicago",
     description: "Home of the NFL Kansas City Chiefs, known for its loud atmosphere.",
+    videoUrl: "https://www.youtube.com/watch?v=irnvDeFZEPA",
   },
   {
     name: "NRG Stadium",
@@ -963,6 +970,7 @@ export const stadiums: StadiumInfo[] = [
     lng: -95.4107,
     timezone: "America/Chicago",
     description: "Retractable-roof stadium home of the NFL Houston Texans.",
+    videoUrl: "https://www.youtube.com/watch?v=0NpzQnVgeQI",
   },
   {
     name: "Gillette Stadium",
@@ -973,6 +981,7 @@ export const stadiums: StadiumInfo[] = [
     lng: -71.2643,
     timezone: "America/New_York",
     description: "Home of the NFL New England Patriots in Foxborough.",
+    videoUrl: "https://www.youtube.com/watch?v=17L4aACbFAw",
   },
   {
     name: "Lincoln Financial Field",
@@ -983,16 +992,18 @@ export const stadiums: StadiumInfo[] = [
     lng: -75.1675,
     timezone: "America/New_York",
     description: "Home of the NFL Philadelphia Eagles and Penn FC.",
+    videoUrl: "https://www.youtube.com/watch?v=ZdMiWgxCRoA",
   },
   {
-    name: "Allegiant Stadium",
-    city: "Las Vegas",
+    name: "Lumen Field",
+    city: "Seattle",
     country: "USA",
-    capacity: 65000,
-    lat: 36.0909,
-    lng: -115.1839,
+    capacity: 69000,
+    lat: 47.5952,
+    lng: -122.3316,
     timezone: "America/Los_Angeles",
-    description: "Home of the NFL Las Vegas Raiders and Inter Las Vegas.",
+    description: "Home of the NFL Seahawks and MLS Sounders, overlooking Seattle's port.",
+    videoUrl: "https://www.youtube.com/watch?v=46Wi8kAILOw",
   },
   // ── Canada ────────────────────────────────────────────────────────────────
   {
@@ -1004,6 +1015,7 @@ export const stadiums: StadiumInfo[] = [
     lng: -123.1115,
     timezone: "America/Vancouver",
     description: "Multi-purpose stadium in downtown Vancouver with retractable roof.",
+    videoUrl: "https://www.youtube.com/watch?v=JAown-dJZLc",
   },
   {
     name: "BMO Field",
@@ -1014,6 +1026,7 @@ export const stadiums: StadiumInfo[] = [
     lng: -79.4189,
     timezone: "America/Toronto",
     description: "Home of Toronto FC expanded for the 2026 World Cup.",
+    videoUrl: "https://www.youtube.com/watch?v=aOdpElPoL6o",
   },
   // ── Mexico ────────────────────────────────────────────────────────────────
   {
@@ -1025,6 +1038,7 @@ export const stadiums: StadiumInfo[] = [
     lng: -99.1505,
     timezone: "America/Mexico_City",
     description: "Historic stadium that hosted 1970 and 1986 World Cup Finals.",
+    videoUrl: "https://www.youtube.com/watch?v=kSED9Zjr9mo",
   },
   {
     name: "Estadio BBVA",
@@ -1035,6 +1049,7 @@ export const stadiums: StadiumInfo[] = [
     lng: -100.2467,
     timezone: "America/Monterrey",
     description: "Modern stadium home of Club de Fútbol Monterrey.",
+    videoUrl: "https://www.youtube.com/watch?v=o6BZTgI9Kko",
   },
   {
     name: "Estadio Akron",
@@ -1045,6 +1060,7 @@ export const stadiums: StadiumInfo[] = [
     lng: -103.4715,
     timezone: "America/Mexico_City",
     description: "Home of Club Deportivo Guadalajara (Chivas) opened in 2010.",
+    videoUrl: "https://www.youtube.com/watch?v=ZhaGV-aN4Io",
   },
 ];
 
@@ -1072,7 +1088,7 @@ export const groups: GroupInfo[] = [
 export const matches: MatchInfo[] = [
   // ── Group A ───────────────────────────────────────────────────────────────
   { id: "A1", date: "2026-06-11", time: "19:00", homeTeam: "USA", awayTeam: "BRA", stadiumName: "MetLife Stadium", phase: "group", group: "A" },
-  { id: "A2", date: "2026-06-12", time: "16:00", homeTeam: "MAR", awayTeam: "EGY", stadiumName: "Rose Bowl Stadium", phase: "group", group: "A" },
+  { id: "A2", date: "2026-06-12", time: "16:00", homeTeam: "MAR", awayTeam: "EGY", stadiumName: "Hard Rock Stadium", phase: "group", group: "A" },
   { id: "A3", date: "2026-06-16", time: "16:00", homeTeam: "USA", awayTeam: "MAR", stadiumName: "Mercedes-Benz Stadium", phase: "group", group: "A" },
   { id: "A4", date: "2026-06-16", time: "19:00", homeTeam: "BRA", awayTeam: "EGY", stadiumName: "AT&T Stadium", phase: "group", group: "A" },
   { id: "A5", date: "2026-06-20", time: "19:00", homeTeam: "USA", awayTeam: "EGY", stadiumName: "MetLife Stadium", phase: "group", group: "A" },
@@ -1084,7 +1100,7 @@ export const matches: MatchInfo[] = [
   { id: "B3", date: "2026-06-17", time: "16:00", homeTeam: "MEX", awayTeam: "FRA", stadiumName: "Estadio Azteca", phase: "group", group: "B" },
   { id: "B4", date: "2026-06-17", time: "19:00", homeTeam: "ARG", awayTeam: "ENG", stadiumName: "MetLife Stadium", phase: "group", group: "B" },
   { id: "B5", date: "2026-06-21", time: "19:00", homeTeam: "MEX", awayTeam: "ENG", stadiumName: "Estadio Azteca", phase: "group", group: "B" },
-  { id: "B6", date: "2026-06-21", time: "19:00", homeTeam: "ARG", awayTeam: "FRA", stadiumName: "Rose Bowl Stadium", phase: "group", group: "B" },
+  { id: "B6", date: "2026-06-21", time: "19:00", homeTeam: "ARG", awayTeam: "FRA", stadiumName: "Hard Rock Stadium", phase: "group", group: "B" },
 
   // ── Group C ───────────────────────────────────────────────────────────────
   { id: "C1", date: "2026-06-13", time: "13:00", homeTeam: "CAN", awayTeam: "URU", stadiumName: "BC Place", phase: "group", group: "C" },
@@ -1097,7 +1113,7 @@ export const matches: MatchInfo[] = [
   // ── Group D ───────────────────────────────────────────────────────────────
   { id: "D1", date: "2026-06-14", time: "16:00", homeTeam: "ESP", awayTeam: "COL", stadiumName: "SoFi Stadium", phase: "group", group: "D" },
   { id: "D2", date: "2026-06-14", time: "19:00", homeTeam: "SEN", awayTeam: "TUN", stadiumName: "NRG Stadium", phase: "group", group: "D" },
-  { id: "D3", date: "2026-06-18", time: "16:00", homeTeam: "ESP", awayTeam: "SEN", stadiumName: "Rose Bowl Stadium", phase: "group", group: "D" },
+  { id: "D3", date: "2026-06-18", time: "16:00", homeTeam: "ESP", awayTeam: "SEN", stadiumName: "Hard Rock Stadium", phase: "group", group: "D" },
   { id: "D4", date: "2026-06-18", time: "19:00", homeTeam: "COL", awayTeam: "TUN", stadiumName: "AT&T Stadium", phase: "group", group: "D" },
   { id: "D5", date: "2026-06-22", time: "19:00", homeTeam: "ESP", awayTeam: "TUN", stadiumName: "MetLife Stadium", phase: "group", group: "D" },
   { id: "D6", date: "2026-06-22", time: "19:00", homeTeam: "COL", awayTeam: "SEN", stadiumName: "Levi's Stadium", phase: "group", group: "D" },
@@ -1122,7 +1138,7 @@ export const matches: MatchInfo[] = [
   { id: "G1", date: "2026-06-15", time: "16:00", homeTeam: "SUI", awayTeam: "CIV", stadiumName: "Estadio Azteca", phase: "group", group: "G" },
   { id: "G2", date: "2026-06-16", time: "13:00", homeTeam: "QAT", awayTeam: "UZB", stadiumName: "Levi's Stadium", phase: "group", group: "G" },
   { id: "G3", date: "2026-06-20", time: "13:00", homeTeam: "SUI", awayTeam: "QAT", stadiumName: "Estadio Akron", phase: "group", group: "G" },
-  { id: "G4", date: "2026-06-20", time: "16:00", homeTeam: "CIV", awayTeam: "UZB", stadiumName: "Rose Bowl Stadium", phase: "group", group: "G" },
+  { id: "G4", date: "2026-06-20", time: "16:00", homeTeam: "CIV", awayTeam: "UZB", stadiumName: "Hard Rock Stadium", phase: "group", group: "G" },
   { id: "G5", date: "2026-06-24", time: "19:00", homeTeam: "SUI", awayTeam: "UZB", stadiumName: "Estadio BBVA", phase: "group", group: "G" },
   { id: "G6", date: "2026-06-24", time: "19:00", homeTeam: "CIV", awayTeam: "QAT", stadiumName: "Mercedes-Benz Stadium", phase: "group", group: "G" },
 
@@ -1153,7 +1169,7 @@ export const matches: MatchInfo[] = [
   // ── Group K ───────────────────────────────────────────────────────────────
   { id: "K1", date: "2026-06-18", time: "19:00", homeTeam: "SCO", awayTeam: "SRB", stadiumName: "Gillette Stadium", phase: "group", group: "K" },
   { id: "K2", date: "2026-06-19", time: "13:00", homeTeam: "RSA", awayTeam: "TRI", stadiumName: "Mercedes-Benz Stadium", phase: "group", group: "K" },
-  { id: "K3", date: "2026-06-23", time: "13:00", homeTeam: "SCO", awayTeam: "RSA", stadiumName: "Rose Bowl Stadium", phase: "group", group: "K" },
+  { id: "K3", date: "2026-06-23", time: "13:00", homeTeam: "SCO", awayTeam: "RSA", stadiumName: "Hard Rock Stadium", phase: "group", group: "K" },
   { id: "K4", date: "2026-06-23", time: "13:00", homeTeam: "SRB", awayTeam: "TRI", stadiumName: "BMO Field", phase: "group", group: "K" },
   { id: "K5", date: "2026-06-27", time: "19:00", homeTeam: "SCO", awayTeam: "TRI", stadiumName: "Lincoln Financial Field", phase: "group", group: "K" },
   { id: "K6", date: "2026-06-27", time: "19:00", homeTeam: "SRB", awayTeam: "RSA", stadiumName: "NRG Stadium", phase: "group", group: "K" },
@@ -1161,7 +1177,7 @@ export const matches: MatchInfo[] = [
   // ── Group L ───────────────────────────────────────────────────────────────
   { id: "L1", date: "2026-06-19", time: "19:00", homeTeam: "CRC", awayTeam: "PAN", stadiumName: "Estadio Azteca", phase: "group", group: "L" },
   { id: "L2", date: "2026-06-20", time: "13:00", homeTeam: "NZL", awayTeam: "HON", stadiumName: "Estadio Akron", phase: "group", group: "L" },
-  { id: "L3", date: "2026-06-24", time: "13:00", homeTeam: "CRC", awayTeam: "NZL", stadiumName: "Rose Bowl Stadium", phase: "group", group: "L" },
+  { id: "L3", date: "2026-06-24", time: "13:00", homeTeam: "CRC", awayTeam: "NZL", stadiumName: "Hard Rock Stadium", phase: "group", group: "L" },
   { id: "L4", date: "2026-06-24", time: "16:00", homeTeam: "PAN", awayTeam: "HON", stadiumName: "Estadio BBVA", phase: "group", group: "L" },
   { id: "L5", date: "2026-06-28", time: "19:00", homeTeam: "CRC", awayTeam: "HON", stadiumName: "Estadio Azteca", phase: "group", group: "L" },
   { id: "L6", date: "2026-06-28", time: "19:00", homeTeam: "PAN", awayTeam: "NZL", stadiumName: "Estadio BBVA", phase: "group", group: "L" },
@@ -1169,7 +1185,7 @@ export const matches: MatchInfo[] = [
   // ── Round of 32 (16 matches — 32 qualifiers → 16 teams) ──────────────────
   { id: "R32-1",  date: "2026-07-02", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium",         phase: "round_of_32" },
   { id: "R32-2",  date: "2026-07-02", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",            phase: "round_of_32" },
-  { id: "R32-3",  date: "2026-07-03", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Rose Bowl Stadium",       phase: "round_of_32" },
+  { id: "R32-3",  date: "2026-07-03", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Hard Rock Stadium",       phase: "round_of_32" },
   { id: "R32-4",  date: "2026-07-03", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "SoFi Stadium",            phase: "round_of_32" },
   { id: "R32-5",  date: "2026-07-04", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Estadio Azteca",          phase: "round_of_32" },
   { id: "R32-6",  date: "2026-07-04", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Mercedes-Benz Stadium",   phase: "round_of_32" },
@@ -1182,12 +1198,12 @@ export const matches: MatchInfo[] = [
   { id: "R32-13", date: "2026-07-08", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Estadio Azteca",          phase: "round_of_32" },
   { id: "R32-14", date: "2026-07-08", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",            phase: "round_of_32" },
   { id: "R32-15", date: "2026-07-09", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium",         phase: "round_of_32" },
-  { id: "R32-16", date: "2026-07-09", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Rose Bowl Stadium",       phase: "round_of_32" },
+  { id: "R32-16", date: "2026-07-09", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Hard Rock Stadium",       phase: "round_of_32" },
 
   // ── Round of 16 (8 matches — 16 teams → 8 teams) ─────────────────────────
   { id: "R16-1", date: "2026-07-12", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium",        phase: "round_of_16" },
   { id: "R16-2", date: "2026-07-12", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",           phase: "round_of_16" },
-  { id: "R16-3", date: "2026-07-13", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Rose Bowl Stadium",      phase: "round_of_16" },
+  { id: "R16-3", date: "2026-07-13", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Hard Rock Stadium",      phase: "round_of_16" },
   { id: "R16-4", date: "2026-07-13", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "SoFi Stadium",           phase: "round_of_16" },
   { id: "R16-5", date: "2026-07-14", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Estadio Azteca",         phase: "round_of_16" },
   { id: "R16-6", date: "2026-07-14", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Mercedes-Benz Stadium",  phase: "round_of_16" },
@@ -1196,13 +1212,13 @@ export const matches: MatchInfo[] = [
 
   // ── Quarter-finals (4 matches) ────────────────────────────────────────────
   { id: "QF-1", date: "2026-07-18", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium",       phase: "quarter_final" },
-  { id: "QF-2", date: "2026-07-18", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Rose Bowl Stadium",     phase: "quarter_final" },
+  { id: "QF-2", date: "2026-07-18", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Hard Rock Stadium",     phase: "quarter_final" },
   { id: "QF-3", date: "2026-07-19", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",          phase: "quarter_final" },
   { id: "QF-4", date: "2026-07-19", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Estadio Azteca",        phase: "quarter_final" },
 
   // ── Semi-finals (2 matches) ───────────────────────────────────────────────
   { id: "SF-1", date: "2026-07-22", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium",   phase: "semi_final" },
-  { id: "SF-2", date: "2026-07-23", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Rose Bowl Stadium", phase: "semi_final" },
+  { id: "SF-2", date: "2026-07-23", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Hard Rock Stadium", phase: "semi_final" },
 
   // ── Third place play-off ──────────────────────────────────────────────────
   { id: "3RD",  date: "2026-07-25", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",  phase: "third_place" },

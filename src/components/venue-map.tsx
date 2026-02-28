@@ -470,6 +470,18 @@ export function VenueMap({
           >
             🌤️ Météo à {clickedStadium.city}
           </a>
+
+          {clickedStadium.videoUrl && (
+            <a
+              href={clickedStadium.videoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 w-full py-1.5 rounded-lg text-xs font-semibold text-white text-center block"
+              style={{ background: "#c42b2b" }}
+            >
+              ▶️ Vidéo du stade
+            </a>
+          )}
         </div>
       )}
     </div>

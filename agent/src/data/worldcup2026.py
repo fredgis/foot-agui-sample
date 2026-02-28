@@ -769,11 +769,11 @@ stadiums: list[StadiumInfo] = [
         "description": "Home of the NFL Giants and Jets, hosting the World Cup Final.",
     },
     {
-        "name": "Rose Bowl Stadium",
-        "city": "Los Angeles", "country": "USA",
-        "capacity": 92542, "lat": 34.1614, "lng": -118.1676,
-        "timezone": "America/Los_Angeles",
-        "description": "Iconic Pasadena stadium that hosted the 1994 World Cup Final.",
+        "name": "Hard Rock Stadium",
+        "city": "Miami", "country": "USA",
+        "capacity": 65326, "lat": 25.958, "lng": -80.2389,
+        "timezone": "America/New_York",
+        "description": "Home of the NFL Dolphins. Hosts group matches, a quarter-final, and the 3rd-place match.",
     },
     {
         "name": "AT&T Stadium",
@@ -832,11 +832,11 @@ stadiums: list[StadiumInfo] = [
         "description": "Home of the NFL Philadelphia Eagles and Penn FC.",
     },
     {
-        "name": "Allegiant Stadium",
-        "city": "Las Vegas", "country": "USA",
-        "capacity": 65000, "lat": 36.0909, "lng": -115.1839,
+        "name": "Lumen Field",
+        "city": "Seattle", "country": "USA",
+        "capacity": 69000, "lat": 47.5952, "lng": -122.3316,
         "timezone": "America/Los_Angeles",
-        "description": "Home of the NFL Las Vegas Raiders and Inter Las Vegas.",
+        "description": "Home of the NFL Seahawks and MLS Sounders, overlooking Seattle's port.",
     },
     # ── Canada ────────────────────────────────────────────────────────────────
     {
@@ -899,7 +899,7 @@ groups: list[GroupInfo] = [
 matches: list[MatchInfo] = [
     # ── Group A ───────────────────────────────────────────────────────────────
     {"id": "A1", "date": "2026-06-11", "time": "19:00", "homeTeam": "USA", "awayTeam": "BRA",    "stadiumName": "MetLife Stadium",        "phase": "group", "group": "A"},
-    {"id": "A2", "date": "2026-06-12", "time": "16:00", "homeTeam": "MAR", "awayTeam": "EGY",    "stadiumName": "Rose Bowl Stadium",      "phase": "group", "group": "A"},
+    {"id": "A2", "date": "2026-06-12", "time": "16:00", "homeTeam": "MAR", "awayTeam": "EGY",    "stadiumName": "Hard Rock Stadium",      "phase": "group", "group": "A"},
     {"id": "A3", "date": "2026-06-16", "time": "16:00", "homeTeam": "USA", "awayTeam": "MAR",    "stadiumName": "Mercedes-Benz Stadium",  "phase": "group", "group": "A"},
     {"id": "A4", "date": "2026-06-16", "time": "19:00", "homeTeam": "BRA", "awayTeam": "EGY",    "stadiumName": "AT&T Stadium",           "phase": "group", "group": "A"},
     {"id": "A5", "date": "2026-06-20", "time": "19:00", "homeTeam": "USA", "awayTeam": "EGY",    "stadiumName": "MetLife Stadium",        "phase": "group", "group": "A"},
@@ -911,7 +911,7 @@ matches: list[MatchInfo] = [
     {"id": "B3", "date": "2026-06-17", "time": "16:00", "homeTeam": "MEX", "awayTeam": "FRA",    "stadiumName": "Estadio Azteca",         "phase": "group", "group": "B"},
     {"id": "B4", "date": "2026-06-17", "time": "19:00", "homeTeam": "ARG", "awayTeam": "ENG",    "stadiumName": "MetLife Stadium",        "phase": "group", "group": "B"},
     {"id": "B5", "date": "2026-06-21", "time": "19:00", "homeTeam": "MEX", "awayTeam": "ENG",    "stadiumName": "Estadio Azteca",         "phase": "group", "group": "B"},
-    {"id": "B6", "date": "2026-06-21", "time": "19:00", "homeTeam": "ARG", "awayTeam": "FRA",    "stadiumName": "Rose Bowl Stadium",      "phase": "group", "group": "B"},
+    {"id": "B6", "date": "2026-06-21", "time": "19:00", "homeTeam": "ARG", "awayTeam": "FRA",    "stadiumName": "Hard Rock Stadium",      "phase": "group", "group": "B"},
 
     # ── Group C ───────────────────────────────────────────────────────────────
     {"id": "C1", "date": "2026-06-13", "time": "13:00", "homeTeam": "CAN", "awayTeam": "URU",    "stadiumName": "BC Place",               "phase": "group", "group": "C"},
@@ -924,7 +924,7 @@ matches: list[MatchInfo] = [
     # ── Group D ───────────────────────────────────────────────────────────────
     {"id": "D1", "date": "2026-06-14", "time": "16:00", "homeTeam": "ESP", "awayTeam": "COL",    "stadiumName": "SoFi Stadium",           "phase": "group", "group": "D"},
     {"id": "D2", "date": "2026-06-14", "time": "19:00", "homeTeam": "SEN", "awayTeam": "TUN",    "stadiumName": "NRG Stadium",            "phase": "group", "group": "D"},
-    {"id": "D3", "date": "2026-06-18", "time": "16:00", "homeTeam": "ESP", "awayTeam": "SEN",    "stadiumName": "Rose Bowl Stadium",      "phase": "group", "group": "D"},
+    {"id": "D3", "date": "2026-06-18", "time": "16:00", "homeTeam": "ESP", "awayTeam": "SEN",    "stadiumName": "Hard Rock Stadium",      "phase": "group", "group": "D"},
     {"id": "D4", "date": "2026-06-18", "time": "19:00", "homeTeam": "COL", "awayTeam": "TUN",    "stadiumName": "AT&T Stadium",           "phase": "group", "group": "D"},
     {"id": "D5", "date": "2026-06-22", "time": "19:00", "homeTeam": "ESP", "awayTeam": "TUN",    "stadiumName": "MetLife Stadium",        "phase": "group", "group": "D"},
     {"id": "D6", "date": "2026-06-22", "time": "19:00", "homeTeam": "COL", "awayTeam": "SEN",    "stadiumName": "Levi's Stadium",         "phase": "group", "group": "D"},
@@ -949,7 +949,7 @@ matches: list[MatchInfo] = [
     {"id": "G1", "date": "2026-06-15", "time": "16:00", "homeTeam": "SUI", "awayTeam": "CIV",    "stadiumName": "Estadio Azteca",         "phase": "group", "group": "G"},
     {"id": "G2", "date": "2026-06-16", "time": "13:00", "homeTeam": "QAT", "awayTeam": "UZB",    "stadiumName": "Levi's Stadium",         "phase": "group", "group": "G"},
     {"id": "G3", "date": "2026-06-20", "time": "13:00", "homeTeam": "SUI", "awayTeam": "QAT",    "stadiumName": "Estadio Akron",          "phase": "group", "group": "G"},
-    {"id": "G4", "date": "2026-06-20", "time": "16:00", "homeTeam": "CIV", "awayTeam": "UZB",    "stadiumName": "Rose Bowl Stadium",      "phase": "group", "group": "G"},
+    {"id": "G4", "date": "2026-06-20", "time": "16:00", "homeTeam": "CIV", "awayTeam": "UZB",    "stadiumName": "Hard Rock Stadium",      "phase": "group", "group": "G"},
     {"id": "G5", "date": "2026-06-24", "time": "19:00", "homeTeam": "SUI", "awayTeam": "UZB",    "stadiumName": "Estadio BBVA",           "phase": "group", "group": "G"},
     {"id": "G6", "date": "2026-06-24", "time": "19:00", "homeTeam": "CIV", "awayTeam": "QAT",    "stadiumName": "Mercedes-Benz Stadium",  "phase": "group", "group": "G"},
 
@@ -980,7 +980,7 @@ matches: list[MatchInfo] = [
     # ── Group K ───────────────────────────────────────────────────────────────
     {"id": "K1", "date": "2026-06-18", "time": "19:00", "homeTeam": "SCO", "awayTeam": "SRB",    "stadiumName": "Gillette Stadium",       "phase": "group", "group": "K"},
     {"id": "K2", "date": "2026-06-19", "time": "13:00", "homeTeam": "RSA", "awayTeam": "TRI",    "stadiumName": "Mercedes-Benz Stadium",  "phase": "group", "group": "K"},
-    {"id": "K3", "date": "2026-06-23", "time": "13:00", "homeTeam": "SCO", "awayTeam": "RSA",    "stadiumName": "Rose Bowl Stadium",      "phase": "group", "group": "K"},
+    {"id": "K3", "date": "2026-06-23", "time": "13:00", "homeTeam": "SCO", "awayTeam": "RSA",    "stadiumName": "Hard Rock Stadium",      "phase": "group", "group": "K"},
     {"id": "K4", "date": "2026-06-23", "time": "13:00", "homeTeam": "SRB", "awayTeam": "TRI",    "stadiumName": "BMO Field",              "phase": "group", "group": "K"},
     {"id": "K5", "date": "2026-06-27", "time": "19:00", "homeTeam": "SCO", "awayTeam": "TRI",    "stadiumName": "Lincoln Financial Field","phase": "group", "group": "K"},
     {"id": "K6", "date": "2026-06-27", "time": "19:00", "homeTeam": "SRB", "awayTeam": "RSA",    "stadiumName": "NRG Stadium",            "phase": "group", "group": "K"},
@@ -988,7 +988,7 @@ matches: list[MatchInfo] = [
     # ── Group L ───────────────────────────────────────────────────────────────
     {"id": "L1", "date": "2026-06-19", "time": "19:00", "homeTeam": "CRC", "awayTeam": "PAN",    "stadiumName": "Estadio Azteca",         "phase": "group", "group": "L"},
     {"id": "L2", "date": "2026-06-20", "time": "13:00", "homeTeam": "NZL", "awayTeam": "HON",    "stadiumName": "Estadio Akron",          "phase": "group", "group": "L"},
-    {"id": "L3", "date": "2026-06-24", "time": "13:00", "homeTeam": "CRC", "awayTeam": "NZL",    "stadiumName": "Rose Bowl Stadium",      "phase": "group", "group": "L"},
+    {"id": "L3", "date": "2026-06-24", "time": "13:00", "homeTeam": "CRC", "awayTeam": "NZL",    "stadiumName": "Hard Rock Stadium",      "phase": "group", "group": "L"},
     {"id": "L4", "date": "2026-06-24", "time": "16:00", "homeTeam": "PAN", "awayTeam": "HON",    "stadiumName": "Estadio BBVA",           "phase": "group", "group": "L"},
     {"id": "L5", "date": "2026-06-28", "time": "19:00", "homeTeam": "CRC", "awayTeam": "HON",    "stadiumName": "Estadio Azteca",         "phase": "group", "group": "L"},
     {"id": "L6", "date": "2026-06-28", "time": "19:00", "homeTeam": "PAN", "awayTeam": "NZL",    "stadiumName": "Estadio BBVA",           "phase": "group", "group": "L"},
@@ -996,7 +996,7 @@ matches: list[MatchInfo] = [
     # ── Round of 32 (16 matches — 32 qualifiers → 16 teams) ──────────────────
     {"id": "R32-1",  "date": "2026-07-02", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "MetLife Stadium",         "phase": "round_of_32"},
     {"id": "R32-2",  "date": "2026-07-02", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "AT&T Stadium",            "phase": "round_of_32"},
-    {"id": "R32-3",  "date": "2026-07-03", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Rose Bowl Stadium",       "phase": "round_of_32"},
+    {"id": "R32-3",  "date": "2026-07-03", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Hard Rock Stadium",       "phase": "round_of_32"},
     {"id": "R32-4",  "date": "2026-07-03", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "SoFi Stadium",            "phase": "round_of_32"},
     {"id": "R32-5",  "date": "2026-07-04", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Estadio Azteca",          "phase": "round_of_32"},
     {"id": "R32-6",  "date": "2026-07-04", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Mercedes-Benz Stadium",   "phase": "round_of_32"},
@@ -1009,12 +1009,12 @@ matches: list[MatchInfo] = [
     {"id": "R32-13", "date": "2026-07-08", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Estadio Azteca",          "phase": "round_of_32"},
     {"id": "R32-14", "date": "2026-07-08", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "AT&T Stadium",            "phase": "round_of_32"},
     {"id": "R32-15", "date": "2026-07-09", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "MetLife Stadium",         "phase": "round_of_32"},
-    {"id": "R32-16", "date": "2026-07-09", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Rose Bowl Stadium",       "phase": "round_of_32"},
+    {"id": "R32-16", "date": "2026-07-09", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Hard Rock Stadium",       "phase": "round_of_32"},
 
     # ── Round of 16 (8 matches — 16 teams → 8 teams) ─────────────────────────
     {"id": "R16-1", "date": "2026-07-12", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "MetLife Stadium",        "phase": "round_of_16"},
     {"id": "R16-2", "date": "2026-07-12", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "AT&T Stadium",           "phase": "round_of_16"},
-    {"id": "R16-3", "date": "2026-07-13", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Rose Bowl Stadium",      "phase": "round_of_16"},
+    {"id": "R16-3", "date": "2026-07-13", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Hard Rock Stadium",      "phase": "round_of_16"},
     {"id": "R16-4", "date": "2026-07-13", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "SoFi Stadium",           "phase": "round_of_16"},
     {"id": "R16-5", "date": "2026-07-14", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Estadio Azteca",         "phase": "round_of_16"},
     {"id": "R16-6", "date": "2026-07-14", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Mercedes-Benz Stadium",  "phase": "round_of_16"},
@@ -1023,13 +1023,13 @@ matches: list[MatchInfo] = [
 
     # ── Quarter-finals (4 matches) ────────────────────────────────────────────
     {"id": "QF-1", "date": "2026-07-18", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "MetLife Stadium",      "phase": "quarter_final"},
-    {"id": "QF-2", "date": "2026-07-18", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Rose Bowl Stadium",    "phase": "quarter_final"},
+    {"id": "QF-2", "date": "2026-07-18", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Hard Rock Stadium",    "phase": "quarter_final"},
     {"id": "QF-3", "date": "2026-07-19", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "AT&T Stadium",         "phase": "quarter_final"},
     {"id": "QF-4", "date": "2026-07-19", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Estadio Azteca",       "phase": "quarter_final"},
 
     # ── Semi-finals (2 matches) ───────────────────────────────────────────────
     {"id": "SF-1", "date": "2026-07-22", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "MetLife Stadium",   "phase": "semi_final"},
-    {"id": "SF-2", "date": "2026-07-23", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Rose Bowl Stadium", "phase": "semi_final"},
+    {"id": "SF-2", "date": "2026-07-23", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Hard Rock Stadium", "phase": "semi_final"},
 
     # ── Third place play-off ──────────────────────────────────────────────────
     {"id": "3RD",   "date": "2026-07-25", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "AT&T Stadium",      "phase": "third_place"},
