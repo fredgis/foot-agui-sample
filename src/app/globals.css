@@ -177,6 +177,8 @@ html {
   border-left: 2px solid color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 30%, transparent) !important;
   width: 480px !important;
   max-width: 45vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
 }
 
 /* ── CopilotKit popup — mobile ───────────────────────────────────────────────── */
