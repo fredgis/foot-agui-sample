@@ -1,12 +1,13 @@
 "use client";
 
 import { ClubInfoCard } from "@/components/clubinfo";
+import { TeamCard } from "@/components/team-card";
 import { WeatherCard } from "@/components/weather";
 import { MoonCard } from "@/components/moon";
 import { AgentState } from "@/lib/types";
 import { useCoAgent, useCopilotAction } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Composant page d'accueil attractive
 function WelcomeScreen() {
@@ -226,6 +227,16 @@ function YourMainContent({
     },
   })
 
+  // 🎨 Apply team colors when teamInfo changes
+  useEffect(() => {
+    if (state.teamInfo) {
+      setThemeColor(state.teamInfo.primaryColor);
+      setSecondaryColor(state.teamInfo.secondaryColor);
+      setClubName(state.teamInfo.name);
+      setCountryFlag(state.teamInfo.flag);
+    }
+  }, [state.teamInfo, setThemeColor, setSecondaryColor, setClubName, setCountryFlag]);
+
   //🪁 Generative UI: https://docs.copilotkit.ai/microsoft-agent-framework/generative-ui
   useCopilotAction({
     name: "get_weather",
@@ -439,7 +450,9 @@ function YourMainContent({
 
       {/* Carte des infos du club OU Page d'accueil attractive */}
       <div style={{ position: 'relative', zIndex: 10, width: '90%', maxWidth: '1400px', marginTop: clubName ? '200px' : '0' }}>
-        {clubName ? (
+        {state.teamInfo ? (
+          <TeamCard team={state.teamInfo} themeColor={themeColor} secondaryColor={secondaryColor} />
+        ) : clubName ? (
           <ClubInfoCard clubData={null} themeColor={themeColor} />
         ) : (
           <WelcomeScreen />
