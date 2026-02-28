@@ -858,7 +858,6 @@ function YourMainContent({
   useCopilotAction({
     name: "get_stadium_info",
     description: "Show details about a WC2026 host stadium.",
-    available: "disabled",
     parameters: [
       { name: "stadium_name", type: "string", description: "Stadium name", required: true },
     ],
@@ -888,7 +887,6 @@ function YourMainContent({
   useCopilotAction({
     name: "compare_teams",
     description: "Compare two national teams side by side.",
-    available: "disabled",
     parameters: [
       { name: "team_a", type: "string", description: "First team FIFA code", required: true },
       { name: "team_b", type: "string", description: "Second team FIFA code", required: true },
@@ -925,7 +923,6 @@ function YourMainContent({
   useCopilotAction({
     name: "show_tournament_bracket",
     description: "Switch frontend to the tournament bracket (knockout stage) view.",
-    available: "disabled",
     parameters: [],
     handler: async () => {
       setState({ teamInfo: null, matches: [], selectedStadium: null, tournamentView: "bracket", highlightedCity: null });
@@ -940,7 +937,6 @@ function YourMainContent({
   useCopilotAction({
     name: "get_group_standings",
     description: "Show group standings view.",
-    available: "disabled",
     parameters: [
       { name: "group", type: "string", description: "Group letter A–L", required: true },
     ],
