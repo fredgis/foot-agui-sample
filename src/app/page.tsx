@@ -11,7 +11,7 @@ import { AgentState, Confederation, MatchInfo, MatchPhase, StadiumInfo } from "@
 import { stadiums as allStadiums, groups, matches, teams } from "@/lib/worldcup-data";
 import { FlagImg, getFlagUrl } from "@/lib/flags";
 import { useCoAgent, useCopilotAction, useCopilotChat, useCopilotMessagesContext } from "@copilotkit/react-core";
-import { TextMessage, MessageRole, ActionExecutionMessage } from "@copilotkit/runtime-client-gql";
+import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar } from "@copilotkit/react-ui";
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
@@ -666,57 +666,31 @@ function YourMainContent({
     });
   }, [setState]);
 
-  // 🔄 Auto-detect team from agent messages → update page
+  // 🔄 Text-based fallback: detect team from agent messages (backup for client-side update_team_info)
   const lastDetectedTeam = useRef<string | null>(null);
   const { messages: contextMessages } = useCopilotMessagesContext();
 
   useEffect(() => {
     if (!contextMessages || contextMessages.length === 0) return;
-    // Find last assistant text message
     for (let i = contextMessages.length - 1; i >= 0; i--) {
       const msg = contextMessages[i];
       if (msg.isTextMessage() && (msg as TextMessage).role === MessageRole.Assistant) {
         const content = (msg as TextMessage).content;
         if (!content || content.length < 20) break;
-        // Look for FIFA codes in parentheses like "(POR)", "(FRA)"
         const codeMatches = content.match(/\(([A-Z]{3})\)/g);
         if (codeMatches) {
           for (const m of codeMatches) {
             const code = m.slice(1, 4);
-            if (fifaCodesSet.current.has(code)) {
-              if (code !== lastDetectedTeam.current) {
-                console.log(`[Copa] Team switch detected: ${lastDetectedTeam.current} → ${code}`);
-                lastDetectedTeam.current = code;
-                loadTeamByCode(code);
-              }
+            if (fifaCodesSet.current.has(code) && code !== lastDetectedTeam.current) {
+              console.log(`[Copa] Text fallback team switch: ${lastDetectedTeam.current} → ${code}`);
+              lastDetectedTeam.current = code;
+              loadTeamByCode(code);
               return;
             }
           }
         }
         break;
       }
-    }
-  }, [contextMessages, loadTeamByCode]);
-
-  // Watch for server-side tool calls that should trigger page navigation
-  useEffect(() => {
-    if (!contextMessages || contextMessages.length === 0) return;
-    for (let i = contextMessages.length - 1; i >= 0; i--) {
-      const msg = contextMessages[i];
-      if (msg.isActionExecutionMessage()) {
-        const actionMsg = msg as ActionExecutionMessage;
-        if (actionMsg.name === "update_team_info") {
-          const teamCode = String(actionMsg.arguments?.team_code ?? "").toUpperCase();
-          if (teamCode && fifaCodesSet.current.has(teamCode) && teamCode !== lastDetectedTeam.current) {
-            console.log(`[Copa] Team switch via update_team_info: ${lastDetectedTeam.current} → ${teamCode}`);
-            lastDetectedTeam.current = teamCode;
-            loadTeamByCode(teamCode);
-          }
-          return;
-        }
-      }
-      // Stop scanning at the first user message (don't go further back)
-      if (msg.isTextMessage() && (msg as TextMessage).role === MessageRole.User) break;
     }
   }, [contextMessages, loadTeamByCode]);
 
@@ -803,6 +777,42 @@ function YourMainContent({
       }
     },
   }, [setThemeColor, setSecondaryColor, setClubName, setClubLogo, setBackgroundImage, setCountryFlag, setState]);
+
+  // ⚽ Client-side tool: update_team_info — updates UI state AND returns data to agent
+  useCopilotAction({
+    name: "update_team_info",
+    description:
+      "Load a national team into the frontend page. " +
+      "MUST be called IMMEDIATELY whenever a national team is mentioned. " +
+      "Accepts the FIFA three-letter code (e.g. 'FRA', 'BRA', 'ARG') or the team name (e.g. 'France'). " +
+      "Returns the full team data and match schedule as JSON. " +
+      "IMPORTANT: Do NOT call any other tool in the same turn as this tool.",
+    parameters: [
+      { name: "team_code", type: "string", description: "FIFA three-letter code (e.g. 'FRA') or team name (e.g. 'France').", required: true },
+    ],
+    handler: async ({ team_code }: { team_code: string }) => {
+      const code = team_code.trim().toUpperCase();
+      const team = teams.find(
+        (t) => t.fifaCode.toUpperCase() === code || t.name.toLowerCase() === team_code.toLowerCase()
+      );
+      if (!team) {
+        return `Team '${team_code}' not found in WC2026 roster.`;
+      }
+      const teamMatches = matches.filter(
+        (m) => m.homeTeam === team.fifaCode || m.awayTeam === team.fifaCode
+      );
+      // Update React state → triggers UI change (colors, team card, matches, map)
+      setState({
+        teamInfo: team,
+        matches: teamMatches,
+        selectedStadium: null,
+        tournamentView: null,
+        highlightedCity: null,
+      });
+      console.log(`[Copa] update_team_info(${team.fifaCode}) → ${team.name}, ${teamMatches.length} matches`);
+      return JSON.stringify({ team, matches: teamMatches });
+    },
+  }, [setState]);
 
   // 📅 Match click → highlight city on map
   function handleMatchClick(match: MatchInfo) {

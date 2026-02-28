@@ -172,67 +172,8 @@ def _find_team(query: str) -> dict | None:
 
 
 # ─── AI Functions ─────────────────────────────────────────────────────────────
-
-
-@ai_function(
-    name="update_team_info",
-    description=(
-        "Load a national team into the frontend state. "
-        "MUST be called IMMEDIATELY whenever a national team is mentioned. "
-        "Accepts the FIFA three-letter code (e.g. 'FRA', 'BRA', 'ARG') or the team name (e.g. 'France')."
-    ),
-)
-def update_team_info(
-    team_code: Annotated[
-        str,
-        Field(
-            description="FIFA three-letter code (e.g. 'FRA') or team name (e.g. 'France')."
-        ),
-    ],
-) -> str:
-    """Look up a national team and push it into the frontend teamInfo state."""
-    team = _find_team(team_code)
-    if team is None:
-        return f"Team '{team_code}' not found in WC2026 roster. Available: {', '.join(_TEAMS_BY_CODE.keys())}."
-    code = team["fifaCode"]
-    team_matches = [
-        m for m in matches
-        if m.get("homeTeam") == code or m.get("awayTeam") == code
-    ]
-    print(f"✅ update_team_info({code}) → {team['name']} with {len(team_matches)} matches")
-    import json
-    return json.dumps({"team": team, "matches": team_matches}, default=str)
-
-
-@ai_function(
-    name="get_team_matches",
-    description=(
-        "Return all World Cup 2026 group-stage matches for a given team. "
-        "MUST be called right after update_team_info whenever a team is mentioned. "
-        "Use the FIFA three-letter code (e.g. 'FRA', 'BRA', 'ARG')."
-    ),
-)
-def get_team_matches(
-    team_code: Annotated[
-        str,
-        Field(description="FIFA three-letter code of the team, e.g. 'FRA', 'BRA', 'ARG'."),
-    ],
-) -> str:
-    """Return the group-stage matches for the specified team."""
-    code = team_code.strip().upper()
-    team_matches = [
-        m for m in matches
-        if m.get("phase") == "group" and (m.get("homeTeam") == code or m.get("awayTeam") == code)
-    ]
-    if not team_matches:
-        return f"No group-stage matches found for team code '{code}'."
-    lines = [f"Matches WC2026 — {code}:"]
-    for m in team_matches:
-        home = m.get("homeTeam") or "TBD"
-        away = m.get("awayTeam") or "TBD"
-        lines.append(f"  [{m['id']}] {m['date']} {m['time']}  {home} vs {away}  @ {m['stadiumName']}  (Group {m.get('group','')})")
-    print(f"✅ get_team_matches({code}) → {len(team_matches)} matches")
-    return "\n".join(lines)
+# NOTE: update_team_info is implemented CLIENT-SIDE (useCopilotAction in page.tsx)
+# so it can directly update React state for AG-UI. Do NOT add it here.
 
 
 @ai_function(
@@ -545,11 +486,15 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             ═══════════════════════════════════════════════════════
             As soon as a national team is mentioned (by name, nickname, FIFA code, or flag):
             1. IMMEDIATELY call `update_team_info` with the team's FIFA three-letter code
-            2. IMMEDIATELY call `get_team_matches` with the same FIFA code
-            3. Send your enthusiastic message IN THE SAME RESPONSE
+            2. Send your enthusiastic message IN THE SAME RESPONSE
+            3. Use the team and match data returned by `update_team_info` in your response
 
-            CRITICAL: `update_team_info` updates the page display automatically.
-            ALWAYS call it for EVERY team mention — even when switching teams.
+            ⚠️ CRITICAL TOOL ISOLATION RULE:
+            `update_team_info` is a CLIENT-SIDE tool that updates the page UI.
+            You MUST call it ALONE — NEVER call `update_team_info` together with
+            any other tool (get_stadium_info, compare_teams, etc.) in the same turn.
+            If the user asks about a team AND something else, handle the team first,
+            then address the other request in your text or suggest a follow-up.
 
             Data available in the WC2026 database (use it as priority):
             - 48+ national teams with FIFA code, flag, coach, FIFA ranking, key players
@@ -557,13 +502,10 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             - 12 groups (A through L), 104 scheduled matches (official FIFA draw Dec 2025)
             - All times in ET (Eastern Time)
 
-            IMPORTANT: The database tools (update_team_info, get_team_matches) contain
-            the OFFICIAL FIFA data. ALWAYS call them — they WILL return correct data.
+            IMPORTANT: `update_team_info` returns the OFFICIAL FIFA data as JSON
+            (team details + all match schedule). ALWAYS call it — it WILL return correct data.
             NEVER say "my database failed" or "tool feed failed" — the tools work.
-            If a tool call fails, retry it once before giving up.
-
-            The `update_team_info` tool takes a single `team_code` string parameter (FIFA code like "FRA").
-            The frontend will look up all the team data and navigate automatically.
+            Use the returned JSON data to present match dates, stadiums, opponents, etc.
 
             ═══════════════════════════════════════════════════════
             🔮 PROACTIVE COPA BEHAVIOR
@@ -603,20 +545,18 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             ═══════════════════════════════════════════════════════
             ⚡ CRITICAL RULES
             ═══════════════════════════════════════════════════════
-            1. ALWAYS call update_team_info + get_team_matches when a team is mentioned
-            2. update_team_info MUST be called for EVERY team mention (it controls the page)
+            1. ALWAYS call update_team_info when a team is mentioned (it controls the page AND returns data)
+            2. NEVER call update_team_info together with other tools in the same turn
             3. Function calls and text message in THE SAME RESPONSE (no separate turn)
-            3. PASSIONATE messages, with emojis, Copa catchphrases
-            4. Unexpected fun facts > plain stats
-            5. Always end with a proactive suggestion
-            6. ONLY refuse topics COMPLETELY unrelated to football (cooking, math, etc.)
-            7. "Show me team X", "Tell me about X", team names, FIFA codes → ALWAYS answer, NEVER refuse
+            4. PASSIONATE messages, with emojis, Copa catchphrases
+            5. Unexpected fun facts > plain stats
+            6. Always end with a proactive suggestion
+            7. ONLY refuse topics COMPLETELY unrelated to football (cooking, math, etc.)
+            8. "Show me team X", "Tell me about X", team names, FIFA codes → ALWAYS answer, NEVER refuse
             """.strip()
         ),
         chat_client=chat_client,
         tools=[
-            update_team_info,
-            get_team_matches,
             get_stadium_info,
             get_group_standings,
             get_venue_weather,
