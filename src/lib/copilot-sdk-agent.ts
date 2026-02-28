@@ -294,6 +294,13 @@ export class CopilotSDKAgent extends AbstractAgent {
     super({
       agentId: config.agentId ?? "copa_agent",
       description: "Copa 🎙️ — WC2026 expert powered by GitHub Copilot SDK",
+      initialState: {
+        teamInfo: null,
+        matches: [],
+        selectedStadium: null,
+        tournamentView: null,
+        highlightedCity: null,
+      },
     });
     this.providerConfig = config.provider;
     this.modelName = config.model ?? "gpt-4o-mini";
@@ -362,13 +369,12 @@ export class CopilotSDKAgent extends AbstractAgent {
     const sessionConfig: any = {
       model: this.modelName,
       tools: buildCopaTools(),
-      availableTools: CUSTOM_TOOL_NAMES,
       systemMessage: { mode: "replace" as const, content: COPA_SYSTEM_PROMPT },
       onPermissionRequest: approveAll,
       streaming: true,
       mcpServers: {
         "weather": {
-          type: "http",
+          type: "sse",
           url: "https://mcp.open-meteo.com/sse",
           tools: ["*"],
         },
@@ -447,6 +453,7 @@ export class CopilotSDKAgent extends AbstractAgent {
       const resultStr = typeof event.data.result === "string"
         ? event.data.result
         : event.data.result?.content ?? "";
+      console.log(`[CopilotSDKAgent] Tool completed: ${toolName}, result type: ${typeof event.data.result}, resultStr length: ${resultStr.length}`);
       if (toolName === "update_team_info" && resultStr) {
         try {
           const parsed = JSON.parse(resultStr);
@@ -463,7 +470,9 @@ export class CopilotSDKAgent extends AbstractAgent {
             });
             console.log(`[CopilotSDKAgent] STATE_DELTA emitted for team: ${parsed.team.name}`);
           }
-        } catch { /* ignore parse errors */ }
+        } catch (e) {
+          console.error(`[CopilotSDKAgent] Failed to parse update_team_info result:`, e);
+        }
       } else if (toolName === "show_tournament_bracket") {
         emit({
           type: EventType.STATE_DELTA,
