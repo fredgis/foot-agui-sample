@@ -349,11 +349,26 @@ export class CopilotSDKAgent extends AbstractAgent {
 
   run(input: RunAgentInput): Observable<BaseEvent> {
     return new Observable<BaseEvent>((subscriber) => {
+      // Check if this is a suggestion request — skip it to avoid loops
+      const userMsg = this.extractUserMessage(input);
+      if (userMsg.startsWith("Suggest what the user could say next")) {
+        console.log("[CopilotSDKAgent] Skipping suggestion request");
+        const runId = input.runId ?? crypto.randomUUID();
+        const threadId = input.threadId ?? crypto.randomUUID();
+        const ts = Date.now();
+        subscriber.next({ type: EventType.RUN_STARTED, runId, threadId, timestamp: ts, rawEvent: {} } as BaseEvent);
+        subscriber.next({ type: EventType.RUN_FINISHED, runId, threadId, timestamp: ts, rawEvent: {} } as BaseEvent);
+        subscriber.complete();
+        return;
+      }
+
       this.runCopilotSession(input, subscriber).catch((err) => {
         console.error("[CopilotSDKAgent] Fatal error:", err);
         subscriber.next({
           type: EventType.RUN_ERROR,
           message: err instanceof Error ? err.message : String(err),
+          timestamp: Date.now(),
+          rawEvent: {},
         } as BaseEvent);
         subscriber.complete();
       });
