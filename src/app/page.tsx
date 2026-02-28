@@ -15,6 +15,18 @@ import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
+// ── TeamLoaderEffect: triggers loadTeamByCode when a tool call is detected ──
+function TeamLoaderEffect({ teamCode, loadFn }: { teamCode: string; loadFn: (code: string) => void }) {
+  const loadedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (teamCode && teamCode !== loadedRef.current) {
+      loadedRef.current = teamCode;
+      loadFn(teamCode);
+    }
+  }, [teamCode, loadFn]);
+  return null;
+}
+
 // ── Mobile detection ──────────────────────────────────────────────────────────
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -845,7 +857,6 @@ function YourMainContent({
       const teamMatches = matches.filter(
         (m) => m.homeTeam === team.fifaCode || m.awayTeam === team.fifaCode
       );
-      // Update React state → triggers UI change (colors, team card, matches, map)
       setState({
         teamInfo: team,
         matches: teamMatches,
@@ -856,7 +867,15 @@ function YourMainContent({
       console.log(`[Copa] update_team_info(${team.fifaCode}) → ${team.name}, ${teamMatches.length} matches`);
       return JSON.stringify({ team, matches: teamMatches });
     },
-  }, [setState]);
+    render: ({ args, status }) => {
+      return (
+        <>
+          {args.team_code && <TeamLoaderEffect teamCode={args.team_code} loadFn={loadTeamByCode} />}
+          {status === "inProgress" && <div className="p-2 text-sm opacity-60">⚽ Loading team…</div>}
+        </>
+      );
+    },
+  }, [setState, loadTeamByCode]);
 
   // 🏟️ Generative UI: render rich stadium card in chat when agent calls get_stadium_info
   useCopilotAction({
