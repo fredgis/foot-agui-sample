@@ -1,24 +1,20 @@
 @import "tailwindcss";
 
+/* ── CSS Variables ─────────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  
-  /* Variables de thème dynamique */
+  --background: #0a0a0a;
+  --foreground: #f0f0f0;
+
+  /* Dynamic theme variables */
   --theme-primary: #6366f1;
   --theme-secondary: #8b5cf6;
   --theme-accent: #a78bfa;
-  --theme-background: #ffffff;
-  --theme-text: #171717;
+
+  /* Color morph transition */
+  --color-morph-duration: 0.6s;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ── Dark theme by default (WC2026) ─────────────────────────────────────────── */
 body {
   background: var(--background);
   color: var(--foreground);
@@ -30,16 +26,139 @@ html {
   height: 100%;
 }
 
-/* Style amélioré pour le chat sidebar - Version Sympa ! 🎨 */
+/* ── Animations ─────────────────────────────────────────────────────────────── */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 8px var(--copilot-kit-primary-color, #6366f1);
+  }
+  50% {
+    box-shadow: 0 0 24px var(--copilot-kit-primary-color, #6366f1);
+  }
+}
+
+@keyframes countdownPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes staggeredReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes colorMorph {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+@keyframes welcomeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Utility animation classes ──────────────────────────────────────────────── */
+.welcome-fade-in {
+  animation: welcomeFadeIn 0.7s ease-out both;
+}
+
+.stagger-item {
+  animation: staggeredReveal 0.45s ease-out both;
+  animation-fill-mode: both;
+}
+
+/* ── WC2026 gradient text ────────────────────────────────────────────────────── */
+.wc-gradient-text {
+  /* WC2026 colors: host countries USA (red), gold, Mexico/Canada (green) */
+  background: linear-gradient(135deg, #c8102e 0%, #f4d03f 40%, #007a3d 70%, #c8102e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Skeleton loaders ────────────────────────────────────────────────────────── */
+.skeleton-pulse {
+  background: rgba(200, 200, 200, 0.15);
+  animation: pulse 1.4s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+/* ── CopilotKit sidebar — desktop ────────────────────────────────────────────── */
 .copilot-sidebar-custom {
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%) !important;
+  background: linear-gradient(180deg, rgba(10, 12, 20, 0.98) 0%, rgba(18, 24, 38, 0.98) 100%) !important;
   backdrop-filter: blur(30px) saturate(180%) !important;
   border-left: none !important;
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6) !important;
   border-left: 2px solid color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 30%, transparent) !important;
 }
 
-/* Messages dans le chat popup - Style Fun ! 😊 */
+/* ── CopilotKit popup — mobile ───────────────────────────────────────────────── */
+.copilot-popup-mobile {
+  /* Let CopilotKit handle the popup positioning */
+}
+
+/* ── Chat messages ───────────────────────────────────────────────────────────── */
 [data-copilotkit-message-role="user"] {
   background: var(--copilot-kit-primary-color, #6366f1) !important;
   border-radius: 24px 24px 4px 24px !important;
@@ -51,7 +170,11 @@ html {
 }
 
 [data-copilotkit-message-role="assistant"] {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 15%, transparent) 0%, color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 10%, transparent) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 15%, transparent) 0%,
+    color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 10%, transparent) 100%
+  ) !important;
   border-left: 4px solid var(--copilot-kit-primary-color, #6366f1) !important;
   border-radius: 4px 24px 24px 24px !important;
   padding: 14px 20px !important;
@@ -61,9 +184,9 @@ html {
   line-height: 1.6 !important;
 }
 
-/* Input du chat - Plus accueillant */
+/* ── Chat input ──────────────────────────────────────────────────────────────── */
 [data-copilotkit-input] {
-  background: rgba(51, 65, 85, 0.8) !important;
+  background: rgba(30, 41, 59, 0.8) !important;
   border: 2px solid rgba(148, 163, 184, 0.3) !important;
   border-radius: 28px !important;
   padding: 16px 24px !important;
@@ -74,8 +197,10 @@ html {
 
 [data-copilotkit-input]:focus {
   border-color: var(--copilot-kit-primary-color, #6366f1) !important;
-  background: rgba(51, 65, 85, 1) !important;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 20%, transparent), 0 8px 24px color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 30%, transparent) !important;
+  background: rgba(30, 41, 59, 1) !important;
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 20%, transparent),
+    0 8px 24px color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 30%, transparent) !important;
   transform: scale(1.02) !important;
 }
 
@@ -83,7 +208,7 @@ html {
   color: rgba(203, 213, 225, 0.6) !important;
 }
 
-/* Bouton d'envoi - Super Fun ! 🚀 */
+/* ── Send button ─────────────────────────────────────────────────────────────── */
 [data-copilotkit-send-button] {
   background: var(--copilot-kit-primary-color, #6366f1) !important;
   border-radius: 50% !important;
@@ -105,9 +230,13 @@ html {
   transform: scale(0.95) !important;
 }
 
-/* Suggestions - Super Sympas ! 💫 */
+/* ── Suggestions ──────────────────────────────────────────────────────────────── */
 [data-copilotkit-suggestion] {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 20%, transparent) 0%, color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 15%, transparent) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 20%, transparent) 0%,
+    color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 15%, transparent) 100%
+  ) !important;
   border: 2px solid color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 40%, transparent) !important;
   border-radius: 24px !important;
   padding: 10px 20px !important;
@@ -125,13 +254,13 @@ html {
   color: white !important;
 }
 
-/* Scrollbar stylée */
+/* ── Scrollbar ────────────────────────────────────────────────────────────────── */
 .copilot-sidebar-custom ::-webkit-scrollbar {
   width: 8px !important;
 }
 
 .copilot-sidebar-custom ::-webkit-scrollbar-track {
-  background: rgba(30, 41, 59, 0.4) !important;
+  background: rgba(18, 24, 38, 0.4) !important;
 }
 
 .copilot-sidebar-custom ::-webkit-scrollbar-thumb {
@@ -141,4 +270,12 @@ html {
 
 .copilot-sidebar-custom ::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 80%, #000) !important;
+}
+
+/* ── Mobile-first responsive ─────────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  /* Desktop enhancements */
+  .welcome-fade-in {
+    animation-duration: 0.9s;
+  }
 }
