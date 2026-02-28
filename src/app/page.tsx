@@ -3,7 +3,9 @@
 import { ClubInfoCard } from "@/components/clubinfo";
 import { WeatherCard } from "@/components/weather";
 import { MoonCard } from "@/components/moon";
-import { AgentState } from "@/lib/types";
+import { VenueMap } from "@/components/venue-map";
+import { AgentState, StadiumInfo } from "@/lib/types";
+import { stadiums as allStadiums } from "@/lib/worldcup-data";
 import { useCoAgent, useCopilotAction } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
 import { useState } from "react";
@@ -440,7 +442,23 @@ function YourMainContent({
       {/* Carte des infos du club OU Page d'accueil attractive */}
       <div style={{ position: 'relative', zIndex: 10, width: '90%', maxWidth: '1400px', marginTop: clubName ? '200px' : '0' }}>
         {clubName ? (
-          <ClubInfoCard clubData={null} themeColor={themeColor} />
+          <>
+            <ClubInfoCard clubData={null} themeColor={themeColor} />
+            {/* VenueMap — affiché quand des matchs WorldCup sont disponibles */}
+            {state.matches && state.matches.length > 0 && (
+              <div className="mt-6">
+                <VenueMap
+                  stadiums={allStadiums}
+                  teamMatches={state.matches}
+                  highlightedCity={state.highlightedCity}
+                  themeColor={themeColor}
+                  onStadiumClick={(stadium: StadiumInfo) => {
+                    setState({ ...state, selectedStadium: stadium });
+                  }}
+                />
+              </div>
+            )}
+          </>
         ) : (
           <WelcomeScreen />
         )}
