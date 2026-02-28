@@ -866,9 +866,6 @@ function YourMainContent({
       const stadium = allStadiums.find(
         (s) => s.name.toLowerCase().includes((stadium_name ?? "").toLowerCase())
       );
-      if (stadium) {
-        setState({ ...state, selectedStadium: stadium, highlightedCity: stadium.city });
-      }
       return stadium ? `Showing ${stadium.name}` : `Stadium '${stadium_name}' not found`;
     },
     render: ({ args, status }) => {
@@ -885,7 +882,7 @@ function YourMainContent({
         </div>
       );
     },
-  }, [themeColor, state, setState]);
+  }, [themeColor]);
 
   // 🆚 Generative UI: render comparison card when agent calls compare_teams
   useCopilotAction({
