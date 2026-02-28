@@ -638,20 +638,22 @@ function YourMainContent({
 
   // 🔄 Auto-detect team from agent messages → update page
   const lastDetectedTeam = useRef<string | null>(null);
-  useEffect(() => {
+  const lastCheckedContent = useRef<string>("");
+  
+  // Check messages for team codes — called by effect AND interval
+  const checkMessagesForTeam = useCallback(() => {
     if (!visibleMessages || visibleMessages.length === 0) return;
-    // Find last assistant text message
     for (let i = visibleMessages.length - 1; i >= 0; i--) {
       const msg = visibleMessages[i];
       if (msg.isTextMessage() && msg.role === MessageRole.Assistant) {
         const content = (msg as TextMessage).content;
-        if (!content || content.length < 10) break; // still streaming, wait
-        // Look for FIFA codes in parentheses like "(POR)", "(FRA)"
+        if (!content || content.length < 20) break;
+        if (content === lastCheckedContent.current) return;
+        lastCheckedContent.current = content;
         const codeMatches = content.match(/\(([A-Z]{3})\)/g);
         if (codeMatches) {
-          // Find the LAST mentioned team code (most relevant)
-          for (let j = codeMatches.length - 1; j >= 0; j--) {
-            const code = codeMatches[j].slice(1, 4);
+          for (const m of codeMatches) {
+            const code = m.slice(1, 4);
             if (fifaCodesSet.current.has(code)) {
               if (code !== lastDetectedTeam.current) {
                 lastDetectedTeam.current = code;
@@ -665,6 +667,15 @@ function YourMainContent({
       }
     }
   }, [visibleMessages, loadTeamByCode]);
+
+  // Primary: react to visibleMessages changes
+  useEffect(() => { checkMessagesForTeam(); }, [checkMessagesForTeam]);
+
+  // Backup: poll every 2s in case visibleMessages ref doesn't change
+  useEffect(() => {
+    const id = setInterval(checkMessagesForTeam, 2000);
+    return () => clearInterval(id);
+  }, [checkMessagesForTeam]);
 
   // 🏠 Return to welcome screen
   const goHome = useCallback(() => {
