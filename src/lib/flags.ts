@@ -114,12 +114,15 @@ const fifaToName: Record<string, string> = {
 
 /**
  * Returns a flagcdn.com PNG URL for the given FIFA code.
- * Returns empty string if the code is unknown.
+ * flagcdn.com supports specific widths: 20, 40, 80, 160, 320, 640, 1280, 2560.
+ * We pick the smallest width that is >= requested display width.
  */
 export function getFlagUrl(fifaCode: string, width?: number): string {
   const iso = fifaToIso2[fifaCode];
   if (!iso) return "";
-  const w = width || 80;
+  const requested = width || 80;
+  const supported = [20, 40, 80, 160, 320, 640, 1280, 2560];
+  const w = supported.find((s) => s >= requested) || 80;
   return `https://flagcdn.com/w${w}/${iso}.png`;
 }
 

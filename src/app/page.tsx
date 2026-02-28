@@ -533,7 +533,6 @@ function YourMainContent({
 
   // Known FIFA codes for team detection
   const fifaCodesSet = useRef(new Set(teams.map((t) => t.fifaCode)));
-  const lastProcessedMsgId = useRef<string | null>(null);
 
   // 🏳️ Helper: load a team by code into state
   const loadTeamByCode = useCallback((code: string) => {
@@ -560,9 +559,8 @@ function YourMainContent({
     for (let i = visibleMessages.length - 1; i >= 0; i--) {
       const msg = visibleMessages[i];
       if (msg.isTextMessage() && msg.role === MessageRole.Assistant) {
-        if (msg.id === lastProcessedMsgId.current) return;
-        lastProcessedMsgId.current = msg.id;
         const content = (msg as TextMessage).content;
+        if (!content || content.length < 10) break; // still streaming, wait
         // Look for first FIFA code in parentheses like "(POR)", "(FRA)"
         const codeMatches = content.match(/\(([A-Z]{3})\)/g);
         if (codeMatches) {
