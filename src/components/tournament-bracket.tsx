@@ -2,12 +2,13 @@
 
 import type { MatchInfo, MatchPhase } from "@/lib/types";
 import { teams as allTeams } from "@/lib/worldcup-data";
+import { FlagImg } from "@/lib/flags";
 
 interface TournamentBracketProps {
   matches: MatchInfo[];
   selectedTeamCode?: string;
   themeColor: string;
-  onPhaseClick?: (phase: MatchPhase) => void; // → filtre MatchSchedule
+  onPhaseClick?: (phase: MatchPhase) => void;
 }
 
 const PHASE_LABELS: Partial<Record<MatchPhase, string>> = {
@@ -15,8 +16,8 @@ const PHASE_LABELS: Partial<Record<MatchPhase, string>> = {
   round_of_16: "R16",
   quarter_final: "QF",
   semi_final: "SF",
-  final: "Finale",
-  third_place: "3e Place",
+  final: "Final",
+  third_place: "3rd Place",
 };
 
 // Height in px allocated per match slot
@@ -63,14 +64,14 @@ export function TournamentBracket({
         }}
       >
         <div className="flex items-center gap-1 py-0.5">
-          <span>{home?.flag ?? "🏳"}</span>
+          <span>{home ? <FlagImg fifaCode={match.homeTeam!} width={16} height={11} /> : "🏳"}</span>
           <span className="font-medium text-gray-700 truncate">
             {home?.name ?? "TBD"}
           </span>
         </div>
         <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)" }} />
         <div className="flex items-center gap-1 py-0.5">
-          <span>{away?.flag ?? "🏳"}</span>
+          <span>{away ? <FlagImg fifaCode={match.awayTeam!} width={16} height={11} /> : "🏳"}</span>
           <span className="font-medium text-gray-700 truncate">
             {away?.name ?? "TBD"}
           </span>
@@ -139,7 +140,7 @@ export function TournamentBracket({
         className="text-2xl font-bold mb-4 text-center"
         style={{ color: themeColor }}
       >
-        🏆 Tableau — Coupe du Monde 2026
+        🏆 Bracket — FIFA World Cup 2026
       </h2>
 
       {/* Horizontal scroll on mobile */}

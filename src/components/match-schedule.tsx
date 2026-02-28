@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { MatchInfo, MatchPhase } from "@/lib/types";
 import { teams, stadiums } from "@/lib/worldcup-data";
+import { FlagImg } from "@/lib/flags";
 
 export interface MatchScheduleProps {
   matches: MatchInfo[];
@@ -15,13 +16,13 @@ export interface MatchScheduleProps {
 // ─── Phase badge config ───────────────────────────────────────────────────────
 
 const PHASE_LABELS: Record<MatchPhase, string> = {
-  group: "Groupe",
+  group: "Group",
   round_of_32: "R32",
   round_of_16: "R16",
   quarter_final: "QF",
   semi_final: "SF",
-  third_place: "3e Place",
-  final: "Finale",
+  third_place: "3rd Place",
+  final: "Final",
 };
 
 const PHASE_COLORS: Record<MatchPhase, string> = {
@@ -64,7 +65,7 @@ function getDaysUntil(dateStr: string): number {
 function formatMatchDate(dateStr: string): string {
   const [year, month, day] = dateStr.split("-").map(Number);
   const d = new Date(year, month - 1, day);
-  return d.toLocaleDateString("fr-FR", {
+  return d.toLocaleDateString("en-US", {
     weekday: "short",
     day: "numeric",
     month: "short",
@@ -157,8 +158,8 @@ function MatchCard({
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
   const daysUntil = getDaysUntil(match.date);
-  const homeFlag = getTeamFlag(match.homeTeam);
-  const awayFlag = getTeamFlag(match.awayTeam);
+  const homeFlag = match.homeTeam;
+  const awayFlag = match.awayTeam;
   const stadiumDetails = getStadiumDetails(match.stadiumName);
 
   const handleOpponentClick = (code: string | null, e: React.MouseEvent) => {
@@ -219,11 +220,11 @@ function MatchCard({
               }}
               title={
                 match.homeTeam && match.homeTeam !== teamCode
-                  ? `Comparer avec ${getTeamName(match.homeTeam)}`
+                  ? `Compare with ${getTeamName(match.homeTeam)}`
                   : undefined
               }
             >
-              {homeFlag}
+              {homeFlag ? <FlagImg fifaCode={homeFlag} width={24} height={16} /> : <span>❓</span>}
             </span>
             <span className="text-xs font-bold text-gray-700 truncate w-full">
               {getTeamName(match.homeTeam)}
@@ -258,11 +259,11 @@ function MatchCard({
               }}
               title={
                 match.awayTeam && match.awayTeam !== teamCode
-                  ? `Comparer avec ${getTeamName(match.awayTeam)}`
+                  ? `Compare with ${getTeamName(match.awayTeam)}`
                   : undefined
               }
             >
-              {awayFlag}
+              {awayFlag ? <FlagImg fifaCode={awayFlag} width={24} height={16} /> : <span>❓</span>}
             </span>
             <span className="text-xs font-bold text-gray-700 truncate w-full">
               {getTeamName(match.awayTeam)}
@@ -297,7 +298,7 @@ function MatchCard({
               }}
             >
               <div className="font-bold mb-1">🏟️ {stadiumDetails.name}</div>
-              <div>👥 {stadiumDetails.capacity.toLocaleString()} places</div>
+              <div>👥 {stadiumDetails.capacity.toLocaleString()} seats</div>
               <div>
                 📍 {stadiumDetails.city}, {stadiumDetails.country}
               </div>
@@ -314,17 +315,17 @@ function MatchCard({
             className="mt-2 text-center text-xs font-semibold"
             style={{ color: themeColor }}
           >
-            ⏳ Dans {daysUntil} jour{daysUntil !== 1 ? "s" : ""}
+            ⏳ In {daysUntil} day{daysUntil !== 1 ? "s" : ""}
           </div>
         )}
         {daysUntil === 0 && (
           <div className="mt-2 text-center text-xs font-bold text-green-600">
-            🔴 Aujourd'hui !
+            🔴 Today!
           </div>
         )}
         {daysUntil < 0 && (
           <div className="mt-2 text-center text-xs text-gray-400">
-            ✅ Match joué
+            ✅ Match played
           </div>
         )}
       </div>
@@ -369,7 +370,7 @@ export function MatchSchedule({
             style={{ background: `${themeColor}40` }}
           />
           <span className="text-sm font-bold px-3" style={{ color: themeColor }}>
-            📅 Calendrier
+            📅 Schedule
           </span>
           <div
             className="flex-1 h-px"
@@ -400,7 +401,7 @@ export function MatchSchedule({
           className="text-sm font-bold px-3 whitespace-nowrap"
           style={{ color: themeColor }}
         >
-          📅 Calendrier des Matchs
+          📅 Match Schedule
         </span>
         <div
           className="flex-1 h-px"
@@ -411,7 +412,7 @@ export function MatchSchedule({
       {/* Group stage section */}
       {groupMatches.length > 0 && (
         <div>
-          <PhaseSeparator themeColor={themeColor} label="⚽ Phase de Groupes" />
+          <PhaseSeparator themeColor={themeColor} label="⚽ Group Stage" />
           {groupMatches.map((m, i) => (
             <MatchCard
               key={m.id}
@@ -429,14 +430,14 @@ export function MatchSchedule({
 
       {/* Knockout / group separator */}
       {groupMatches.length > 0 && knockoutMatches.length > 0 && (
-        <PhaseSeparator themeColor={themeColor} label="🏆 Phases Éliminatoires" />
+        <PhaseSeparator themeColor={themeColor} label="🏆 Knockout Stage" />
       )}
 
       {/* Knockout stage section */}
       {knockoutMatches.length > 0 && (
         <div>
           {groupMatches.length === 0 && (
-            <PhaseSeparator themeColor={themeColor} label="🏆 Phases Éliminatoires" />
+            <PhaseSeparator themeColor={themeColor} label="🏆 Knockout Stage" />
           )}
           {knockoutMatches.map((m, i) => (
             <MatchCard

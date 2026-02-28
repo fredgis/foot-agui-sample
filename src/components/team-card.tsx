@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { TeamInfo, PlayerInfo } from "@/lib/types";
 import { groups } from "@/lib/worldcup-data";
+import { FlagImg } from "@/lib/flags";
 
 interface TeamCardProps {
   team: TeamInfo | null;
@@ -14,7 +15,7 @@ interface TeamCardProps {
 function findTeamGroup(fifaCode: string): string {
   for (const group of groups) {
     if (group.teams.includes(fifaCode)) {
-      return `Groupe ${group.name}`;
+      return `Group ${group.name}`;
     }
   }
   return "–";
@@ -216,10 +217,10 @@ export function TeamCard({ team, themeColor, secondaryColor }: TeamCardProps) {
         style={{ animation: "fadeUp 0.6s ease-out both", animationDelay: "0s" }}
       >
         <div
-          className="text-8xl md:text-9xl select-none leading-none"
+          className="select-none leading-none"
           style={{ filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.2))" }}
         >
-          {team.flag}
+          <FlagImg fifaCode={team.fifaCode} width={120} height={80} style={{ borderRadius: "8px", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }} />
         </div>
         <div className="flex-1 text-center md:text-left">
           <h2
@@ -254,18 +255,18 @@ export function TeamCard({ team, themeColor, secondaryColor }: TeamCardProps) {
         style={{ animation: "fadeUp 0.6s ease-out both", animationDelay: "0.12s" }}
       >
         {[
-          { icon: "📊", label: "Classement FIFA", value: `#${team.fifaRanking}` },
-          { icon: "🗺️", label: "Groupe WC2026", value: group },
+          { icon: "📊", label: "FIFA Ranking", value: `#${team.fifaRanking}` },
+          { icon: "🗺️", label: "WC2026 Group", value: group },
           {
             icon: "🏆",
-            label: "Titres WC",
+            label: "WC Titles",
             value: team.worldCupHistory.titles > 0
               ? `${team.worldCupHistory.titles} 🥇`
               : "0",
           },
           {
             icon: "🎽",
-            label: "Participations WC",
+            label: "WC Appearances",
             value: `${team.worldCupHistory.participations}`,
           },
         ].map((stat, i) => (
@@ -317,7 +318,7 @@ export function TeamCard({ team, themeColor, secondaryColor }: TeamCardProps) {
           className="text-xl font-bold mb-4 flex items-center gap-2"
           style={{ color: themeColor }}
         >
-          📜 Historique Coupe du Monde
+          📜 World Cup History
         </h3>
         <div
           className="p-5 rounded-xl"
@@ -331,19 +332,19 @@ export function TeamCard({ team, themeColor, secondaryColor }: TeamCardProps) {
               <div className="text-4xl font-extrabold" style={{ color: themeColor }}>
                 {team.worldCupHistory.participations}
               </div>
-              <div className="text-sm text-gray-500">Participations</div>
+              <div className="text-sm text-gray-500">Appearances</div>
             </div>
             <div className="hidden sm:block w-px h-10 bg-gray-300" />
             <div>
               <div className="text-4xl font-extrabold" style={{ color: themeColor }}>
                 {team.worldCupHistory.titles}
               </div>
-              <div className="text-sm text-gray-500">Titre(s)</div>
+              <div className="text-sm text-gray-500">Title(s)</div>
             </div>
             <div className="hidden sm:block w-px h-10 bg-gray-300" />
             <div className="flex-1 text-center sm:text-left">
               <div className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
-                Meilleur résultat
+                Best result
               </div>
               <div className="text-lg font-bold" style={{ color: themeColor }}>
                 🏅 {team.worldCupHistory.bestResult}

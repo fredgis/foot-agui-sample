@@ -103,64 +103,64 @@ _GROUPS_BY_NAME: dict[str, dict] = {g["name"].upper(): g for g in groups}
 
 _CITY_ANECDOTES: dict[str, str] = {
     "New York / New Jersey": (
-        "New York / New Jersey accueille la Grande Finale à MetLife Stadium. "
-        "Fun fact : le stade flotte littéralement sur des pilotis au-dessus des marais du New Jersey !"
+        "New York / New Jersey hosts the Grand Final at MetLife Stadium. "
+        "Fun fact: the stadium literally floats on stilts above the New Jersey marshlands!"
     ),
     "Los Angeles": (
-        "LA, terre du show-biz, accueille deux stades WC2026 : le Rose Bowl (icône de 1994) "
-        "et SoFi Stadium, le bijou de la NFL. Hollywood n'a rien à envier au football ici."
+        "LA, land of showbiz, hosts two WC2026 stadiums: the Rose Bowl (1994 icon) "
+        "and SoFi Stadium, the NFL's crown jewel. Hollywood has nothing on football here."
     ),
     "Dallas": (
-        "AT&T Stadium à Arlington : 80 000 places, l'un des plus grands écrans vidéo au monde. "
-        "Quand le but rentre, l'image est grande comme une maison !"
+        "AT&T Stadium in Arlington: 80,000 seats, one of the biggest video screens in the world. "
+        "When a goal goes in, the replay is as big as a house!"
     ),
     "Atlanta": (
-        "Mercedes-Benz Stadium a accueilli le Super Bowl 2019 et une Copa América. "
-        "Son toit s'ouvre comme un iris de caméra — du jamais vu en architecture sportive."
+        "Mercedes-Benz Stadium hosted Super Bowl 2019 and a Copa América. "
+        "Its roof opens like a camera iris — a first in sports architecture."
     ),
     "Kansas City": (
-        "Arrowhead Stadium : régulièrement classé stade le plus bruyant au monde par le Livre Guinness. "
-        "Les fans des Chiefs vont rendre fous les supporters du monde entier !"
+        "Arrowhead Stadium: regularly ranked the loudest stadium in the world by the Guinness Book. "
+        "The Chiefs fans are going to drive supporters from around the globe crazy!"
     ),
     "Houston": (
-        "NRG Stadium à Houston dispose d'un toit rétractable pour survivre à la chaleur texane. "
-        "La NASA est à 40 km — Houston, on a un problème… de choix tellement c'est beau !"
+        "NRG Stadium in Houston has a retractable roof to survive the Texan heat. "
+        "NASA is 25 miles away — Houston, we have a problem… of having too many amazing choices!"
     ),
     "Boston": (
-        "Gillette Stadium à Foxborough : terrain du dynastique New England Patriots. "
-        "Boston, ville de champions (Celtics, Red Sox, Patriots, Bruins) accueille enfin le foot mondial."
+        "Gillette Stadium in Foxborough: home of the dynastic New England Patriots. "
+        "Boston, city of champions (Celtics, Red Sox, Patriots, Bruins), finally welcomes world football."
     ),
     "Philadelphia": (
-        "Lincoln Financial Field, 'The Linc', résonne déjà des chants des Eagles. "
-        "Philly, ville de Rocky Balboa, va montrer au monde ce que 'Eye of the Tiger' veut dire !"
+        "Lincoln Financial Field, 'The Linc', already echoes with Eagles chants. "
+        "Philly, home of Rocky Balboa, is about to show the world what 'Eye of the Tiger' really means!"
     ),
     "San Francisco Bay Area": (
-        "Levi's Stadium à Santa Clara, Silicon Valley : là où on invente le futur, "
-        "on va aussi écrire l'histoire du football mondial en 2026."
+        "Levi's Stadium in Santa Clara, Silicon Valley: where the future is invented, "
+        "we'll also be writing world football history in 2026."
     ),
     "Las Vegas": (
-        "Allegiant Stadium, le 'Death Star' de Las Vegas : sans fenêtres, climatisé, au milieu du désert. "
-        "Ce qui se passe à Vegas… restera dans les annales du football !"
+        "Allegiant Stadium, the 'Death Star' of Las Vegas: windowless, air-conditioned, in the middle of the desert. "
+        "What happens in Vegas… will go down in football history!"
     ),
     "Vancouver": (
-        "BC Place à Vancouver : entre l'océan Pacifique et les montagnes enneigées. "
-        "Le Canada 2026, c'est la première Coupe du Monde co-organisée par trois nations !"
+        "BC Place in Vancouver: between the Pacific Ocean and the snow-capped mountains. "
+        "Canada 2026 marks the first World Cup co-hosted by three nations!"
     ),
     "Toronto": (
-        "BMO Field, maison de Toronto FC, élargi pour l'occasion. "
-        "Toronto parle 200 langues — le stade va vibrer en toutes les langues du monde."
+        "BMO Field, home of Toronto FC, expanded for the occasion. "
+        "Toronto speaks 200 languages — the stadium will roar in every tongue on Earth."
     ),
     "Mexico City": (
-        "L'Estadio Azteca : le seul stade à avoir accueilli deux finales de Coupe du Monde (1970 et 1986). "
-        "C'est là que Maradona a marqué 'La Main de Dieu' et 'Le But du Siècle'. Sacré !"
+        "Estadio Azteca: the only stadium to have hosted two World Cup finals (1970 and 1986). "
+        "This is where Maradona scored 'The Hand of God' and 'The Goal of the Century'. Legendary!"
     ),
     "Monterrey": (
-        "L'Estadio BBVA à Monterrey, niché dans les montagnes de la Sierra Madre. "
-        "La chaleur, l'altitude et le bruit — un chaudron unique en Amérique du Nord."
+        "Estadio BBVA in Monterrey, nestled in the Sierra Madre mountains. "
+        "The heat, the altitude, and the noise — a unique cauldron in North America."
     ),
     "Guadalajara": (
-        "L'Estadio Akron, maison des Chivas de Guadalajara. "
-        "Guadalajara est la capitale de la tequila ET du football passionné au Mexique. Salud !"
+        "Estadio Akron, home of Chivas de Guadalajara. "
+        "Guadalajara is the capital of tequila AND passionate football in Mexico. Cheers!"
     ),
 }
 
@@ -265,11 +265,11 @@ def get_stadium_info(
     anecdote = _CITY_ANECDOTES.get(city, "")
     result = (
         f"🏟️ {stadium['name']} — {city}, {stadium['country']}\n"
-        f"   Capacité : {stadium['capacity']:,} | Timezone : {stadium['timezone']}\n"
+        f"   Capacity: {stadium['capacity']:,} | Timezone: {stadium['timezone']}\n"
         f"   {stadium['description']}"
     )
     if anecdote:
-        result += f"\n   💡 Anecdote : {anecdote}"
+        result += f"\n   💡 Fun fact: {anecdote}"
     print(f"✅ get_stadium_info → {stadium['name']}")
     return result
 
@@ -299,8 +299,8 @@ def get_group_standings(
         t = _TEAMS_BY_CODE.get(code)
         team_names.append(f"{t['flag']} {t['name']} ({code})" if t else code)
     group_matches = [m for m in matches if m.get("group") == g]
-    lines = [f"🏆 Groupe {g} — équipes : {', '.join(team_names)}", ""]
-    lines.append("Calendrier :")
+    lines = [f"🏆 Group {g} — teams: {', '.join(team_names)}", ""]
+    lines.append("Schedule:")
     for m in group_matches:
         home = m.get("homeTeam") or "TBD"
         away = m.get("awayTeam") or "TBD"
@@ -324,30 +324,30 @@ def get_venue_weather(
 ) -> str:
     """Return climate and weather info for a WC2026 host city in June/July."""
     city_weather: dict[str, str] = {
-        "new york": "Juin–juillet : chaud et humide, ~28°C. Orages possibles en soirée. MetLife Stadium est à l'air libre.",
-        "los angeles": "Juin–juillet : ensoleillé et sec, ~27°C. Brouillard matinal côtier possible. Parfait pour le foot !",
-        "dallas": "Juin–juillet : très chaud, ~35°C. Humidité modérée. AT&T Stadium est climatisé — ouf !",
-        "atlanta": "Juin–juillet : chaud et humide, ~30°C. Mercedes-Benz Stadium a un toit rétractable.",
-        "kansas city": "Juin–juillet : chaud, ~30°C. Orages fréquents. L'atmosphère à Arrowhead est électrique.",
-        "houston": "Juin–juillet : torride et très humide, ~34°C. NRG Stadium avec toit rétractable — indispensable.",
-        "boston": "Juin–juillet : agréable, ~24°C. Le plus frais des sites US. Parfait pour les fans européens.",
-        "philadelphia": "Juin–juillet : chaud et humide, ~28°C. 'The Linc' est à l'air libre — prévoir la crème solaire.",
-        "san francisco": "Juin–juillet : frais, ~18°C. Vent froid du Pacifique. Prévoyez une veste pour les matches du soir !",
-        "las vegas": "Juin–juillet : canicule, ~42°C ! Allegiant Stadium est entièrement climatisé — une nécessité absolue.",
-        "vancouver": "Juin–juillet : doux et parfois pluvieux, ~20°C. BC Place a un toit — Canada oblige.",
-        "toronto": "Juin–juillet : agréable, ~23°C. BMO Field est à l'air libre — belle météo attendue.",
-        "mexico city": "Juin–juillet : tempéré et pluvieux (saison des pluies), ~18°C, altitude 2 240 m. L'Azteca peut être frais !",
-        "monterrey": "Juin–juillet : très chaud, ~36°C. L'Estadio BBVA est dans les collines — légèrement plus frais.",
-        "guadalajara": "Juin–juillet : chaud avec pluies tropicales en fin de journée, ~25°C. Beau temps le matin.",
+        "new york": "June–July: hot and humid, ~28°C. Evening thunderstorms possible. MetLife Stadium is open-air.",
+        "los angeles": "June–July: sunny and dry, ~27°C. Coastal morning fog possible. Perfect for football!",
+        "dallas": "June–July: very hot, ~35°C. Moderate humidity. AT&T Stadium is air-conditioned — phew!",
+        "atlanta": "June–July: hot and humid, ~30°C. Mercedes-Benz Stadium has a retractable roof.",
+        "kansas city": "June–July: hot, ~30°C. Frequent thunderstorms. The atmosphere at Arrowhead is electric.",
+        "houston": "June–July: scorching and very humid, ~34°C. NRG Stadium has a retractable roof — essential.",
+        "boston": "June–July: pleasant, ~24°C. The coolest US venue. Perfect for European fans.",
+        "philadelphia": "June–July: hot and humid, ~28°C. 'The Linc' is open-air — bring sunscreen.",
+        "san francisco": "June–July: cool, ~18°C. Cold Pacific wind. Bring a jacket for evening matches!",
+        "las vegas": "June–July: scorching heat, ~42°C! Allegiant Stadium is fully air-conditioned — an absolute necessity.",
+        "vancouver": "June–July: mild and sometimes rainy, ~20°C. BC Place has a roof — Canada style.",
+        "toronto": "June–July: pleasant, ~23°C. BMO Field is open-air — great weather expected.",
+        "mexico city": "June–July: mild and rainy (rainy season), ~18°C, altitude 2,240 m. The Azteca can be cool!",
+        "monterrey": "June–July: very hot, ~36°C. Estadio BBVA sits in the hills — slightly cooler.",
+        "guadalajara": "June–July: warm with tropical showers in the late afternoon, ~25°C. Beautiful mornings.",
     }
     key = city.strip().lower()
     for k, v in city_weather.items():
         if k in key or key in k:
             print(f"✅ get_venue_weather({city})")
-            return f"🌤️ Météo WC2026 — {city} :\n{v}"
+            return f"🌤️ WC2026 Weather — {city}:\n{v}"
     return (
-        f"Météo pour '{city}' : données non disponibles pour cette ville hôte. "
-        f"Villes disponibles : {', '.join(city_weather.keys())}."
+        f"Weather for '{city}': data not available for this host city. "
+        f"Available cities: {', '.join(city_weather.keys())}."
     )
 
 
@@ -362,9 +362,9 @@ def show_tournament_bracket() -> str:
     """Activate the bracket view in the frontend."""
     print("✅ show_tournament_bracket called")
     return (
-        "🏆 Vue bracket activée ! Le tableau des phases finales de la WC2026 est maintenant affiché. "
-        "32 équipes → Round of 32 → Round of 16 → Quarts → Demies → Finale à MetLife Stadium le 19 juillet 2026. "
-        "Attention, ça va être du lourd... 🔥"
+        "🏆 Bracket view activated! The WC2026 knockout stage bracket is now displayed. "
+        "32 teams → Round of 32 → Round of 16 → Quarterfinals → Semifinals → Final at MetLife Stadium on July 19, 2026. "
+        "Hold on tight, this is going to be HUGE... 🔥"
     )
 
 
@@ -383,20 +383,20 @@ def compare_teams(
     ta = _find_team(team_a)
     tb = _find_team(team_b)
     if ta is None:
-        return f"Équipe '{team_a}' introuvable dans le roster WC2026."
+        return f"Team '{team_a}' not found in the WC2026 roster."
     if tb is None:
-        return f"Équipe '{team_b}' introuvable dans le roster WC2026."
+        return f"Team '{team_b}' not found in the WC2026 roster."
 
     def _fmt(t: dict) -> str:
         wch = t["worldCupHistory"]
         players = ", ".join(p["name"] for p in t["keyPlayers"][:3])
         return (
             f"{t['flag']} {t['name']} ({t['fifaCode']})\n"
-            f"   FIFA Ranking : #{t['fifaRanking']} | Confédération : {t['confederation']}\n"
-            f"   Coach : {t['coach']}\n"
-            f"   Stars : {players}\n"
-            f"   Palmarès WC : {wch['titles']}x titres, {wch['participations']} participations\n"
-            f"   Meilleur résultat : {wch['bestResult']}"
+            f"   FIFA Ranking: #{t['fifaRanking']} | Confederation: {t['confederation']}\n"
+            f"   Coach: {t['coach']}\n"
+            f"   Stars: {players}\n"
+            f"   WC Honors: {wch['titles']}x titles, {wch['participations']} participations\n"
+            f"   Best result: {wch['bestResult']}"
         )
 
     # Check if they share a group match
@@ -411,7 +411,7 @@ def compare_teams(
     result += _fmt(tb)
     if shared:
         m = shared[0]
-        result += f"\n\n📅 Ils se retrouvent en phase de groupes !\n   [{m['id']}] {m['date']} {m['time']} @ {m['stadiumName']} (Groupe {m.get('group','')})"
+        result += f"\n\n📅 They face each other in the group stage!\n   [{m['id']}] {m['date']} {m['time']} @ {m['stadiumName']} (Group {m.get('group','')})"
     print(f"✅ compare_teams({code_a}, {code_b})")
     return result
 
@@ -432,53 +432,53 @@ def get_city_guide(
     """Return a fan guide for a WC2026 host city."""
     guides: dict[str, str] = {
         "new york": (
-            "🗽 New York / New Jersey — Guide Fan WC2026\n"
-            "• Incontournables : Times Square, Central Park, Brooklyn Bridge, Statue de la Liberté\n"
-            "• Fan Zone : FIFA Fan Festival à Central Park prévu\n"
-            "• Resto : Cheesecake Factory, Di Fara Pizza, Gray's Papaya pour l'ambiance\n"
-            "• Transport : Metro + navette vers MetLife Stadium depuis Penn Station (45 min)\n"
-            "• Conseil Copa : Réservez votre hébergement 6 mois à l'avance — NYC sera blindée !"
+            "🗽 New York / New Jersey — WC2026 Fan Guide\n"
+            "• Must-sees: Times Square, Central Park, Brooklyn Bridge, Statue of Liberty\n"
+            "• Fan Zone: FIFA Fan Festival at Central Park planned\n"
+            "• Food: Cheesecake Factory, Di Fara Pizza, Gray's Papaya for the vibes\n"
+            "• Transport: Metro + shuttle to MetLife Stadium from Penn Station (45 min)\n"
+            "• Copa tip: Book your accommodation 6 months in advance — NYC will be PACKED!"
         ),
         "los angeles": (
-            "🌴 Los Angeles — Guide Fan WC2026\n"
-            "• Incontournables : Hollywood Boulevard, Venice Beach, Getty Museum, Universal Studios\n"
-            "• Fan Zone : LA Live Downtown\n"
-            "• Resto : Tacos Leo, In-N-Out Burger (incontournable), Grand Central Market\n"
-            "• Transport : Navette officielle depuis Union Station vers Rose Bowl et SoFi\n"
-            "• Conseil Copa : Louez un vélo — LA a de superbes pistes cyclables vers les stades !"
+            "🌴 Los Angeles — WC2026 Fan Guide\n"
+            "• Must-sees: Hollywood Boulevard, Venice Beach, Getty Museum, Universal Studios\n"
+            "• Fan Zone: LA Live Downtown\n"
+            "• Food: Tacos Leo, In-N-Out Burger (a must!), Grand Central Market\n"
+            "• Transport: Official shuttle from Union Station to Rose Bowl and SoFi\n"
+            "• Copa tip: Rent a bike — LA has amazing cycling paths to the stadiums!"
         ),
         "dallas": (
-            "🤠 Dallas — Guide Fan WC2026\n"
-            "• Incontournables : Dealey Plaza, Deep Ellum (musique live), Fort Worth Stockyards\n"
-            "• Fan Zone : Klyde Warren Park prévu pour les fan zones\n"
-            "• Resto : Pecan Lodge BBQ (le meilleur brisket du Texas), Whataburger\n"
-            "• Transport : Navette depuis Downtown Dallas vers AT&T Stadium (30 min)\n"
-            "• Conseil Copa : La chaleur est RÉELLE — boire au moins 2L d'eau par match !"
+            "🤠 Dallas — WC2026 Fan Guide\n"
+            "• Must-sees: Dealey Plaza, Deep Ellum (live music), Fort Worth Stockyards\n"
+            "• Fan Zone: Klyde Warren Park planned for fan zones\n"
+            "• Food: Pecan Lodge BBQ (best brisket in Texas), Whataburger\n"
+            "• Transport: Shuttle from Downtown Dallas to AT&T Stadium (30 min)\n"
+            "• Copa tip: The heat is REAL — drink at least 2L of water per match!"
         ),
         "mexico city": (
-            "🇲🇽 Mexico City — Guide Fan WC2026\n"
-            "• Incontournables : Zócalo, Teotihuacán, Frida Kahlo Museum, Chapultepec\n"
-            "• Fan Zone : Zócalo et Parque Bicentenario\n"
-            "• Resto : El Cardenal (tamales), Taqueria Los Parados, Mercado de la Merced\n"
-            "• Transport : Métro Línea 2 jusqu'à la station Tasqueña, puis bus vers l'Azteca\n"
-            "• Conseil Copa : L'altitude (2 240 m) essoufle — arrivez 2 jours avant le match !\n"
-            "• Anecdote : L'Azteca a vu Pelé soulever la Coupe (1970) ET Maradona la Main de Dieu (1986)"
+            "🇲🇽 Mexico City — WC2026 Fan Guide\n"
+            "• Must-sees: Zócalo, Teotihuacán, Frida Kahlo Museum, Chapultepec\n"
+            "• Fan Zone: Zócalo and Parque Bicentenario\n"
+            "• Food: El Cardenal (tamales), Taqueria Los Parados, Mercado de la Merced\n"
+            "• Transport: Metro Línea 2 to Tasqueña station, then bus to the Azteca\n"
+            "• Copa tip: The altitude (2,240 m) is no joke — arrive 2 days before the match!\n"
+            "• Fun fact: The Azteca saw Pelé lift the Cup (1970) AND Maradona's Hand of God (1986)"
         ),
         "vancouver": (
-            "🍁 Vancouver — Guide Fan WC2026\n"
-            "• Incontournables : Stanley Park, Granville Island, Capilano Suspension Bridge\n"
-            "• Fan Zone : Robson Square et Canada Place\n"
-            "• Resto : Japadog (hot-dog japonais unique au monde !), Vij's Indian Restaurant\n"
-            "• Transport : SkyTrain ligne Expo jusqu'à BC Place (centre-ville)\n"
-            "• Conseil Copa : Prévoyez un imperméable — il peut pleuvoir même en juillet !"
+            "🍁 Vancouver — WC2026 Fan Guide\n"
+            "• Must-sees: Stanley Park, Granville Island, Capilano Suspension Bridge\n"
+            "• Fan Zone: Robson Square and Canada Place\n"
+            "• Food: Japadog (one-of-a-kind Japanese hot dog!), Vij's Indian Restaurant\n"
+            "• Transport: SkyTrain Expo line to BC Place (downtown)\n"
+            "• Copa tip: Pack a raincoat — it can rain even in July!"
         ),
         "toronto": (
-            "🍁 Toronto — Guide Fan WC2026\n"
-            "• Incontournables : CN Tower, Kensington Market, Distillery District, Niagara Falls (2h)\n"
-            "• Fan Zone : Nathan Phillips Square et Ontario Place\n"
-            "• Resto : St. Lawrence Market (le meilleur marché food de la ville), Big Smoke Burger\n"
-            "• Transport : Streetcar 509 ou 511 jusqu'à BMO Field (15 min depuis le centre)\n"
-            "• Conseil Copa : Toronto est multiculturelle — vous trouverez des supporters de TOUTES les équipes !"
+            "🍁 Toronto — WC2026 Fan Guide\n"
+            "• Must-sees: CN Tower, Kensington Market, Distillery District, Niagara Falls (2h)\n"
+            "• Fan Zone: Nathan Phillips Square and Ontario Place\n"
+            "• Food: St. Lawrence Market (best food market in the city), Big Smoke Burger\n"
+            "• Transport: Streetcar 509 or 511 to BMO Field (15 min from downtown)\n"
+            "• Copa tip: Toronto is multicultural — you'll find fans of EVERY team here!"
         ),
     }
     key = city.strip().lower()
@@ -489,10 +489,10 @@ def get_city_guide(
     # Generic fallback
     print(f"✅ get_city_guide({city}) — fallback")
     return (
-        f"🌎 {city} — Guide Fan WC2026\n"
-        "• Consultez le site officiel FIFA pour les fan zones officielles.\n"
-        "• Réservez transport et hébergement bien à l'avance — la WC2026 va tout saturer !\n"
-        "• Conseil Copa : Respectez les cultures locales, apprenez quelques mots dans la langue du pays hôte. ¡Vamos !"
+        f"🌎 {city} — WC2026 Fan Guide\n"
+        "• Check the official FIFA website for official fan zones.\n"
+        "• Book transport and accommodation well in advance — WC2026 will sell out everything!\n"
+        "• Copa tip: Respect local cultures, learn a few words in the host country's language. Let's go!"
     )
 
 
@@ -505,97 +505,99 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
         name="copa_agent",
         instructions=dedent(
             """
-            Tu es **Copa** 🎙️ — le guide officieux et passionné de la FIFA World Cup 2026 (USA, Canada, Mexique).
-            Tu es un commentateur sportif expert, chaleureux, avec une vraie personnalité.
+            You are **Copa** 🎙️ — the unofficial and passionate guide to the FIFA World Cup 2026 (USA, Canada, Mexico).
+            You are an expert sports commentator, warm and full of personality.
+            You ALWAYS respond in English, regardless of the team being discussed.
 
             ═══════════════════════════════════════════════════════
-            🚨 RESTRICTION ABSOLUE — SUJET UNIQUE : FOOTBALL / WC2026
+            🚨 ABSOLUTE RESTRICTION — SINGLE TOPIC: FOOTBALL / WC2026
             ═══════════════════════════════════════════════════════
-            Tu REFUSES poliment toute question hors football / Coupe du Monde 2026 :
-            → "Désolé, je suis Copa, spécialiste WC2026 ! Parle-moi d'une équipe, d'un stade ou d'un match. Et c'est le but... de ma mission ! ⚽🏆"
+            You POLITELY REFUSE any question outside football / World Cup 2026:
+            → "Sorry, I'm Copa, your WC2026 specialist! Ask me about a team, a stadium, or a match. And that's a GOOOAL... for my mission! ⚽🏆"
 
             ═══════════════════════════════════════════════════════
-            🎤 TICS DE LANGAGE COPA (utilise-les naturellement)
+            🎤 COPA CATCHPHRASES (use them naturally)
             ═══════════════════════════════════════════════════════
-            - « Et c'est le but ! » — quand tu révèles quelque chose d'excitant
-            - « Quelle équipe ! » — après avoir présenté une sélection
-            - « Attention, ça va être du lourd... » — avant une info importante
-            - « On reste concentrés ! » — pour cadrer la conversation
-            - « Le ballon est rond et la finale est ronde aussi ! » — humour Copa
-            - « 2026, c'est l'année ! » — pour rappeler l'événement
+            - "And that's a GOOOAL!" — when you reveal something exciting
+            - "What a team!" — after presenting a squad
+            - "Hold on tight, this is going to be HUGE..." — before an important piece of info
+            - "Stay focused!" — to steer the conversation
+            - "The ball is round and so is the trophy!" — Copa humor
+            - "2026 is THE year!" — to remind everyone about the event
 
             ═══════════════════════════════════════════════════════
-            🌍 ADAPTATION LINGUISTIQUE PAR ÉQUIPE
+            🌍 LANGUAGE
             ═══════════════════════════════════════════════════════
-            - France / Belgique / Maroc → Français avec enthousiasme (« Allez les Bleus ! »)
-            - Brésil → mots portugais : « Que seleção incrível ! », « Jogo bonito ! », « Vai Brasil ! »
-            - Argentine / Espagne / Mexique / Uruguay / Colombie → espagnol : « ¡Qué equipazo! », « ¡Vamos! »
-            - Angleterre / USA / Australie → anglais : « What a team! », « Brilliant! »
-            - Allemagne → « Was für eine Mannschaft! »
-            - Par défaut → Français
+            Copa ALWAYS responds in English regardless of the team discussed.
+            You may sprinkle in short team-specific expressions for flavor:
+            - Brazil → "Jogo bonito!", "Vai Brasil!"
+            - Argentina / Spain / Mexico → "¡Vamos!"
+            - France → "Allez les Bleus!"
+            - Germany → "Was für eine Mannschaft!"
+            But the main response body is ALWAYS in English.
 
             ═══════════════════════════════════════════════════════
-            ⚽ COMPORTEMENT AUTOMATIQUE — ÉQUIPE MENTIONNÉE
+            ⚽ AUTO-BEHAVIOR — TEAM MENTIONED
             ═══════════════════════════════════════════════════════
-            Dès qu'une équipe nationale est mentionnée (par nom, surnom, code FIFA ou drapeau) :
-            1. Appelle IMMÉDIATEMENT `update_team_info` avec les données complètes de l'équipe
-            2. Appelle IMMÉDIATEMENT `get_team_matches` avec le code FIFA de l'équipe
-            3. Envoie ton message enthousiaste DANS LA MÊME RÉPONSE
+            As soon as a national team is mentioned (by name, nickname, FIFA code, or flag):
+            1. IMMEDIATELY call `update_team_info` with the full team data
+            2. IMMEDIATELY call `get_team_matches` with the team's FIFA code
+            3. Send your enthusiastic message IN THE SAME RESPONSE
 
-            Données disponibles dans la base WC2026 (utilise-les en priorité) :
-            - 48 équipes nationales avec FIFA code, flag, coach, classement FIFA, joueurs clés
-            - 16 stades hôtes (USA, Canada, Mexique)
-            - 12 groupes (A à L), 104 matchs programmés
-            
-            Utilise `update_team_info` avec les données EXACTES de la base de données WC2026. Par exemple :
-            - France : fifaCode="FRA", flag="🇫🇷", confederation="UEFA", fifaRanking=2, primaryColor="#0055A4"
-            - Brazil : fifaCode="BRA", flag="🇧🇷", confederation="CONMEBOL", fifaRanking=4, primaryColor="#009C3B"
-            - Argentina : fifaCode="ARG", flag="🇦🇷", confederation="CONMEBOL", fifaRanking=1, primaryColor="#74ACDF"
+            Data available in the WC2026 database (use it as priority):
+            - 48 national teams with FIFA code, flag, coach, FIFA ranking, key players
+            - 16 host stadiums (USA, Canada, Mexico)
+            - 12 groups (A through L), 104 scheduled matches
 
-            ═══════════════════════════════════════════════════════
-            🔮 COMPORTEMENT PROACTIF COPA
-            ═══════════════════════════════════════════════════════
-            Après chaque réponse sur une équipe :
-            → Suggère l'adversaire du premier match de groupe : 
-              "Tu veux que je te parle de [ADVERSAIRE], leur premier adversaire le [DATE] ?"
-            
-            Après un compare_teams :
-            → Rebondis sur le lieu du match :
-              "Ce duel se jouera à [STADE] — tu veux en savoir plus sur cette arène ? 🏟️"
-            
-            En fin de conversation ou sur demande :
-            → Propose un pronostic Copa :
-              "Mon pronostic Copa pour cette équipe : [PRONOSTIC PASSIONNÉ]"
-            
-            Utilise les suggestions CopilotKit (boutons) pour ces rebonds proactifs.
+            Use `update_team_info` with the EXACT data from the WC2026 database. For example:
+            - France: fifaCode="FRA", flag="🇫🇷", confederation="UEFA", fifaRanking=2, primaryColor="#0055A4"
+            - Brazil: fifaCode="BRA", flag="🇧🇷", confederation="CONMEBOL", fifaRanking=4, primaryColor="#009C3B"
+            - Argentina: fifaCode="ARG", flag="🇦🇷", confederation="CONMEBOL", fifaRanking=1, primaryColor="#74ACDF"
 
             ═══════════════════════════════════════════════════════
-            🏟️ STADES & VILLES
+            🔮 PROACTIVE COPA BEHAVIOR
             ═══════════════════════════════════════════════════════
-            Quand un stade ou une ville hôte est mentionné, appelle `get_stadium_info` 
-            et partage une ANECDOTE inattendue (pas juste des stats).
+            After each response about a team:
+            → Suggest the opponent of their first group match:
+              "Want me to tell you about [OPPONENT], their first opponent on [DATE]?"
+
+            After a compare_teams:
+            → Follow up on the match venue:
+              "This showdown takes place at [STADIUM] — want to know more about this arena? 🏟️"
+
+            At end of conversation or on request:
+            → Offer a Copa prediction:
+              "My Copa prediction for this team: [PASSIONATE PREDICTION]"
+
+            Use CopilotKit suggestions (buttons) for these proactive follow-ups.
 
             ═══════════════════════════════════════════════════════
-            📊 GROUPES & BRACKET
+            🏟️ STADIUMS & CITIES
             ═══════════════════════════════════════════════════════
-            - Pour afficher un groupe : appelle `get_group_standings` + dis "Vue groupe activée !"
-            - Pour le tableau knockout : appelle `show_tournament_bracket`
+            When a stadium or host city is mentioned, call `get_stadium_info`
+            and share an UNEXPECTED FUN FACT (not just stats).
 
             ═══════════════════════════════════════════════════════
-            🌤️ MÉTÉO & GUIDE FAN
+            📊 GROUPS & BRACKET
             ═══════════════════════════════════════════════════════
-            - Météo venue : appelle `get_venue_weather` avec des détails pratiques pour les fans
-            - Guide ville : appelle `get_city_guide` avec suggestions touristiques et fan zones
+            - To display a group: call `get_group_standings` + say "Group view activated!"
+            - For the knockout bracket: call `show_tournament_bracket`
 
             ═══════════════════════════════════════════════════════
-            ⚡ RÈGLES CRITIQUES
+            🌤️ WEATHER & FAN GUIDE
             ═══════════════════════════════════════════════════════
-            1. TOUJOURS appeler update_team_info + get_team_matches quand une équipe est mentionnée
-            2. Appels de fonctions et message texte dans LA MÊME RÉPONSE (pas de tour séparé)
-            3. Messages PASSIONNÉS, avec emojis, tics de langage Copa
-            4. Anecdotes inattendues > simples stats
-            5. Toujours terminer par une suggestion proactive
-            6. Refuser poliment tout sujet hors football/WC2026
+            - Venue weather: call `get_venue_weather` with practical details for fans
+            - City guide: call `get_city_guide` with tourist suggestions and fan zones
+
+            ═══════════════════════════════════════════════════════
+            ⚡ CRITICAL RULES
+            ═══════════════════════════════════════════════════════
+            1. ALWAYS call update_team_info + get_team_matches when a team is mentioned
+            2. Function calls and text message in THE SAME RESPONSE (no separate turn)
+            3. PASSIONATE messages, with emojis, Copa catchphrases
+            4. Unexpected fun facts > plain stats
+            5. Always end with a proactive suggestion
+            6. Politely refuse any topic outside football/WC2026
             """.strip()
         ),
         chat_client=chat_client,
@@ -614,7 +616,7 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
     return AgentFrameworkAgent(
         agent=base_agent,
         name="CopaAgent",
-        description="Copa 🎙️ — guide officieux WC2026. Expert World Cup 2026, passionné, proactif. UNIQUEMENT football.",
+        description="Copa 🎙️ — unofficial WC2026 guide. World Cup 2026 expert, passionate, proactive. Football ONLY.",
         state_schema=STATE_SCHEMA,
         predict_state_config=PREDICT_STATE_CONFIG,
         require_confirmation=False,

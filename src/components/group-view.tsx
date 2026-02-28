@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { teams as allTeams, matches as allMatches } from "@/lib/worldcup-data";
 import type { GroupInfo } from "@/lib/types";
+import { FlagImg } from "@/lib/flags";
 
 interface GroupViewProps {
   groups: GroupInfo[];
   selectedTeamCode?: string;
   themeColor: string;
   onGroupClick?: (group: GroupInfo) => void;
-  onTeamClick?: (teamCode: string) => void; // → déclenche compare_teams
+  onTeamClick?: (teamCode: string) => void;
 }
 
 export function GroupView({
@@ -41,7 +42,7 @@ export function GroupView({
         className="text-2xl font-bold mb-6 text-center"
         style={{ color: themeColor }}
       >
-        🌍 Groupes — Coupe du Monde 2026
+        🌍 Groups — FIFA World Cup 2026
       </h2>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -77,7 +78,7 @@ export function GroupView({
                 className="text-base font-bold text-center mb-2"
                 style={{ color: isHighlighted ? highlightColor : themeColor }}
               >
-                Groupe {group.name}
+                Group {group.name}
               </div>
 
               {/* Teams list */}
@@ -105,7 +106,7 @@ export function GroupView({
                         cursor: isSelected ? "default" : "pointer",
                       }}
                     >
-                      <span className="text-base">{team?.flag ?? "🌍"}</span>
+                      <span className="text-base">{team ? <FlagImg fifaCode={code} width={24} height={16} /> : "🌍"}</span>
                       <span className="text-xs font-medium text-gray-800 flex-1 truncate">
                         {team?.name ?? code}
                       </span>
@@ -124,7 +125,7 @@ export function GroupView({
                   style={{ borderTop: `1px solid ${highlightColor}40` }}
                 >
                   <div className="text-xs font-semibold text-gray-500 mb-1">
-                    📅 Calendrier
+                    📅 Schedule
                   </div>
                   {groupMatches.map((match) => {
                     const home = getTeam(match.homeTeam ?? "");
@@ -137,9 +138,9 @@ export function GroupView({
                         <span className="text-gray-400 w-9 shrink-0">
                           {match.date.slice(5)}
                         </span>
-                        <span>{home?.flag ?? match.homeTeam}</span>
+                        <span>{home ? <FlagImg fifaCode={match.homeTeam!} width={16} height={11} /> : match.homeTeam}</span>
                         <span className="text-gray-400">vs</span>
-                        <span>{away?.flag ?? match.awayTeam}</span>
+                        <span>{away ? <FlagImg fifaCode={match.awayTeam!} width={16} height={11} /> : match.awayTeam}</span>
                       </div>
                     );
                   })}
