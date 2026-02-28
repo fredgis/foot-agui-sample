@@ -1,6 +1,8 @@
 # ⚽🏆 Copa — FIFA World Cup 2026 AI Assistant
 
-> Immersive AI-powered experience to explore the 2026 FIFA World Cup: 48 teams, 104 matches, 16 stadiums — built on the **AG-UI Protocol** with **GitHub Copilot SDK (CopilotKit)** and **Microsoft Agent Framework**.
+> Immersive AI-powered experience to explore the 2026 FIFA World Cup: 48 teams, 104 matches, 16 stadiums — built on the **AG-UI Protocol** with **[GitHub Copilot SDK](https://github.com/github/copilot-sdk)**, **[CopilotKit](https://copilotkit.ai)** and **Microsoft Agent Framework**.
+>
+> **Dual backend support**: choose between the GitHub Copilot SDK (Node.js, zero Python) or Microsoft Agent Framework (Python/FastAPI).
 
 ![Copa Welcome Screen](screenshot.png)
 ![Copa — AS Saint-Étienne (club mode)](screenshot-asse.png)
@@ -127,7 +129,62 @@ graph TB
 
 ---
 
-## 🏗️ Architecture
+## 🔌 GitHub Copilot SDK — Alternative Backend
+
+The project integrates the official **[GitHub Copilot SDK](https://github.com/github/copilot-sdk)** (`@github/copilot-sdk`) as an alternative backend engine. This allows running Copa **without the Python backend** — everything runs in Node.js.
+
+### How it works
+
+A custom `CopilotSDKAgent` class (in `src/lib/copilot-sdk-agent.ts`) extends AG-UI's `AbstractAgent` and translates **Copilot SDK events → AG-UI events**:
+
+```
+Copilot SDK Event              →  AG-UI Event
+─────────────────────────────────────────────────
+assistant.message.delta        →  TEXT_MESSAGE_CONTENT
+tool.invocation.start          →  TOOL_CALL_START + TOOL_CALL_ARGS
+tool.invocation.result         →  TOOL_CALL_END
+session.idle                   →  TEXT_MESSAGE_END + RUN_FINISHED
+error                          →  RUN_ERROR
+```
+
+### Enabling Copilot SDK backend
+
+```bash
+# 1. Install Copilot CLI (required)
+# See: https://docs.github.com/en/copilot/how-tos/set-up/install-copilot-cli
+
+# 2. Set environment variable
+echo "USE_COPILOT_SDK=true" >> .env.local
+
+# 3. Configure BYOK (use your existing Azure OpenAI or OpenAI key)
+echo "AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/" >> .env.local
+echo "AZURE_OPENAI_API_KEY=your-key" >> .env.local
+echo "COPILOT_SDK_MODEL=gpt-4o-mini" >> .env.local
+
+# 4. Run — no Python backend needed!
+npm run dev:ui
+```
+
+### Copilot SDK features used
+
+| Feature | How We Use It |
+|---|---|
+| **Custom Tools** | 6 WC2026 tools defined via `defineTool()` — stadiums, groups, weather, bracket, compare, city guide |
+| **Custom Agents** | Copa persona with full system prompt |
+| **BYOK** | Bring Your Own Key — Azure OpenAI or OpenAI API |
+| **Streaming** | Real-time event streaming translated to AG-UI protocol |
+| **Tool Invocation** | Automatic tool calling with JSON schema parameters |
+
+---
+
+## 🏗️ Architecture — Dual Backend
+
+The project supports **two backend engines** — configurable via `USE_COPILOT_SDK` env var:
+
+| Backend | Engine | LLM Access | Python Required |
+|---|---|---|---|
+| **Default** | Microsoft Agent Framework (Python/FastAPI) | Azure OpenAI / OpenAI directly | ✅ Yes |
+| **Copilot SDK** | GitHub Copilot SDK (Node.js) | BYOK via Copilot CLI | ❌ No |
 
 ```mermaid
 graph TB
@@ -138,7 +195,7 @@ graph TB
     subgraph "🖥️ Frontend — Next.js 16 + React 19"
         Layout["layout.tsx<br/>CopilotKit Provider"]
         Page["page.tsx<br/>Main orchestration"]
-        API["api/copilotkit/route.ts<br/>HttpAgent → Backend"]
+        API["api/copilotkit/route.ts<br/>Dual backend support"]
         
         subgraph "📦 Components (9)"
             Welcome["WelcomeScreen<br/>Countdown + 48 teams"]
@@ -165,10 +222,15 @@ graph TB
         end
     end
 
-    subgraph "🐍 Backend — Python 3.12 + FastAPI"
+    subgraph "🐍 Backend A — Python 3.12 + FastAPI"
         Main["main.py<br/>FastAPI + LLM client"]
         Agent["agent.py<br/>Copa Agent + 6 server tools"]
         PyData["data/worldcup2026.py<br/>Mirror of TS data"]
+    end
+
+    subgraph "🔧 Backend B — GitHub Copilot SDK"
+        SDKAgent["copilot-sdk-agent.ts<br/>CopilotSDKAgent + 6 tools"]
+        CLI["Copilot CLI<br/>(server mode)"]
     end
 
     subgraph "🧠 LLM"
@@ -180,10 +242,13 @@ graph TB
     Page --> Welcome & TeamCard & Schedule & VenueMap & GroupView & Bracket
     Page --> UseCoAgent & UseAction & UseReadable & UseSuggestions
     Page -->|"useCoAgent"| API
-    API -->|"AG-UI Protocol<br/>(SSE events)"| Main
+    API -->|"AG-UI Protocol<br/>(SSE — default)"| Main
+    API -->|"AG-UI via SDK<br/>(USE_COPILOT_SDK=true)"| SDKAgent
     Main --> Agent
     Agent --> PyData
     Agent -->|"API call"| AzureOAI
+    SDKAgent -->|"JSON-RPC"| CLI
+    CLI -->|"BYOK"| AzureOAI
     Page --> Types & Data & Flags
 ```
 
@@ -331,12 +396,15 @@ flowchart TD
 ### 3. Run
 
 ```bash
-# Frontend + Agent together
+# Frontend + Agent together (default: Python backend)
 npm run dev
 
 # Or separately:
 npm run dev:ui    # → http://localhost:3000
 npm run dev:agent # → http://localhost:8000
+
+# Or with GitHub Copilot SDK backend (no Python needed):
+USE_COPILOT_SDK=true npm run dev:ui
 ```
 
 ### 4. Test
@@ -373,7 +441,8 @@ foot-agui-sample/
 │   └── lib/
 │       ├── types.ts                    # Types: TeamInfo, MatchInfo, StadiumInfo, AgentState
 │       ├── worldcup-data.ts            # 48 teams, 16 stadiums, 12 groups, 104 matches
-│       └── flags.ts                    # FIFA code → ISO → flagcdn.com images
+│       ├── flags.ts                    # FIFA code → ISO → flagcdn.com images
+│       └── copilot-sdk-agent.ts        # CopilotSDKAgent — AG-UI ↔ GitHub Copilot SDK bridge
 ├── agent/
 │   ├── src/
 │   │   ├── agent.py                    # Copa agent: system prompt + 6 server @ai_function tools
@@ -557,9 +626,10 @@ Required GitHub secrets:
 | Layer | Technology | Version |
 |---|---|---|
 | Frontend | Next.js + React + TailwindCSS | 16 + 19 + 4 |
-| Chat UI | CopilotKit / GitHub Copilot SDK (Sidebar + Popup) | 1.52.1 |
+| Chat UI | CopilotKit (Sidebar + Popup) | 1.52.1 |
 | Protocol | AG-UI (SSE events) | 0.0.46 |
-| Backend | Python + FastAPI + Microsoft Agent Framework | 3.12 |
+| Backend A | Python + FastAPI + Microsoft Agent Framework | 3.12 |
+| Backend B | GitHub Copilot SDK (Node.js) | latest |
 | LLM | Azure OpenAI / OpenAI | gpt-5.2 / gpt-4o-mini |
 | Deployment | Azure Static Web Apps + Container Apps | — |
 | CI/CD | GitHub Actions | — |
@@ -602,4 +672,4 @@ MIT — see [LICENSE](LICENSE)
 ---
 
 **⚽ Built for the 2026 FIFA World Cup 🇺🇸🇲🇽🇨🇦**
-**Powered by [AG-UI Protocol](https://docs.ag-ui.com) · [CopilotKit](https://copilotkit.ai) · [Microsoft Agent Framework](https://aka.ms/agent-framework) · [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service)**
+**Powered by [AG-UI Protocol](https://docs.ag-ui.com) · [GitHub Copilot SDK](https://github.com/github/copilot-sdk) · [CopilotKit](https://copilotkit.ai) · [Microsoft Agent Framework](https://aka.ms/agent-framework) · [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service)**
