@@ -1,54 +1,54 @@
-# ⚽🏆 FIFA World Cup 2026 — Copa, Assistant IA Immersif
+# ⚽🏆 FIFA World Cup 2026 — Copa, Immersive AI Assistant
 
-> Application conversationnelle propulsée par l'IA pour explorer la Coupe du Monde 2026 : 48 équipes, 104 matchs, 16 stades — powered by AG-UI + CopilotKit + Microsoft Agent Framework.
+> AI-powered conversational app to explore the 2026 FIFA World Cup: 48 teams, 104 matches, 16 stadiums — built with AG-UI + CopilotKit + Microsoft Agent Framework.
 
 ---
 
-## 🌟 Présentation
+## 🌟 Overview
 
-**Copa** est un assistant IA expert de la **Coupe du Monde FIFA 2026** 🇺🇸🇲🇽🇨🇦.
+**Copa** is an AI assistant specialized in the **2026 FIFA World Cup** 🇺🇸🇲🇽🇨🇦.
 
-L'application combine un **agent conversationnel intelligent** (Python + Microsoft Agent Framework) avec une **interface immersive** (Next.js + React 19) qui s'adapte dynamiquement à chaque équipe sélectionnée — couleurs nationales, drapeaux, calendrier des matchs, carte des stades, groupes et bracket du tournoi.
+It combines an **intelligent conversational agent** (Python + Microsoft Agent Framework) with an **immersive UI** (Next.js + React 19) that dynamically adapts to each selected team — national colors, flags, match schedule, stadium map, group standings and tournament bracket.
 
-Le protocole **AG-UI** (Agent-Generated UI) permet au backend de piloter l'interface en temps réel via des événements SSE, avec synchronisation bidirectionnelle du state entre l'agent Python et les composants React.
+The **AG-UI** (Agent-Generated UI) protocol lets the backend drive the frontend in real time via SSE events, with bidirectional state synchronization between the Python agent and React components.
 
-### ✨ Fonctionnalités principales
+### ✨ Key Features
 
-| Fonctionnalité | Description |
+| Feature | Description |
 |---|---|
-| 🗣️ **Agent Copa** | Chatbot expert WC2026 avec 8 outils IA (infos équipes, matchs, stades, comparaisons, météo, bracket, guide ville) |
-| 🏳️ **48 équipes** | Fiches complètes avec drapeaux réels, joueurs clés, palmarès, classement FIFA, couleurs nationales |
-| 📅 **104 matchs** | Calendrier complet : phases de groupes (72) → R32 (16) → R16 (8) → QF (4) → SF (2) → 3e place → Finale |
-| 🗺️ **Carte SVG interactive** | 16 stades placés sur carte USA / Canada / Mexique avec pins cliquables |
-| 🌍 **12 groupes** | Vue groupes responsive avec navigation inter-équipes |
-| 🏆 **Bracket tournoi** | Arbre visuel R32 → Finale avec sélection de phase |
-| 🎨 **Thème 100% dynamique** | L'UI entière change de couleurs selon l'équipe sélectionnée |
-| 📱 **Mobile-first** | Tabs mobiles + CopilotPopup / Desktop sidebar + grille multi-panneaux |
-| ⏱️ **Countdown live** | Décompte en temps réel jusqu'au 11 juin 2026 |
-| 🔗 **Cross-component** | Clic match → highlight stade sur carte ; clic adversaire → comparaison dans le chat |
+| 🗣️ **Copa Agent** | WC2026 expert chatbot with 8 AI tools (team info, matches, stadiums, comparisons, weather, bracket, city guide) |
+| 🏳️ **48 teams** | Full profiles with real flag images, key players, honors, FIFA ranking, national colors |
+| 📅 **104 matches** | Complete schedule: group stage (72) → R32 (16) → R16 (8) → QF (4) → SF (2) → 3rd place → Final |
+| 🗺️ **Interactive SVG map** | 16 stadiums across USA / Canada / Mexico with clickable pins |
+| 🌍 **12 groups** | Responsive group view with inter-team navigation |
+| 🏆 **Tournament bracket** | Visual tree R32 → Final with phase selection |
+| 🎨 **Fully dynamic theme** | Entire UI changes colors based on the selected team |
+| 📱 **Mobile-first** | Mobile tabs + CopilotPopup / Desktop sidebar + multi-panel grid |
+| ⏱️ **Live countdown** | Real-time countdown to June 11, 2026 |
+| 🔗 **Cross-component** | Click match → highlight stadium on map; click opponent → comparison in chat |
 
 ---
 
-## 🏗️ Architecture globale
+## 🏗️ Architecture
 
 ```mermaid
 graph TB
-    subgraph "👤 Utilisateur"
-        Browser["🌐 Navigateur<br/>(Desktop / Mobile)"]
+    subgraph "👤 User"
+        Browser["🌐 Browser<br/>(Desktop / Mobile)"]
     end
 
     subgraph "🖥️ Frontend — Next.js 16 + React 19"
         Layout["layout.tsx<br/>CopilotKit Provider"]
-        Page["page.tsx<br/>Orchestration principale"]
+        Page["page.tsx<br/>Main orchestration"]
         API["api/copilotkit/route.ts<br/>HttpAgent → Backend"]
         
-        subgraph "📦 Composants"
-            Welcome["WelcomeScreen<br/>Countdown + 48 équipes"]
-            TeamCard["TeamCard<br/>Fiche équipe complète"]
-            Schedule["MatchSchedule<br/>104 matchs + filtres"]
-            VenueMap["VenueMap<br/>Carte SVG 16 stades"]
-            GroupView["GroupView<br/>12 groupes"]
-            Bracket["TournamentBracket<br/>R32 → Finale"]
+        subgraph "📦 Components"
+            Welcome["WelcomeScreen<br/>Countdown + 48 teams"]
+            TeamCard["TeamCard<br/>Full team profile"]
+            Schedule["MatchSchedule<br/>104 matches + filters"]
+            VenueMap["VenueMap<br/>SVG map — 16 stadiums"]
+            GroupView["GroupView<br/>12 groups"]
+            Bracket["TournamentBracket<br/>R32 → Final"]
         end
 
         subgraph "📚 Data & Utils"
@@ -61,7 +61,7 @@ graph TB
     subgraph "🐍 Backend — Python 3.12 + FastAPI"
         Main["main.py<br/>FastAPI + LLM client"]
         Agent["agent.py<br/>Copa Agent + 8 tools"]
-        PyData["data/worldcup2026.py<br/>Mirror des données TS"]
+        PyData["data/worldcup2026.py<br/>Mirror of TS data"]
     end
 
     subgraph "🧠 LLM"
@@ -79,32 +79,32 @@ graph TB
     Page --> Types & Data & Flags
 ```
 
-### Flux de données détaillé
+### Data Flow
 
 ```mermaid
 sequenceDiagram
-    participant U as 👤 Utilisateur
+    participant U as 👤 User
     participant F as 🖥️ Frontend<br/>(React + CopilotKit)
     participant R as 🔀 API Route<br/>(/api/copilotkit)
-    participant A as 🐍 Agent Copa<br/>(FastAPI)
+    participant A as 🐍 Copa Agent<br/>(FastAPI)
     participant L as 🧠 Azure OpenAI
 
-    U->>F: "Montre-moi la France"
+    U->>F: "Show me France"
     F->>R: POST /api/copilotkit
     R->>A: AG-UI RunAgent (SSE)
     A->>L: Chat completion + tools
     L-->>A: tool_call: update_team_info({FRA data})
     A-->>F: StateSnapshotEvent (teamInfo = France)
-    Note over F: useCoAgent → state.teamInfo change<br/>→ thème bleu/rouge, TeamCard s'affiche
+    Note over F: useCoAgent → state.teamInfo changes<br/>→ blue/red theme, TeamCard renders
     L-->>A: tool_call: get_team_matches("FRA")
     A-->>F: StateSnapshotEvent (matches = [...])
-    Note over F: MatchSchedule + VenueMap s'affichent
-    L-->>A: TextMessageContent (réponse Copa)
+    Note over F: MatchSchedule + VenueMap render
+    L-->>A: TextMessageContent (Copa response)
     A-->>F: SSE text stream
-    F-->>U: UI mise à jour + réponse Copa dans le chat
+    F-->>U: UI updated + Copa reply in chat
 ```
 
-### Architecture de déploiement Azure
+### Azure Deployment Architecture
 
 ```mermaid
 graph LR
@@ -132,18 +132,18 @@ graph LR
 
 ---
 
-## 🚀 Démarrage rapide
+## 🚀 Quick Start
 
-### Prérequis
+### Prerequisites
 
-| Outil | Version | Installation |
+| Tool | Version | Install |
 |---|---|---|
-| Node.js | 18+ (v24 LTS recommandé) | [nodejs.org](https://nodejs.org) |
+| Node.js | 18+ (v24 LTS recommended) | [nodejs.org](https://nodejs.org) |
 | Python | 3.12+ | [python.org](https://python.org) |
 | uv | latest | `pip install uv` |
-| Clé API | Azure OpenAI ou OpenAI | Voir section Configuration |
+| API Key | Azure OpenAI or OpenAI | See Configuration below |
 
-### 1. Cloner et installer
+### 1. Clone & install
 
 ```bash
 git clone https://github.com/fredgis/foot-agui-sample.git
@@ -159,64 +159,64 @@ uv sync
 cd ..
 ```
 
-### 2. ⚙️ Configurer la clé du modèle LLM
+### 2. ⚙️ Configure the LLM API key
 
 ```bash
 cp agent/.env.example agent/.env
 ```
 
-Éditer `agent/.env` avec **une** de ces options :
+Edit `agent/.env` with **one** of these options:
 
-#### Option A — Azure OpenAI avec clé API ✅ (recommandé)
+#### Option A — Azure OpenAI with API key ✅ (recommended)
 
 ```env
-AZURE_OPENAI_ENDPOINT=https://votre-resource.openai.azure.com/
-AZURE_OPENAI_API_KEY=votre-clé-api
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+AZURE_OPENAI_API_KEY=your-api-key
 AZURE_OPENAI_CHAT_DEPLOYMENT_NAME=gpt-4o-mini
 ```
 
-> Pas de `az login` nécessaire — la clé API suffit.
+> No `az login` needed — the API key is used directly.
 
-#### Option B — Azure OpenAI avec Managed Identity
+#### Option B — Azure OpenAI with Managed Identity
 
 ```env
-AZURE_OPENAI_ENDPOINT=https://votre-resource.openai.azure.com/
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
 AZURE_OPENAI_CHAT_DEPLOYMENT_NAME=gpt-4o-mini
 ```
 
-> Sans clé API, le code utilise `DefaultAzureCredential` (nécessite `az login` en local, Managed Identity en prod).
+> Without `AZURE_OPENAI_API_KEY`, the code uses `DefaultAzureCredential` (requires `az login` locally, Managed Identity in prod).
 
-#### Option C — OpenAI directement
+#### Option C — OpenAI directly
 
 ```env
-OPENAI_API_KEY=sk-proj-...votre-clé...
+OPENAI_API_KEY=sk-proj-...your-key...
 OPENAI_CHAT_MODEL_ID=gpt-4o-mini
 ```
 
-### 3. Lancer
+### 3. Run
 
 ```bash
-# Frontend + Agent ensemble
+# Frontend + Agent together
 npm run dev
 
-# Ou séparément :
+# Or separately:
 npm run dev:ui    # → http://localhost:3000
 npm run dev:agent # → http://localhost:8000
 ```
 
-### 4. Tester
+### 4. Test
 
-Ouvrir **http://localhost:3000** :
+Open **http://localhost:3000**:
 
-- 🏳️ Cliquer sur un drapeau → l'agent affiche la fiche complète de l'équipe
-- 💬 Taper : *"Montre-moi les matchs de la France"*
-- ⚔️ Essayer : *"Compare Brésil vs Argentine"*
-- 🏟️ Demander : *"Parle-moi du MetLife Stadium"*
-- 🌍 Naviguer entre Groupes et Bracket
+- 🏳️ Click a team flag → the agent shows the full team profile
+- 💬 Type: *"Show me France's matches"*
+- ⚔️ Try: *"Compare Brazil vs Argentina"*
+- 🏟️ Ask: *"Tell me about MetLife Stadium"*
+- 🌍 Navigate between Groups and Bracket views
 
 ---
 
-## 📁 Structure du projet
+## 📁 Project Structure
 
 ```
 foot-agui-sample/
@@ -227,104 +227,104 @@ foot-agui-sample/
 │   │   ├── layout.tsx                  # CopilotKit Provider + metadata
 │   │   └── api/copilotkit/route.ts     # Next.js API → HttpAgent(AGENT_URL) → backend
 │   ├── components/
-│   │   ├── team-card.tsx               # Fiche équipe (joueurs, palmarès, confédération, maillot SVG)
-│   │   ├── match-schedule.tsx          # 104 matchs avec filtres phase/groupe + countdown
-│   │   ├── venue-map.tsx               # Carte SVG interactive — 16 stades sur 3 pays
-│   │   ├── group-view.tsx              # 12 groupes (A→L) responsive grid
-│   │   └── tournament-bracket.tsx      # Bracket R32 → Finale avec sélection de phase
+│   │   ├── team-card.tsx               # Team profile (players, honors, confederation, SVG jersey)
+│   │   ├── match-schedule.tsx          # 104 matches with phase/group filters + countdown
+│   │   ├── venue-map.tsx               # Interactive SVG map — 16 stadiums across 3 countries
+│   │   ├── group-view.tsx              # 12 groups (A→L) responsive grid
+│   │   └── tournament-bracket.tsx      # Bracket R32 → Final with phase selection
 │   └── lib/
-│       ├── types.ts                    # Types : TeamInfo, MatchInfo, StadiumInfo, AgentState
+│       ├── types.ts                    # Types: TeamInfo, MatchInfo, StadiumInfo, AgentState
 │       ├── worldcup-data.ts            # 48 teams, 16 stadiums, 12 groups, 104 matches
 │       └── flags.ts                    # FIFA code → ISO → flagcdn.com images
 ├── agent/
 │   ├── src/
-│   │   ├── agent.py                    # Copa agent : system prompt + 8 @ai_function tools
+│   │   ├── agent.py                    # Copa agent: system prompt + 8 @ai_function tools
 │   │   ├── main.py                     # FastAPI + _build_chat_client() (Azure/OpenAI)
-│   │   └── data/worldcup2026.py        # Mirror Python des données TS
-│   ├── .env.example                    # Template config LLM — COPIER vers .env
+│   │   └── data/worldcup2026.py        # Python mirror of TS data
+│   ├── .env.example                    # LLM config template — COPY to .env
 │   ├── Dockerfile                      # Multi-stage Docker build
-│   └── pyproject.toml                  # Dépendances Python (agent-framework-ag-ui)
+│   └── pyproject.toml                  # Python deps (agent-framework-ag-ui)
 ├── scripts/
 │   ├── deploy.sh                       # One-click Azure deploy — idempotent (Linux/Mac)
 │   ├── deploy.ps1                      # One-click Azure deploy — idempotent (Windows)
-│   └── deploy-config.env.example       # Config Azure (subscription, region, resource group)
+│   └── deploy-config.env.example       # Azure config (subscription, region, resource group)
 ├── .github/workflows/
 │   └── deploy-azure.yml                # CI/CD GitHub Actions → Azure SWA + Container Apps
 ├── docs/
-│   └── worldcup2026-development-plan.md  # Plan de développement complet (1470+ lignes, 9 workstreams)
+│   └── worldcup2026-development-plan.md  # Full development plan (1470+ lines, 9 workstreams)
 ├── package.json
-└── README.md                           # ← Vous êtes ici
+└── README.md                           # ← You are here
 ```
 
 ---
 
-## 🤖 Agent Copa — 8 outils IA
+## 🤖 Copa Agent — 8 AI Tools
 
-L'agent Copa est défini dans `agent/src/agent.py` avec un system prompt de commentateur passionné et 8 fonctions IA :
+The Copa agent is defined in `agent/src/agent.py` with a passionate commentator system prompt and 8 AI functions:
 
-| Outil | Description | Effet sur l'UI |
+| Tool | Description | UI Effect |
 |---|---|---|
-| `update_team_info` | Charge une équipe dans le state | Affiche TeamCard, change les couleurs |
-| `get_team_matches` | Retourne les matchs d'une équipe | Affiche MatchSchedule + VenueMap |
-| `get_stadium_info` | Détails d'un stade | Highlight sur la carte, info bulle |
-| `get_group_standings` | Classement d'un groupe | Bascule en GroupView |
-| `get_venue_weather` | Météo d'une ville hôte | Affiche WeatherCard |
-| `show_tournament_bracket` | Active la vue bracket | Bascule en TournamentBracket |
-| `compare_teams` | Compare deux équipes | Affiche les deux fiches |
-| `get_city_guide` | Anecdotes sur une ville hôte | Texte dans le chat |
+| `update_team_info` | Load a team into the shared state | Renders TeamCard, changes theme colors |
+| `get_team_matches` | Return a team's group-stage matches | Renders MatchSchedule + VenueMap |
+| `get_stadium_info` | Stadium details | Highlights stadium on map |
+| `get_group_standings` | Group standings | Switches to GroupView |
+| `get_venue_weather` | Host city weather | Renders WeatherCard |
+| `show_tournament_bracket` | Activate bracket view | Switches to TournamentBracket |
+| `compare_teams` | Compare two teams | Shows both team profiles |
+| `get_city_guide` | Host city fun facts | Text response in chat |
 
-### State partagé (AgentState)
+### Shared State (AgentState)
 
 ```typescript
 type AgentState = {
-  teamInfo: TeamInfo | null;        // Équipe sélectionnée → TeamCard
-  matches: MatchInfo[];             // Matchs filtrés → MatchSchedule
-  selectedStadium: StadiumInfo | null; // Stade sélectionné → VenueMap highlight
-  tournamentView: "group" | "bracket" | null; // Vue active
-  highlightedCity: string | null;   // Ville highlight sur la carte
+  teamInfo: TeamInfo | null;           // Selected team → TeamCard
+  matches: MatchInfo[];                // Filtered matches → MatchSchedule
+  selectedStadium: StadiumInfo | null; // Selected stadium → VenueMap highlight
+  tournamentView: "group" | "bracket" | null; // Active view
+  highlightedCity: string | null;      // Highlighted city on map
 };
 ```
 
-Ce state est synchronisé en temps réel entre Python (`predict_state` + `STATE_SCHEMA`) et React (`useCoAgent`).
+This state is synchronized in real time between Python (`predict_state` + `STATE_SCHEMA`) and React (`useCoAgent`).
 
 ---
 
-## 🛠️ Scripts disponibles
+## 🛠️ Available Scripts
 
-| Commande | Description |
+| Command | Description |
 |---|---|
-| `npm run dev` | Lance frontend + agent ensemble (concurrently) |
-| `npm run dev:ui` | Frontend seul (Next.js Turbopack) sur `:3000` |
-| `npm run dev:agent` | Agent Python seul sur `:8000` |
-| `npm run build` | Build de production Next.js |
-| `npm run lint` | Vérification ESLint |
+| `npm run dev` | Start frontend + agent together (concurrently) |
+| `npm run dev:ui` | Frontend only (Next.js Turbopack) on `:3000` |
+| `npm run dev:agent` | Python agent only on `:8000` |
+| `npm run build` | Production build (Next.js) |
+| `npm run lint` | ESLint check |
 
 ---
 
-## 🎨 Tout est dynamique
+## 🎨 Everything is Dynamic
 
-- **Couleurs** — Quand une équipe est sélectionnée, l'UI entière change : header, borders, sidebar, countdown, boutons, background gradient
-- **Contenu** — L'agent LLM génère les réponses en streaming temps réel via AG-UI (SSE events)
-- **State sync** — Le state Python (`teamInfo`, `matches`, `selectedStadium`, `tournamentView`, `highlightedCity`) est synchronisé avec React via `useCoAgent` / `predict_state`
-- **Routing UI** — La page affiche dynamiquement le bon composant : WelcomeScreen → TeamCard+Schedule+Map → GroupView → Bracket
-- **Drapeaux** — Images chargées à la demande depuis CDN (flagcdn.com)
-- **Cross-component** — Clic match → highlight stade ; clic adversaire → comparaison chat ; clic groupe → navigation équipe
+- **Colors** — When a team is selected, the entire UI changes: header, borders, sidebar, countdown, buttons, background gradient
+- **Content** — The LLM agent generates responses via real-time AG-UI streaming (SSE events)
+- **State sync** — The Python state (`teamInfo`, `matches`, `selectedStadium`, `tournamentView`, `highlightedCity`) is synchronized with React via `useCoAgent` / `predict_state`
+- **UI routing** — The page dynamically renders the right component: WelcomeScreen → TeamCard+Schedule+Map → GroupView → Bracket
+- **Flags** — Images loaded on demand from CDN (flagcdn.com)
+- **Cross-component** — Click match → highlight stadium; click opponent → comparison in chat; click group team → navigate
 
 ---
 
-## ☁️ Déploiement Azure
+## ☁️ Azure Deployment
 
-| Composant | Service Azure | Notes |
+| Component | Azure Service | Notes |
 |---|---|---|
-| Frontend (SSR) | Azure Static Web Apps | Next.js hybrid rendering, API routes incluses |
-| Backend (API) | Azure Container Apps | Scale-to-zero, Docker, health check `/healthz` |
-| LLM | Azure OpenAI | API key ou Managed Identity |
+| Frontend (SSR) | Azure Static Web Apps | Next.js hybrid rendering, API routes included |
+| Backend (API) | Azure Container Apps | Scale-to-zero, Docker, health check at `/healthz` |
+| LLM | Azure OpenAI | API key or Managed Identity |
 
 ### One-click deploy (idempotent)
 
 ```bash
 cp scripts/deploy-config.env.example scripts/deploy-config.env
-# Éditer avec vos valeurs Azure
+# Edit with your Azure values
 
 # Linux/Mac
 bash scripts/deploy.sh
@@ -333,54 +333,54 @@ bash scripts/deploy.sh
 powershell scripts/deploy.ps1
 ```
 
-Le script est **réentrant** : il peut être relancé à tout moment sans casser l'existant (7 étapes idempotentes).
+The script is **re-entrant**: it can be re-run at any time without breaking existing resources (7 idempotent steps).
 
-### CI/CD GitHub Actions
+### CI/CD with GitHub Actions
 
-Le workflow `.github/workflows/deploy-azure.yml` se déclenche sur push vers `main`.
+The workflow `.github/workflows/deploy-azure.yml` triggers on push to `main`.
 
-Secrets GitHub requis :
+Required GitHub secrets:
 
 | Secret | Description |
 |---|---|
 | `AZURE_CREDENTIALS` | Service Principal JSON |
-| `AZURE_STATIC_WEB_APPS_API_TOKEN` | Token déploiement SWA |
-| `AGENT_URL` | URL du Container App backend |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN` | SWA deployment token |
+| `AGENT_URL` | Container App backend URL |
 
-> ⚠️ `AGENT_URL` doit aussi être configuré comme **Application Setting** dans le portail Azure SWA pour fonctionner au runtime SSR.
+> ⚠️ `AGENT_URL` must also be set as an **Application Setting** in the Azure SWA portal for runtime SSR to work.
 
 ---
 
-## 📚 Documentation complémentaire
+## 📚 Additional Documentation
 
-| Document | Contenu |
+| Document | Content |
 |---|---|
-| [`docs/worldcup2026-development-plan.md`](docs/worldcup2026-development-plan.md) | Plan de développement complet : 9 workstreams, diagrammes Mermaid, acceptance criteria, risques, architecture détaillée |
-| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Architecture technique originale |
-| [`DEBUG.md`](DEBUG.md) | Guide de débogage |
+| [`docs/worldcup2026-development-plan.md`](docs/worldcup2026-development-plan.md) | Full development plan: 9 workstreams, Mermaid diagrams, acceptance criteria, risks, detailed architecture |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Original technical architecture |
+| [`DEBUG.md`](DEBUG.md) | Debugging guide |
 
 ---
 
-## 🔧 Stack technique
+## 🔧 Tech Stack
 
-| Couche | Technologie | Version |
+| Layer | Technology | Version |
 |---|---|---|
 | Frontend | Next.js + React + TailwindCSS | 16 + 19 + 4 |
 | Chat UI | CopilotKit (Sidebar + Popup) | 1.52.1 |
 | Protocol | AG-UI (SSE events) | 0.0.46 |
 | Backend | Python + FastAPI + Microsoft Agent Framework | 3.12 |
 | LLM | Azure OpenAI / OpenAI | gpt-4o-mini |
-| Déploiement | Azure Static Web Apps + Container Apps | — |
+| Deployment | Azure Static Web Apps + Container Apps | — |
 | CI/CD | GitHub Actions | — |
 | Flags | flagcdn.com (CDN) | — |
 
 ---
 
-## 📄 Licence
+## 📄 License
 
-MIT — voir [LICENSE](LICENSE)
+MIT — see [LICENSE](LICENSE)
 
 ---
 
-**⚽ Développé pour la FIFA World Cup 2026 🇺🇸🇲🇽🇨🇦**
-**Propulsé par [CopilotKit](https://copilotkit.ai) + [Microsoft Agent Framework](https://aka.ms/agent-framework) + [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service)**
+**⚽ Built for the 2026 FIFA World Cup 🇺🇸🇲🇽🇨🇦**
+**Powered by [CopilotKit](https://copilotkit.ai) · [Microsoft Agent Framework](https://aka.ms/agent-framework) · [Azure OpenAI](https://azure.microsoft.com/products/ai-services/openai-service)**
