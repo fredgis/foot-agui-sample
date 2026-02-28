@@ -3,11 +3,13 @@
 import { ClubInfoCard } from "@/components/clubinfo";
 import { TeamCard } from "@/components/team-card";
 import { MatchSchedule } from "@/components/match-schedule";
+import { GroupView } from "@/components/group-view";
+import { TournamentBracket } from "@/components/tournament-bracket";
 import { WeatherCard } from "@/components/weather";
 import { MoonCard } from "@/components/moon";
 import { VenueMap } from "@/components/venue-map";
-import { AgentState, MatchInfo, StadiumInfo } from "@/lib/types";
-import { stadiums as allStadiums } from "@/lib/worldcup-data";
+import { AgentState, MatchInfo, MatchPhase, StadiumInfo } from "@/lib/types";
+import { stadiums as allStadiums, groups, matches } from "@/lib/worldcup-data";
 import { useCoAgent, useCopilotAction, useCopilotChat } from "@copilotkit/react-core";
 import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
@@ -229,7 +231,34 @@ function YourMainContent({
       tournamentView: null,
       highlightedCity: null,
     },
-  })
+  });
+
+  // Chat hook to programmatically send messages (cross-component interactions)
+  const { appendMessage } = useCopilotChat();
+
+  // Local state: selected phase for bracket cross-component filtering
+  const [selectedPhase, setSelectedPhase] = useState<MatchPhase | null>(null);
+
+  // Cross-component: clicking a team in GroupView triggers compare_teams in chat
+  const handleTeamClick = (teamCode: string) => {
+    const currentTeam = state.teamInfo?.name ?? state.teamInfo?.fifaCode;
+    const message = currentTeam
+      ? `Compare ${currentTeam} and ${teamCode}`
+      : `Tell me about ${teamCode}`;
+    appendMessage(
+      new TextMessage({ role: Role.User, content: message })
+    );
+  };
+
+  // Cross-component: clicking a phase in TournamentBracket filters the schedule
+  const handlePhaseClick = (phase: MatchPhase) => {
+    setSelectedPhase((prev) => (prev === phase ? null : phase));
+  };
+
+  // Filtered matches for bracket phase selection (available for MatchSchedule WS4)
+  const filteredMatches = selectedPhase
+    ? matches.filter((m) => m.phase === selectedPhase)
+    : matches;
 
   // 🎨 Apply team colors when teamInfo changes
   useEffect(() => {
@@ -476,9 +505,31 @@ function YourMainContent({
         </>
       )}
 
-      {/* Carte des infos du club OU Page d'accueil attractive */}
-      <div style={{ position: 'relative', zIndex: 10, width: '90%', maxWidth: '1400px', marginTop: clubName ? '200px' : '0' }}>
-        {state.teamInfo ? (
+      {/* Carte des infos, vue tournoi, ou page d'accueil */}
+      <div style={{
+        position: 'relative',
+        zIndex: 10,
+        width: '90%',
+        maxWidth: '1400px',
+        marginTop: clubName && !state.tournamentView ? '200px' : '20px',
+        overflowY: 'auto',
+        maxHeight: state.tournamentView ? '90vh' : undefined,
+      }}>
+        {state.tournamentView === "group" ? (
+          <GroupView
+            groups={groups}
+            selectedTeamCode={state.teamInfo?.fifaCode}
+            themeColor={themeColor}
+            onTeamClick={handleTeamClick}
+          />
+        ) : state.tournamentView === "bracket" ? (
+          <TournamentBracket
+            matches={filteredMatches}
+            selectedTeamCode={state.teamInfo?.fifaCode}
+            themeColor={themeColor}
+            onPhaseClick={handlePhaseClick}
+          />
+        ) : state.teamInfo ? (
           <div className="flex flex-col lg:flex-row gap-6 items-start w-full">
             <div className="flex-1 min-w-0">
               <TeamCard team={state.teamInfo} themeColor={themeColor} secondaryColor={secondaryColor} />
