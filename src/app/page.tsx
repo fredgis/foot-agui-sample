@@ -862,6 +862,15 @@ function YourMainContent({
     parameters: [
       { name: "stadium_name", type: "string", description: "Stadium name", required: true },
     ],
+    handler: async ({ stadium_name }: { stadium_name: string }) => {
+      const stadium = allStadiums.find(
+        (s) => s.name.toLowerCase().includes((stadium_name ?? "").toLowerCase())
+      );
+      if (stadium) {
+        setState({ ...state, selectedStadium: stadium, highlightedCity: stadium.city });
+      }
+      return stadium ? `Showing ${stadium.name}` : `Stadium '${stadium_name}' not found`;
+    },
     render: ({ args, status }) => {
       const stadium = allStadiums.find(
         (s) => s.name.toLowerCase().includes((args.stadium_name ?? "").toLowerCase())
@@ -876,7 +885,7 @@ function YourMainContent({
         </div>
       );
     },
-  }, [themeColor]);
+  }, [themeColor, state, setState]);
 
   // 🆚 Generative UI: render comparison card when agent calls compare_teams
   useCopilotAction({
@@ -887,6 +896,7 @@ function YourMainContent({
       { name: "team_a", type: "string", description: "First team FIFA code", required: true },
       { name: "team_b", type: "string", description: "Second team FIFA code", required: true },
     ],
+    handler: async () => "Comparison displayed",
     render: ({ args, status }) => {
       const a = teams.find((t) => t.fifaCode === (args.team_a ?? "").toUpperCase());
       const b = teams.find((t) => t.fifaCode === (args.team_b ?? "").toUpperCase());
