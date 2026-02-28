@@ -56,8 +56,16 @@ export const fifaToIso2: Record<string, string> = {
   JAM: "jm",
   HON: "hn",
   TRI: "tt",
+  HAI: "ht",
+  CUW: "cw",
   // OFC (1)
   NZL: "nz",
+  // New WC2026 teams
+  CPV: "cv",
+  NOR: "no",
+  JOR: "jo",
+  PAR: "py",
+  GHA: "gh",
 };
 
 /** FIFA code → country / team display name */
@@ -109,7 +117,20 @@ const fifaToName: Record<string, string> = {
   JAM: "Jamaica",
   HON: "Honduras",
   TRI: "Trinidad and Tobago",
+  HAI: "Haiti",
+  CUW: "Curaçao",
   NZL: "New Zealand",
+  CPV: "Cape Verde",
+  NOR: "Norway",
+  JOR: "Jordan",
+  PAR: "Paraguay",
+  GHA: "Ghana",
+  POA: "UEFA Playoff A",
+  POB: "UEFA Playoff B",
+  POC: "UEFA Playoff C",
+  POD: "UEFA Playoff D",
+  IP1: "FIFA IC Playoff 1",
+  IP2: "FIFA IC Playoff 2",
 };
 
 /**

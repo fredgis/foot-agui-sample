@@ -878,9 +878,196 @@ export const teams: TeamInfo[] = [
     ],
     worldCupHistory: { participations: 3, titles: 0, bestResult: "Group Stage" },
   },
+
+  // ── New teams for WC2026 draw ──────────────────────────────────────────────
+  {
+    name: "Haiti",
+    fifaCode: "HAI",
+    flag: "🇭🇹",
+    confederation: "CONCACAF",
+    fifaRanking: 100,
+    primaryColor: "#00209F",
+    secondaryColor: "#D21034",
+    coach: "Marc Collat",
+    keyPlayers: [
+      { name: "Duckens Nazon", position: "FW", club: "AC Ajaccio" },
+      { name: "Frantzdy Pierrot", position: "FW", club: "Boluspor" },
+      { name: "Bryan Alceus", position: "MF", club: "Grenoble Foot" },
+    ],
+    worldCupHistory: { participations: 1, titles: 0, bestResult: "Group Stage (1974)" },
+  },
+  {
+    name: "Curaçao",
+    fifaCode: "CUW",
+    flag: "🇨🇼",
+    confederation: "CONCACAF",
+    fifaRanking: 80,
+    primaryColor: "#002B7F",
+    secondaryColor: "#F9E814",
+    coach: "Patrick Kluivert",
+    keyPlayers: [
+      { name: "Cuco Martina", position: "DF", club: "Free Agent" },
+      { name: "Leandro Bacuna", position: "MF", club: "Free Agent" },
+      { name: "Juninho Bacuna", position: "MF", club: "Birmingham City" },
+    ],
+    worldCupHistory: { participations: 1, titles: 0, bestResult: "First appearance" },
+  },
+  {
+    name: "Cape Verde",
+    fifaCode: "CPV",
+    flag: "🇨🇻",
+    confederation: "CAF",
+    fifaRanking: 70,
+    primaryColor: "#003893",
+    secondaryColor: "#CF2027",
+    coach: "Pedro Brito",
+    keyPlayers: [
+      { name: "Garry Rodrigues", position: "FW", club: "Al Ittihad" },
+      { name: "Ryan Mendes", position: "FW", club: "Free Agent" },
+      { name: "Kenny Rocha Santos", position: "MF", club: "Rio Ave" },
+    ],
+    worldCupHistory: { participations: 1, titles: 0, bestResult: "First appearance" },
+  },
+  {
+    name: "Norway",
+    fifaCode: "NOR",
+    flag: "🇳🇴",
+    confederation: "UEFA",
+    fifaRanking: 55,
+    primaryColor: "#BA0C2F",
+    secondaryColor: "#FFFFFF",
+    coach: "Ståle Solbakken",
+    keyPlayers: [
+      { name: "Erling Haaland", position: "FW", club: "Manchester City" },
+      { name: "Martin Ødegaard", position: "MF", club: "Arsenal" },
+      { name: "Alexander Sørloth", position: "FW", club: "Atlético Madrid" },
+    ],
+    worldCupHistory: { participations: 4, titles: 0, bestResult: "Group Stage (1938, 1994, 1998)" },
+  },
+  {
+    name: "Jordan",
+    fifaCode: "JOR",
+    flag: "🇯🇴",
+    confederation: "AFC",
+    fifaRanking: 65,
+    primaryColor: "#007A3D",
+    secondaryColor: "#FFFFFF",
+    coach: "Hussein Ammouta",
+    keyPlayers: [
+      { name: "Mousa Al-Tamari", position: "FW", club: "Montpellier" },
+      { name: "Yazan Al-Naimat", position: "FW", club: "Young Boys" },
+      { name: "Baha Faisal", position: "FW", club: "Al-Wehdat" },
+    ],
+    worldCupHistory: { participations: 1, titles: 0, bestResult: "First appearance" },
+  },
+  {
+    name: "Paraguay",
+    fifaCode: "PAR",
+    flag: "🇵🇾",
+    confederation: "CONMEBOL",
+    fifaRanking: 50,
+    primaryColor: "#DA121A",
+    secondaryColor: "#FFFFFF",
+    coach: "Alfaro Moreno",
+    keyPlayers: [
+      { name: "Miguel Almirón", position: "MF", club: "Atlanta United" },
+      { name: "Julio Enciso", position: "FW", club: "Brighton" },
+      { name: "Gustavo Gómez", position: "DF", club: "Palmeiras" },
+    ],
+    worldCupHistory: { participations: 9, titles: 0, bestResult: "Quarter-final (2010)" },
+  },
+  {
+    name: "Ghana",
+    fifaCode: "GHA",
+    flag: "🇬🇭",
+    confederation: "CAF",
+    fifaRanking: 60,
+    primaryColor: "#006B3F",
+    secondaryColor: "#FCD116",
+    coach: "Otto Addo",
+    keyPlayers: [
+      { name: "Mohammed Kudus", position: "MF", club: "West Ham United" },
+      { name: "Thomas Partey", position: "MF", club: "Arsenal" },
+      { name: "Iñaki Williams", position: "FW", club: "Athletic Bilbao" },
+    ],
+    worldCupHistory: { participations: 5, titles: 0, bestResult: "Quarter-final (2010)" },
+  },
+  // ── Playoff placeholders ───────────────────────────────────────────────────
+  {
+    name: "UEFA Playoff A",
+    fifaCode: "POA",
+    flag: "🏳️",
+    confederation: "UEFA",
+    fifaRanking: 0,
+    primaryColor: "#555555",
+    secondaryColor: "#AAAAAA",
+    coach: "TBD",
+    keyPlayers: [],
+    worldCupHistory: { participations: 0, titles: 0, bestResult: "TBD" },
+  },
+  {
+    name: "UEFA Playoff B",
+    fifaCode: "POB",
+    flag: "🏳️",
+    confederation: "UEFA",
+    fifaRanking: 0,
+    primaryColor: "#555555",
+    secondaryColor: "#AAAAAA",
+    coach: "TBD",
+    keyPlayers: [],
+    worldCupHistory: { participations: 0, titles: 0, bestResult: "TBD" },
+  },
+  {
+    name: "UEFA Playoff C",
+    fifaCode: "POC",
+    flag: "🏳️",
+    confederation: "UEFA",
+    fifaRanking: 0,
+    primaryColor: "#555555",
+    secondaryColor: "#AAAAAA",
+    coach: "TBD",
+    keyPlayers: [],
+    worldCupHistory: { participations: 0, titles: 0, bestResult: "TBD" },
+  },
+  {
+    name: "UEFA Playoff D",
+    fifaCode: "POD",
+    flag: "🏳️",
+    confederation: "UEFA",
+    fifaRanking: 0,
+    primaryColor: "#555555",
+    secondaryColor: "#AAAAAA",
+    coach: "TBD",
+    keyPlayers: [],
+    worldCupHistory: { participations: 0, titles: 0, bestResult: "TBD" },
+  },
+  {
+    name: "FIFA IC Playoff 1",
+    fifaCode: "IP1",
+    flag: "🏳️",
+    confederation: "CONCACAF",
+    fifaRanking: 0,
+    primaryColor: "#555555",
+    secondaryColor: "#AAAAAA",
+    coach: "TBD",
+    keyPlayers: [],
+    worldCupHistory: { participations: 0, titles: 0, bestResult: "TBD" },
+  },
+  {
+    name: "FIFA IC Playoff 2",
+    fifaCode: "IP2",
+    flag: "🏳️",
+    confederation: "CONMEBOL",
+    fifaRanking: 0,
+    primaryColor: "#555555",
+    secondaryColor: "#AAAAAA",
+    coach: "TBD",
+    keyPlayers: [],
+    worldCupHistory: { participations: 0, titles: 0, bestResult: "TBD" },
+  },
 ];
 
-// ─── 16 Stadiums ──────────────────────────────────────────────────────────────
+// ─── 16 Stadiums──────────────────────────────────────────────────────────────
 
 export const stadiums: StadiumInfo[] = [
   // ── USA ───────────────────────────────────────────────────────────────────
@@ -1064,165 +1251,158 @@ export const stadiums: StadiumInfo[] = [
   },
 ];
 
-// ─── 12 Groups ────────────────────────────────────────────────────────────────
+// ─── 12 Groups (Official FIFA Draw, December 2025) ───────────────────────────
+// Source: https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/standings
+// PDF:    https://digitalhub.fifa.com/m/1be9ce37eb98fcc5/original/FWC26-Match-Schedule_English.pdf
 
 export const groups: GroupInfo[] = [
-  { name: "A", teams: ["USA", "BRA", "MAR", "EGY"] },
-  { name: "B", teams: ["MEX", "ARG", "FRA", "ENG"] },
-  { name: "C", teams: ["CAN", "URU", "GER", "JPN"] },
-  { name: "D", teams: ["ESP", "COL", "SEN", "TUN"] },
-  { name: "E", teams: ["POR", "NED", "NGA", "AUS"] },
-  { name: "F", teams: ["BEL", "CRO", "KOR", "IRN"] },
-  { name: "G", teams: ["SUI", "CIV", "QAT", "UZB"] },
-  { name: "H", teams: ["POL", "CMR", "KSA", "CHN"] },
-  { name: "I", teams: ["UKR", "DEN", "ECU", "ALG"] },
-  { name: "J", teams: ["TUR", "AUT", "CHI", "JAM"] },
-  { name: "K", teams: ["SCO", "SRB", "RSA", "TRI"] },
-  { name: "L", teams: ["CRC", "PAN", "HON", "NZL"] },
+  { name: "A", teams: ["MEX", "KOR", "RSA", "POD"] },
+  { name: "B", teams: ["CAN", "SUI", "QAT", "POA"] },
+  { name: "C", teams: ["BRA", "MAR", "SCO", "HAI"] },
+  { name: "D", teams: ["USA", "AUS", "PAR", "POC"] },
+  { name: "E", teams: ["GER", "ECU", "CIV", "CUW"] },
+  { name: "F", teams: ["NED", "JPN", "TUN", "POB"] },
+  { name: "G", teams: ["BEL", "IRN", "EGY", "NZL"] },
+  { name: "H", teams: ["ESP", "URU", "KSA", "CPV"] },
+  { name: "I", teams: ["FRA", "SEN", "NOR", "IP2"] },
+  { name: "J", teams: ["ARG", "AUT", "ALG", "JOR"] },
+  { name: "K", teams: ["POR", "COL", "UZB", "IP1"] },
+  { name: "L", teams: ["ENG", "GHA", "PAN", "CRO"] },
 ];
 
-// ─── 104 Matches ──────────────────────────────────────────────────────────────
+// ─── 104 Matches (Official FIFA Schedule) ─────────────────────────────────────
+// Source: https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/match-schedule-fixtures-results-teams-stadiums
+// Knockout: https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/knockout-stage-match-schedule-bracket
 // Group stage: 48 teams × 3 matches = 72 group stage matches
-// Knockout stage: 32 teams → 16 (R16) + 8 (QF) + 4 (SF) + 1 (3rd) + 1 (F) = 32 matches
+// Knockout stage: R32(16) + R16(8) + QF(4) + SF(2) + 3P(1) + F(1) = 32
 
 export const matches: MatchInfo[] = [
-  // ── Group A ───────────────────────────────────────────────────────────────
-  { id: "A1", date: "2026-06-11", time: "19:00", homeTeam: "USA", awayTeam: "BRA", stadiumName: "MetLife Stadium", phase: "group", group: "A" },
-  { id: "A2", date: "2026-06-12", time: "16:00", homeTeam: "MAR", awayTeam: "EGY", stadiumName: "Hard Rock Stadium", phase: "group", group: "A" },
-  { id: "A3", date: "2026-06-16", time: "16:00", homeTeam: "USA", awayTeam: "MAR", stadiumName: "Mercedes-Benz Stadium", phase: "group", group: "A" },
-  { id: "A4", date: "2026-06-16", time: "19:00", homeTeam: "BRA", awayTeam: "EGY", stadiumName: "AT&T Stadium", phase: "group", group: "A" },
-  { id: "A5", date: "2026-06-20", time: "19:00", homeTeam: "USA", awayTeam: "EGY", stadiumName: "MetLife Stadium", phase: "group", group: "A" },
-  { id: "A6", date: "2026-06-20", time: "19:00", homeTeam: "BRA", awayTeam: "MAR", stadiumName: "SoFi Stadium", phase: "group", group: "A" },
+  // ── Group A — MEX, KOR, RSA, POD ──────────────────────────────────────────
+  { id: "A1", date: "2026-06-11", time: "21:00", homeTeam: "MEX", awayTeam: "RSA", stadiumName: "Estadio Azteca", phase: "group", group: "A" },
+  { id: "A2", date: "2026-06-11", time: "18:00", homeTeam: "KOR", awayTeam: "POD", stadiumName: "Estadio Akron", phase: "group", group: "A" },
+  { id: "A3", date: "2026-06-18", time: "18:00", homeTeam: "POD", awayTeam: "RSA", stadiumName: "Mercedes-Benz Stadium", phase: "group", group: "A" },
+  { id: "A4", date: "2026-06-18", time: "21:00", homeTeam: "MEX", awayTeam: "KOR", stadiumName: "Estadio Akron", phase: "group", group: "A" },
+  { id: "A5", date: "2026-06-24", time: "21:00", homeTeam: "POD", awayTeam: "MEX", stadiumName: "Estadio Azteca", phase: "group", group: "A" },
+  { id: "A6", date: "2026-06-24", time: "21:00", homeTeam: "RSA", awayTeam: "KOR", stadiumName: "Estadio BBVA", phase: "group", group: "A" },
+  // ── Group B — CAN, SUI, QAT, POA ──────────────────────────────────────────
+  { id: "B1", date: "2026-06-12", time: "17:00", homeTeam: "CAN", awayTeam: "POA", stadiumName: "BMO Field", phase: "group", group: "B" },
+  { id: "B2", date: "2026-06-13", time: "18:00", homeTeam: "QAT", awayTeam: "SUI", stadiumName: "Levi's Stadium", phase: "group", group: "B" },
+  { id: "B3", date: "2026-06-18", time: "18:00", homeTeam: "SUI", awayTeam: "POA", stadiumName: "SoFi Stadium", phase: "group", group: "B" },
+  { id: "B4", date: "2026-06-18", time: "14:00", homeTeam: "CAN", awayTeam: "QAT", stadiumName: "BC Place", phase: "group", group: "B" },
+  { id: "B5", date: "2026-06-24", time: "18:00", homeTeam: "SUI", awayTeam: "CAN", stadiumName: "BC Place", phase: "group", group: "B" },
+  { id: "B6", date: "2026-06-24", time: "18:00", homeTeam: "POA", awayTeam: "QAT", stadiumName: "Lumen Field", phase: "group", group: "B" },
+  // ── Group C — BRA, MAR, SCO, HAI ──────────────────────────────────────────
+  { id: "C1", date: "2026-06-13", time: "21:00", homeTeam: "BRA", awayTeam: "MAR", stadiumName: "MetLife Stadium", phase: "group", group: "C" },
+  { id: "C2", date: "2026-06-13", time: "15:00", homeTeam: "HAI", awayTeam: "SCO", stadiumName: "Gillette Stadium", phase: "group", group: "C" },
+  { id: "C3", date: "2026-06-19", time: "15:00", homeTeam: "SCO", awayTeam: "MAR", stadiumName: "Gillette Stadium", phase: "group", group: "C" },
+  { id: "C4", date: "2026-06-19", time: "18:00", homeTeam: "BRA", awayTeam: "HAI", stadiumName: "Lincoln Financial Field", phase: "group", group: "C" },
+  { id: "C5", date: "2026-06-24", time: "21:00", homeTeam: "SCO", awayTeam: "BRA", stadiumName: "Hard Rock Stadium", phase: "group", group: "C" },
+  { id: "C6", date: "2026-06-24", time: "21:00", homeTeam: "MAR", awayTeam: "HAI", stadiumName: "Mercedes-Benz Stadium", phase: "group", group: "C" },
+  // ── Group D — USA, AUS, PAR, POC ──────────────────────────────────────────
+  { id: "D1", date: "2026-06-12", time: "20:30", homeTeam: "USA", awayTeam: "PAR", stadiumName: "SoFi Stadium", phase: "group", group: "D" },
+  { id: "D2", date: "2026-06-13", time: "21:00", homeTeam: "AUS", awayTeam: "POC", stadiumName: "BC Place", phase: "group", group: "D" },
+  { id: "D3", date: "2026-06-19", time: "18:00", homeTeam: "POC", awayTeam: "PAR", stadiumName: "Levi's Stadium", phase: "group", group: "D" },
+  { id: "D4", date: "2026-06-19", time: "21:00", homeTeam: "USA", awayTeam: "AUS", stadiumName: "Lumen Field", phase: "group", group: "D" },
+  { id: "D5", date: "2026-06-25", time: "21:00", homeTeam: "POC", awayTeam: "USA", stadiumName: "SoFi Stadium", phase: "group", group: "D" },
+  { id: "D6", date: "2026-06-25", time: "21:00", homeTeam: "PAR", awayTeam: "AUS", stadiumName: "Levi's Stadium", phase: "group", group: "D" },
+  // ── Group E — GER, ECU, CIV, CUW ──────────────────────────────────────────
+  { id: "E1", date: "2026-06-14", time: "13:00", homeTeam: "GER", awayTeam: "CUW", stadiumName: "NRG Stadium", phase: "group", group: "E" },
+  { id: "E2", date: "2026-06-14", time: "19:00", homeTeam: "CIV", awayTeam: "ECU", stadiumName: "Lincoln Financial Field", phase: "group", group: "E" },
+  { id: "E3", date: "2026-06-20", time: "16:00", homeTeam: "GER", awayTeam: "CIV", stadiumName: "BMO Field", phase: "group", group: "E" },
+  { id: "E4", date: "2026-06-20", time: "20:00", homeTeam: "ECU", awayTeam: "CUW", stadiumName: "Arrowhead Stadium", phase: "group", group: "E" },
+  { id: "E5", date: "2026-06-25", time: "16:00", homeTeam: "ECU", awayTeam: "GER", stadiumName: "MetLife Stadium", phase: "group", group: "E" },
+  { id: "E6", date: "2026-06-25", time: "16:00", homeTeam: "CUW", awayTeam: "CIV", stadiumName: "Lincoln Financial Field", phase: "group", group: "E" },
+  // ── Group F — NED, JPN, TUN, POB ──────────────────────────────────────────
+  { id: "F1", date: "2026-06-14", time: "16:00", homeTeam: "NED", awayTeam: "JPN", stadiumName: "AT&T Stadium", phase: "group", group: "F" },
+  { id: "F2", date: "2026-06-14", time: "22:00", homeTeam: "TUN", awayTeam: "POB", stadiumName: "Estadio BBVA", phase: "group", group: "F" },
+  { id: "F3", date: "2026-06-20", time: "13:00", homeTeam: "NED", awayTeam: "TUN", stadiumName: "NRG Stadium", phase: "group", group: "F" },
+  { id: "F4", date: "2026-06-20", time: "22:00", homeTeam: "JPN", awayTeam: "POB", stadiumName: "Estadio BBVA", phase: "group", group: "F" },
+  { id: "F5", date: "2026-06-25", time: "19:00", homeTeam: "JPN", awayTeam: "NED", stadiumName: "AT&T Stadium", phase: "group", group: "F" },
+  { id: "F6", date: "2026-06-25", time: "13:00", homeTeam: "POB", awayTeam: "TUN", stadiumName: "BMO Field", phase: "group", group: "F" },
+  // ── Group G — BEL, IRN, EGY, NZL ──────────────────────────────────────────
+  { id: "G1", date: "2026-06-15", time: "18:00", homeTeam: "BEL", awayTeam: "EGY", stadiumName: "Lumen Field", phase: "group", group: "G" },
+  { id: "G2", date: "2026-06-15", time: "21:00", homeTeam: "IRN", awayTeam: "NZL", stadiumName: "SoFi Stadium", phase: "group", group: "G" },
+  { id: "G3", date: "2026-06-21", time: "18:00", homeTeam: "IRN", awayTeam: "BEL", stadiumName: "BC Place", phase: "group", group: "G" },
+  { id: "G4", date: "2026-06-21", time: "21:00", homeTeam: "NZL", awayTeam: "EGY", stadiumName: "SoFi Stadium", phase: "group", group: "G" },
+  { id: "G5", date: "2026-06-26", time: "18:00", homeTeam: "BEL", awayTeam: "NZL", stadiumName: "Lumen Field", phase: "group", group: "G" },
+  { id: "G6", date: "2026-06-26", time: "18:00", homeTeam: "EGY", awayTeam: "IRN", stadiumName: "BC Place", phase: "group", group: "G" },
+  // ── Group H — ESP, URU, KSA, CPV ──────────────────────────────────────────
+  { id: "H1", date: "2026-06-15", time: "15:00", homeTeam: "ESP", awayTeam: "CPV", stadiumName: "Hard Rock Stadium", phase: "group", group: "H" },
+  { id: "H2", date: "2026-06-15", time: "12:00", homeTeam: "URU", awayTeam: "KSA", stadiumName: "Mercedes-Benz Stadium", phase: "group", group: "H" },
+  { id: "H3", date: "2026-06-21", time: "15:00", homeTeam: "ESP", awayTeam: "KSA", stadiumName: "Hard Rock Stadium", phase: "group", group: "H" },
+  { id: "H4", date: "2026-06-21", time: "12:00", homeTeam: "URU", awayTeam: "CPV", stadiumName: "Mercedes-Benz Stadium", phase: "group", group: "H" },
+  { id: "H5", date: "2026-06-27", time: "18:00", homeTeam: "ESP", awayTeam: "URU", stadiumName: "Hard Rock Stadium", phase: "group", group: "H" },
+  { id: "H6", date: "2026-06-27", time: "18:00", homeTeam: "KSA", awayTeam: "CPV", stadiumName: "Mercedes-Benz Stadium", phase: "group", group: "H" },
+  // ── Group I — FRA, SEN, NOR, IP2 ──────────────────────────────────────────
+  { id: "I1", date: "2026-06-16", time: "18:00", homeTeam: "FRA", awayTeam: "SEN", stadiumName: "MetLife Stadium", phase: "group", group: "I" },
+  { id: "I2", date: "2026-06-16", time: "15:00", homeTeam: "NOR", awayTeam: "IP2", stadiumName: "Gillette Stadium", phase: "group", group: "I" },
+  { id: "I3", date: "2026-06-22", time: "18:00", homeTeam: "FRA", awayTeam: "NOR", stadiumName: "MetLife Stadium", phase: "group", group: "I" },
+  { id: "I4", date: "2026-06-22", time: "15:00", homeTeam: "SEN", awayTeam: "IP2", stadiumName: "Lincoln Financial Field", phase: "group", group: "I" },
+  { id: "I5", date: "2026-06-27", time: "21:00", homeTeam: "FRA", awayTeam: "IP2", stadiumName: "Gillette Stadium", phase: "group", group: "I" },
+  { id: "I6", date: "2026-06-27", time: "21:00", homeTeam: "SEN", awayTeam: "NOR", stadiumName: "Lincoln Financial Field", phase: "group", group: "I" },
+  // ── Group J — ARG, AUT, ALG, JOR ──────────────────────────────────────────
+  { id: "J1", date: "2026-06-16", time: "21:00", homeTeam: "ARG", awayTeam: "ALG", stadiumName: "Arrowhead Stadium", phase: "group", group: "J" },
+  { id: "J2", date: "2026-06-16", time: "12:00", homeTeam: "AUT", awayTeam: "JOR", stadiumName: "Levi's Stadium", phase: "group", group: "J" },
+  { id: "J3", date: "2026-06-22", time: "21:00", homeTeam: "ARG", awayTeam: "JOR", stadiumName: "AT&T Stadium", phase: "group", group: "J" },
+  { id: "J4", date: "2026-06-22", time: "12:00", homeTeam: "AUT", awayTeam: "ALG", stadiumName: "Levi's Stadium", phase: "group", group: "J" },
+  { id: "J5", date: "2026-06-27", time: "15:00", homeTeam: "ARG", awayTeam: "AUT", stadiumName: "AT&T Stadium", phase: "group", group: "J" },
+  { id: "J6", date: "2026-06-27", time: "15:00", homeTeam: "JOR", awayTeam: "ALG", stadiumName: "Levi's Stadium", phase: "group", group: "J" },
+  // ── Group K — POR, COL, UZB, IP1 ──────────────────────────────────────────
+  { id: "K1", date: "2026-06-17", time: "18:00", homeTeam: "POR", awayTeam: "UZB", stadiumName: "NRG Stadium", phase: "group", group: "K" },
+  { id: "K2", date: "2026-06-17", time: "21:00", homeTeam: "COL", awayTeam: "IP1", stadiumName: "Estadio Azteca", phase: "group", group: "K" },
+  { id: "K3", date: "2026-06-23", time: "18:00", homeTeam: "POR", awayTeam: "COL", stadiumName: "NRG Stadium", phase: "group", group: "K" },
+  { id: "K4", date: "2026-06-23", time: "21:00", homeTeam: "UZB", awayTeam: "IP1", stadiumName: "Estadio Azteca", phase: "group", group: "K" },
+  { id: "K5", date: "2026-06-28", time: "18:00", homeTeam: "POR", awayTeam: "IP1", stadiumName: "NRG Stadium", phase: "group", group: "K" },
+  { id: "K6", date: "2026-06-28", time: "18:00", homeTeam: "COL", awayTeam: "UZB", stadiumName: "Estadio Azteca", phase: "group", group: "K" },
+  // ── Group L — ENG, GHA, PAN, CRO ──────────────────────────────────────────
+  { id: "L1", date: "2026-06-17", time: "15:00", homeTeam: "ENG", awayTeam: "PAN", stadiumName: "Gillette Stadium", phase: "group", group: "L" },
+  { id: "L2", date: "2026-06-17", time: "12:00", homeTeam: "GHA", awayTeam: "CRO", stadiumName: "BMO Field", phase: "group", group: "L" },
+  { id: "L3", date: "2026-06-23", time: "15:00", homeTeam: "ENG", awayTeam: "CRO", stadiumName: "AT&T Stadium", phase: "group", group: "L" },
+  { id: "L4", date: "2026-06-23", time: "12:00", homeTeam: "GHA", awayTeam: "PAN", stadiumName: "BMO Field", phase: "group", group: "L" },
+  { id: "L5", date: "2026-06-28", time: "21:00", homeTeam: "ENG", awayTeam: "GHA", stadiumName: "Gillette Stadium", phase: "group", group: "L" },
+  { id: "L6", date: "2026-06-28", time: "21:00", homeTeam: "CRO", awayTeam: "PAN", stadiumName: "AT&T Stadium", phase: "group", group: "L" },
 
-  // ── Group B ───────────────────────────────────────────────────────────────
-  { id: "B1", date: "2026-06-12", time: "19:00", homeTeam: "MEX", awayTeam: "ARG", stadiumName: "Estadio Azteca", phase: "group", group: "B" },
-  { id: "B2", date: "2026-06-13", time: "16:00", homeTeam: "FRA", awayTeam: "ENG", stadiumName: "MetLife Stadium", phase: "group", group: "B" },
-  { id: "B3", date: "2026-06-17", time: "16:00", homeTeam: "MEX", awayTeam: "FRA", stadiumName: "Estadio Azteca", phase: "group", group: "B" },
-  { id: "B4", date: "2026-06-17", time: "19:00", homeTeam: "ARG", awayTeam: "ENG", stadiumName: "MetLife Stadium", phase: "group", group: "B" },
-  { id: "B5", date: "2026-06-21", time: "19:00", homeTeam: "MEX", awayTeam: "ENG", stadiumName: "Estadio Azteca", phase: "group", group: "B" },
-  { id: "B6", date: "2026-06-21", time: "19:00", homeTeam: "ARG", awayTeam: "FRA", stadiumName: "Hard Rock Stadium", phase: "group", group: "B" },
+  // ── Round of 32 (16 matches) ──────────────────────────────────────────────
+  { id: "R32-1",  date: "2026-06-28", time: "13:00", homeTeam: null, awayTeam: null, stadiumName: "SoFi Stadium",            phase: "round_of_32" },
+  { id: "R32-2",  date: "2026-06-28", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Arrowhead Stadium",       phase: "round_of_32" },
+  { id: "R32-3",  date: "2026-06-29", time: "13:00", homeTeam: null, awayTeam: null, stadiumName: "Gillette Stadium",        phase: "round_of_32" },
+  { id: "R32-4",  date: "2026-06-29", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Estadio BBVA",            phase: "round_of_32" },
+  { id: "R32-5",  date: "2026-06-29", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "NRG Stadium",             phase: "round_of_32" },
+  { id: "R32-6",  date: "2026-06-29", time: "22:00", homeTeam: null, awayTeam: null, stadiumName: "Estadio Azteca",          phase: "round_of_32" },
+  { id: "R32-7",  date: "2026-06-30", time: "13:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium",         phase: "round_of_32" },
+  { id: "R32-8",  date: "2026-06-30", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",            phase: "round_of_32" },
+  { id: "R32-9",  date: "2026-06-30", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Hard Rock Stadium",       phase: "round_of_32" },
+  { id: "R32-10", date: "2026-06-30", time: "22:00", homeTeam: null, awayTeam: null, stadiumName: "Estadio Azteca",          phase: "round_of_32" },
+  { id: "R32-11", date: "2026-07-01", time: "13:00", homeTeam: null, awayTeam: null, stadiumName: "Mercedes-Benz Stadium",   phase: "round_of_32" },
+  { id: "R32-12", date: "2026-07-01", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Levi's Stadium",          phase: "round_of_32" },
+  { id: "R32-13", date: "2026-07-01", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "BC Place",                phase: "round_of_32" },
+  { id: "R32-14", date: "2026-07-01", time: "22:00", homeTeam: null, awayTeam: null, stadiumName: "Lumen Field",             phase: "round_of_32" },
+  { id: "R32-15", date: "2026-07-02", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "BMO Field",               phase: "round_of_32" },
+  { id: "R32-16", date: "2026-07-02", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Lincoln Financial Field", phase: "round_of_32" },
 
-  // ── Group C ───────────────────────────────────────────────────────────────
-  { id: "C1", date: "2026-06-13", time: "13:00", homeTeam: "CAN", awayTeam: "URU", stadiumName: "BC Place", phase: "group", group: "C" },
-  { id: "C2", date: "2026-06-13", time: "19:00", homeTeam: "GER", awayTeam: "JPN", stadiumName: "AT&T Stadium", phase: "group", group: "C" },
-  { id: "C3", date: "2026-06-17", time: "13:00", homeTeam: "CAN", awayTeam: "GER", stadiumName: "BMO Field", phase: "group", group: "C" },
-  { id: "C4", date: "2026-06-17", time: "16:00", homeTeam: "URU", awayTeam: "JPN", stadiumName: "Mercedes-Benz Stadium", phase: "group", group: "C" },
-  { id: "C5", date: "2026-06-21", time: "16:00", homeTeam: "CAN", awayTeam: "JPN", stadiumName: "BC Place", phase: "group", group: "C" },
-  { id: "C6", date: "2026-06-21", time: "16:00", homeTeam: "URU", awayTeam: "GER", stadiumName: "Levi's Stadium", phase: "group", group: "C" },
-
-  // ── Group D ───────────────────────────────────────────────────────────────
-  { id: "D1", date: "2026-06-14", time: "16:00", homeTeam: "ESP", awayTeam: "COL", stadiumName: "SoFi Stadium", phase: "group", group: "D" },
-  { id: "D2", date: "2026-06-14", time: "19:00", homeTeam: "SEN", awayTeam: "TUN", stadiumName: "NRG Stadium", phase: "group", group: "D" },
-  { id: "D3", date: "2026-06-18", time: "16:00", homeTeam: "ESP", awayTeam: "SEN", stadiumName: "Hard Rock Stadium", phase: "group", group: "D" },
-  { id: "D4", date: "2026-06-18", time: "19:00", homeTeam: "COL", awayTeam: "TUN", stadiumName: "AT&T Stadium", phase: "group", group: "D" },
-  { id: "D5", date: "2026-06-22", time: "19:00", homeTeam: "ESP", awayTeam: "TUN", stadiumName: "MetLife Stadium", phase: "group", group: "D" },
-  { id: "D6", date: "2026-06-22", time: "19:00", homeTeam: "COL", awayTeam: "SEN", stadiumName: "Levi's Stadium", phase: "group", group: "D" },
-
-  // ── Group E ───────────────────────────────────────────────────────────────
-  { id: "E1", date: "2026-06-14", time: "13:00", homeTeam: "POR", awayTeam: "NED", stadiumName: "Gillette Stadium", phase: "group", group: "E" },
-  { id: "E2", date: "2026-06-15", time: "16:00", homeTeam: "NGA", awayTeam: "AUS", stadiumName: "Mercedes-Benz Stadium", phase: "group", group: "E" },
-  { id: "E3", date: "2026-06-19", time: "16:00", homeTeam: "POR", awayTeam: "NGA", stadiumName: "Lincoln Financial Field", phase: "group", group: "E" },
-  { id: "E4", date: "2026-06-19", time: "19:00", homeTeam: "NED", awayTeam: "AUS", stadiumName: "NRG Stadium", phase: "group", group: "E" },
-  { id: "E5", date: "2026-06-23", time: "19:00", homeTeam: "POR", awayTeam: "AUS", stadiumName: "Gillette Stadium", phase: "group", group: "E" },
-  { id: "E6", date: "2026-06-23", time: "19:00", homeTeam: "NED", awayTeam: "NGA", stadiumName: "AT&T Stadium", phase: "group", group: "E" },
-
-  // ── Group F ───────────────────────────────────────────────────────────────
-  { id: "F1", date: "2026-06-15", time: "13:00", homeTeam: "BEL", awayTeam: "CRO", stadiumName: "Lincoln Financial Field", phase: "group", group: "F" },
-  { id: "F2", date: "2026-06-15", time: "19:00", homeTeam: "KOR", awayTeam: "IRN", stadiumName: "SoFi Stadium", phase: "group", group: "F" },
-  { id: "F3", date: "2026-06-19", time: "13:00", homeTeam: "BEL", awayTeam: "KOR", stadiumName: "Arrowhead Stadium", phase: "group", group: "F" },
-  { id: "F4", date: "2026-06-19", time: "16:00", homeTeam: "CRO", awayTeam: "IRN", stadiumName: "BC Place", phase: "group", group: "F" },
-  { id: "F5", date: "2026-06-23", time: "16:00", homeTeam: "BEL", awayTeam: "IRN", stadiumName: "MetLife Stadium", phase: "group", group: "F" },
-  { id: "F6", date: "2026-06-23", time: "16:00", homeTeam: "CRO", awayTeam: "KOR", stadiumName: "Arrowhead Stadium", phase: "group", group: "F" },
-
-  // ── Group G ───────────────────────────────────────────────────────────────
-  { id: "G1", date: "2026-06-15", time: "16:00", homeTeam: "SUI", awayTeam: "CIV", stadiumName: "Estadio Azteca", phase: "group", group: "G" },
-  { id: "G2", date: "2026-06-16", time: "13:00", homeTeam: "QAT", awayTeam: "UZB", stadiumName: "Levi's Stadium", phase: "group", group: "G" },
-  { id: "G3", date: "2026-06-20", time: "13:00", homeTeam: "SUI", awayTeam: "QAT", stadiumName: "Estadio Akron", phase: "group", group: "G" },
-  { id: "G4", date: "2026-06-20", time: "16:00", homeTeam: "CIV", awayTeam: "UZB", stadiumName: "Hard Rock Stadium", phase: "group", group: "G" },
-  { id: "G5", date: "2026-06-24", time: "19:00", homeTeam: "SUI", awayTeam: "UZB", stadiumName: "Estadio BBVA", phase: "group", group: "G" },
-  { id: "G6", date: "2026-06-24", time: "19:00", homeTeam: "CIV", awayTeam: "QAT", stadiumName: "Mercedes-Benz Stadium", phase: "group", group: "G" },
-
-  // ── Group H ───────────────────────────────────────────────────────────────
-  { id: "H1", date: "2026-06-16", time: "16:00", homeTeam: "POL", awayTeam: "CMR", stadiumName: "NRG Stadium", phase: "group", group: "H" },
-  { id: "H2", date: "2026-06-16", time: "19:00", homeTeam: "KSA", awayTeam: "CHN", stadiumName: "SoFi Stadium", phase: "group", group: "H" },
-  { id: "H3", date: "2026-06-20", time: "16:00", homeTeam: "POL", awayTeam: "KSA", stadiumName: "Lincoln Financial Field", phase: "group", group: "H" },
-  { id: "H4", date: "2026-06-20", time: "19:00", homeTeam: "CMR", awayTeam: "CHN", stadiumName: "Arrowhead Stadium", phase: "group", group: "H" },
-  { id: "H5", date: "2026-06-24", time: "16:00", homeTeam: "POL", awayTeam: "CHN", stadiumName: "MetLife Stadium", phase: "group", group: "H" },
-  { id: "H6", date: "2026-06-24", time: "16:00", homeTeam: "CMR", awayTeam: "KSA", stadiumName: "AT&T Stadium", phase: "group", group: "H" },
-
-  // ── Group I ───────────────────────────────────────────────────────────────
-  { id: "I1", date: "2026-06-17", time: "13:00", homeTeam: "UKR", awayTeam: "DEN", stadiumName: "BMO Field", phase: "group", group: "I" },
-  { id: "I2", date: "2026-06-17", time: "16:00", homeTeam: "ECU", awayTeam: "ALG", stadiumName: "Gillette Stadium", phase: "group", group: "I" },
-  { id: "I3", date: "2026-06-21", time: "13:00", homeTeam: "UKR", awayTeam: "ECU", stadiumName: "Estadio BBVA", phase: "group", group: "I" },
-  { id: "I4", date: "2026-06-21", time: "16:00", homeTeam: "DEN", awayTeam: "ALG", stadiumName: "Levi's Stadium", phase: "group", group: "I" },
-  { id: "I5", date: "2026-06-25", time: "19:00", homeTeam: "UKR", awayTeam: "ALG", stadiumName: "Lincoln Financial Field", phase: "group", group: "I" },
-  { id: "I6", date: "2026-06-25", time: "19:00", homeTeam: "DEN", awayTeam: "ECU", stadiumName: "SoFi Stadium", phase: "group", group: "I" },
-
-  // ── Group J ───────────────────────────────────────────────────────────────
-  { id: "J1", date: "2026-06-18", time: "13:00", homeTeam: "TUR", awayTeam: "AUT", stadiumName: "Estadio Azteca", phase: "group", group: "J" },
-  { id: "J2", date: "2026-06-18", time: "16:00", homeTeam: "CHI", awayTeam: "JAM", stadiumName: "NRG Stadium", phase: "group", group: "J" },
-  { id: "J3", date: "2026-06-22", time: "13:00", homeTeam: "TUR", awayTeam: "CHI", stadiumName: "Estadio BBVA", phase: "group", group: "J" },
-  { id: "J4", date: "2026-06-22", time: "16:00", homeTeam: "AUT", awayTeam: "JAM", stadiumName: "Arrowhead Stadium", phase: "group", group: "J" },
-  { id: "J5", date: "2026-06-26", time: "19:00", homeTeam: "TUR", awayTeam: "JAM", stadiumName: "Estadio Akron", phase: "group", group: "J" },
-  { id: "J6", date: "2026-06-26", time: "19:00", homeTeam: "AUT", awayTeam: "CHI", stadiumName: "BC Place", phase: "group", group: "J" },
-
-  // ── Group K ───────────────────────────────────────────────────────────────
-  { id: "K1", date: "2026-06-18", time: "19:00", homeTeam: "SCO", awayTeam: "SRB", stadiumName: "Gillette Stadium", phase: "group", group: "K" },
-  { id: "K2", date: "2026-06-19", time: "13:00", homeTeam: "RSA", awayTeam: "TRI", stadiumName: "Mercedes-Benz Stadium", phase: "group", group: "K" },
-  { id: "K3", date: "2026-06-23", time: "13:00", homeTeam: "SCO", awayTeam: "RSA", stadiumName: "Hard Rock Stadium", phase: "group", group: "K" },
-  { id: "K4", date: "2026-06-23", time: "13:00", homeTeam: "SRB", awayTeam: "TRI", stadiumName: "BMO Field", phase: "group", group: "K" },
-  { id: "K5", date: "2026-06-27", time: "19:00", homeTeam: "SCO", awayTeam: "TRI", stadiumName: "Lincoln Financial Field", phase: "group", group: "K" },
-  { id: "K6", date: "2026-06-27", time: "19:00", homeTeam: "SRB", awayTeam: "RSA", stadiumName: "NRG Stadium", phase: "group", group: "K" },
-
-  // ── Group L ───────────────────────────────────────────────────────────────
-  { id: "L1", date: "2026-06-19", time: "19:00", homeTeam: "CRC", awayTeam: "PAN", stadiumName: "Estadio Azteca", phase: "group", group: "L" },
-  { id: "L2", date: "2026-06-20", time: "13:00", homeTeam: "NZL", awayTeam: "HON", stadiumName: "Estadio Akron", phase: "group", group: "L" },
-  { id: "L3", date: "2026-06-24", time: "13:00", homeTeam: "CRC", awayTeam: "NZL", stadiumName: "Hard Rock Stadium", phase: "group", group: "L" },
-  { id: "L4", date: "2026-06-24", time: "16:00", homeTeam: "PAN", awayTeam: "HON", stadiumName: "Estadio BBVA", phase: "group", group: "L" },
-  { id: "L5", date: "2026-06-28", time: "19:00", homeTeam: "CRC", awayTeam: "HON", stadiumName: "Estadio Azteca", phase: "group", group: "L" },
-  { id: "L6", date: "2026-06-28", time: "19:00", homeTeam: "PAN", awayTeam: "NZL", stadiumName: "Estadio BBVA", phase: "group", group: "L" },
-
-  // ── Round of 32 (16 matches — 32 qualifiers → 16 teams) ──────────────────
-  { id: "R32-1",  date: "2026-07-02", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium",         phase: "round_of_32" },
-  { id: "R32-2",  date: "2026-07-02", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",            phase: "round_of_32" },
-  { id: "R32-3",  date: "2026-07-03", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Hard Rock Stadium",       phase: "round_of_32" },
-  { id: "R32-4",  date: "2026-07-03", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "SoFi Stadium",            phase: "round_of_32" },
-  { id: "R32-5",  date: "2026-07-04", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Estadio Azteca",          phase: "round_of_32" },
-  { id: "R32-6",  date: "2026-07-04", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Mercedes-Benz Stadium",   phase: "round_of_32" },
-  { id: "R32-7",  date: "2026-07-05", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Levi's Stadium",          phase: "round_of_32" },
-  { id: "R32-8",  date: "2026-07-05", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Gillette Stadium",        phase: "round_of_32" },
-  { id: "R32-9",  date: "2026-07-06", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "NRG Stadium",             phase: "round_of_32" },
-  { id: "R32-10", date: "2026-07-06", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Arrowhead Stadium",       phase: "round_of_32" },
-  { id: "R32-11", date: "2026-07-07", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "BC Place",                phase: "round_of_32" },
-  { id: "R32-12", date: "2026-07-07", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Lincoln Financial Field", phase: "round_of_32" },
-  { id: "R32-13", date: "2026-07-08", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Estadio Azteca",          phase: "round_of_32" },
-  { id: "R32-14", date: "2026-07-08", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",            phase: "round_of_32" },
-  { id: "R32-15", date: "2026-07-09", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium",         phase: "round_of_32" },
-  { id: "R32-16", date: "2026-07-09", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Hard Rock Stadium",       phase: "round_of_32" },
-
-  // ── Round of 16 (8 matches — 16 teams → 8 teams) ─────────────────────────
-  { id: "R16-1", date: "2026-07-12", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium",        phase: "round_of_16" },
-  { id: "R16-2", date: "2026-07-12", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",           phase: "round_of_16" },
-  { id: "R16-3", date: "2026-07-13", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Hard Rock Stadium",      phase: "round_of_16" },
-  { id: "R16-4", date: "2026-07-13", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "SoFi Stadium",           phase: "round_of_16" },
-  { id: "R16-5", date: "2026-07-14", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Estadio Azteca",         phase: "round_of_16" },
-  { id: "R16-6", date: "2026-07-14", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Mercedes-Benz Stadium",  phase: "round_of_16" },
-  { id: "R16-7", date: "2026-07-15", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Levi's Stadium",         phase: "round_of_16" },
-  { id: "R16-8", date: "2026-07-15", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Gillette Stadium",       phase: "round_of_16" },
+  // ── Round of 16 (8 matches) ───────────────────────────────────────────────
+  { id: "R16-1", date: "2026-07-04", time: "13:00", homeTeam: null, awayTeam: null, stadiumName: "Lincoln Financial Field", phase: "round_of_16" },
+  { id: "R16-2", date: "2026-07-04", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "NRG Stadium",             phase: "round_of_16" },
+  { id: "R16-3", date: "2026-07-05", time: "13:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium",         phase: "round_of_16" },
+  { id: "R16-4", date: "2026-07-05", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Estadio Azteca",          phase: "round_of_16" },
+  { id: "R16-5", date: "2026-07-06", time: "13:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",            phase: "round_of_16" },
+  { id: "R16-6", date: "2026-07-06", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Lumen Field",             phase: "round_of_16" },
+  { id: "R16-7", date: "2026-07-07", time: "13:00", homeTeam: null, awayTeam: null, stadiumName: "Mercedes-Benz Stadium",   phase: "round_of_16" },
+  { id: "R16-8", date: "2026-07-07", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "BC Place",                phase: "round_of_16" },
 
   // ── Quarter-finals (4 matches) ────────────────────────────────────────────
-  { id: "QF-1", date: "2026-07-18", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium",       phase: "quarter_final" },
-  { id: "QF-2", date: "2026-07-18", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Hard Rock Stadium",     phase: "quarter_final" },
-  { id: "QF-3", date: "2026-07-19", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",          phase: "quarter_final" },
-  { id: "QF-4", date: "2026-07-19", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Estadio Azteca",        phase: "quarter_final" },
+  { id: "QF-1", date: "2026-07-09", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Gillette Stadium",    phase: "quarter_final" },
+  { id: "QF-2", date: "2026-07-10", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",        phase: "quarter_final" },
+  { id: "QF-3", date: "2026-07-10", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Hard Rock Stadium",   phase: "quarter_final" },
+  { id: "QF-4", date: "2026-07-11", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "SoFi Stadium",        phase: "quarter_final" },
 
   // ── Semi-finals (2 matches) ───────────────────────────────────────────────
-  { id: "SF-1", date: "2026-07-22", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium",   phase: "semi_final" },
-  { id: "SF-2", date: "2026-07-23", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Hard Rock Stadium", phase: "semi_final" },
+  { id: "SF-1", date: "2026-07-14", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",          phase: "semi_final" },
+  { id: "SF-2", date: "2026-07-15", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "Mercedes-Benz Stadium", phase: "semi_final" },
 
   // ── Third place play-off ──────────────────────────────────────────────────
-  { id: "3RD",  date: "2026-07-25", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "AT&T Stadium",  phase: "third_place" },
+  { id: "3RD",   date: "2026-07-18", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "Hard Rock Stadium", phase: "third_place" },
 
   // ── Final ─────────────────────────────────────────────────────────────────
-  { id: "FINAL", date: "2026-07-26", time: "19:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium", phase: "final" },
+  { id: "FINAL", date: "2026-07-19", time: "16:00", homeTeam: null, awayTeam: null, stadiumName: "MetLife Stadium", phase: "final" },
 ];
