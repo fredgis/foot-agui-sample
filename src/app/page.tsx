@@ -13,7 +13,7 @@ import { FlagImg, getFlagUrl } from "@/lib/flags";
 import { useCoAgent, useCopilotAction, useCopilotChat } from "@copilotkit/react-core";
 import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar } from "@copilotkit/react-ui";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 // ── Mobile detection ──────────────────────────────────────────────────────────
 function useIsMobile() {
@@ -525,11 +525,59 @@ function YourMainContent({
     },
   });
 
-  const { appendMessage } = useCopilotChat();
+  const { visibleMessages, appendMessage } = useCopilotChat();
 
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<MobileTab>("team");
   const [selectedPhase, setSelectedPhase] = useState<MatchPhase | null>(null);
+
+  // Known FIFA codes for team detection
+  const fifaCodesSet = useRef(new Set(teams.map((t) => t.fifaCode)));
+  const lastProcessedMsgId = useRef<string | null>(null);
+
+  // 🏳️ Helper: load a team by code into state
+  const loadTeamByCode = useCallback((code: string) => {
+    const team = teams.find(
+      (t) => t.fifaCode.toUpperCase() === code.toUpperCase() || t.name.toLowerCase() === code.toLowerCase()
+    );
+    if (!team) return;
+    const teamMatches = matches.filter(
+      (m) => m.homeTeam === team.fifaCode || m.awayTeam === team.fifaCode
+    );
+    setState({
+      teamInfo: team,
+      matches: teamMatches,
+      selectedStadium: null,
+      tournamentView: null,
+      highlightedCity: null,
+    });
+  }, [setState]);
+
+  // 🔄 Auto-detect team from agent messages → update page
+  useEffect(() => {
+    if (!visibleMessages || visibleMessages.length === 0) return;
+    // Find last assistant text message
+    for (let i = visibleMessages.length - 1; i >= 0; i--) {
+      const msg = visibleMessages[i];
+      if (msg.isTextMessage() && msg.role === MessageRole.Assistant) {
+        if (msg.id === lastProcessedMsgId.current) return;
+        lastProcessedMsgId.current = msg.id;
+        const content = (msg as TextMessage).content;
+        // Look for first FIFA code in parentheses like "(POR)", "(FRA)"
+        const codeMatches = content.match(/\(([A-Z]{3})\)/g);
+        if (codeMatches) {
+          for (const m of codeMatches) {
+            const code = m.slice(1, 4);
+            if (fifaCodesSet.current.has(code) && code !== state.teamInfo?.fifaCode) {
+              loadTeamByCode(code);
+              return;
+            }
+          }
+        }
+        break;
+      }
+    }
+  }, [visibleMessages, state.teamInfo?.fifaCode, loadTeamByCode]);
 
   // Cross-component: clicking a team in GroupView triggers compare_teams in chat
   const handleTeamClick = (teamCode: string) => {
@@ -561,24 +609,6 @@ function YourMainContent({
       setActiveTab("team");
     }
   }, [state.teamInfo, setThemeColor, setSecondaryColor, setClubName, setCountryFlag]);
-
-  // 🏳️ Helper: load a team by code into state
-  const loadTeamByCode = useCallback((code: string) => {
-    const team = teams.find(
-      (t) => t.fifaCode.toUpperCase() === code.toUpperCase() || t.name.toLowerCase() === code.toLowerCase()
-    );
-    if (!team) return;
-    const teamMatches = matches.filter(
-      (m) => m.homeTeam === team.fifaCode || m.awayTeam === team.fifaCode
-    );
-    setState({
-      teamInfo: team,
-      matches: teamMatches,
-      selectedStadium: null,
-      tournamentView: null,
-      highlightedCity: null,
-    });
-  }, [setState]);
 
   // 🪁 Generative UI
   useCopilotAction({
@@ -699,7 +729,7 @@ function YourMainContent({
           }}
         >
           <div className="flex items-center justify-center gap-3">
-            {countryFlag && <span className="text-2xl">{countryFlag}</span>}
+            {state.teamInfo?.fifaCode && <FlagImg fifaCode={state.teamInfo.fifaCode} width={32} height={22} />}
             <h1
               className="text-2xl md:text-4xl font-bold tracking-wide"
               style={{
@@ -710,7 +740,7 @@ function YourMainContent({
             >
               {clubName}
             </h1>
-            {countryFlag && <span className="text-2xl">{countryFlag}</span>}
+            {state.teamInfo?.fifaCode && <FlagImg fifaCode={state.teamInfo.fifaCode} width={32} height={22} />}
           </div>
         </div>
       )}
