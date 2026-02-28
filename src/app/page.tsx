@@ -867,7 +867,7 @@ function YourMainContent({
       );
       return stadium ? `Showing ${stadium.name}` : `Stadium '${stadium_name}' not found`;
     },
-    render: ({ args, status }) => {
+    render: ({ args }) => {
       const stadium = allStadiums.find(
         (s) => s.name.toLowerCase().includes((args.stadium_name ?? "").toLowerCase())
       );
@@ -877,7 +877,6 @@ function YourMainContent({
           <div className="font-bold text-base">🏟️ {stadium.name}</div>
           <div className="opacity-80">{stadium.city}, {stadium.country} • Capacity: {stadium.capacity.toLocaleString()}</div>
           {stadium.description && <div className="mt-1 italic opacity-70">{stadium.description}</div>}
-          {status === "inProgress" && <div className="mt-1 animate-pulse text-xs opacity-50">Loading details…</div>}
         </div>
       );
     },
@@ -892,7 +891,7 @@ function YourMainContent({
       { name: "team_b", type: "string", description: "Second team FIFA code", required: true },
     ],
     handler: async () => "Comparison displayed",
-    render: ({ args, status }) => {
+    render: ({ args }) => {
       const a = teams.find((t) => t.fifaCode === (args.team_a ?? "").toUpperCase());
       const b = teams.find((t) => t.fifaCode === (args.team_b ?? "").toUpperCase());
       if (!a || !b) return <div className="p-2 text-sm opacity-60">Loading comparison…</div>;
@@ -913,7 +912,6 @@ function YourMainContent({
             <div className="opacity-50">Coach</div>
             <div>{b.coach}</div>
           </div>
-          {status === "inProgress" && <div className="mt-1 animate-pulse text-xs opacity-50">Analyzing matchup…</div>}
         </div>
       );
     },
@@ -1178,19 +1176,59 @@ function YourMainContent({
         }}
       >
         {showGroupView ? (
-          <GroupView
-            groups={groups}
-            selectedTeamCode={state.teamInfo?.fifaCode}
-            themeColor={themeColor}
-            onTeamClick={handleTeamClick}
-          />
+          <>
+            <button
+              onClick={goHome}
+              title="Back to Home"
+              style={{
+                position: "fixed", top: "1rem", left: "1rem", zIndex: 30,
+                background: "rgba(255,255,255,0.15)",
+                border: "1px solid rgba(255,255,255,0.25)",
+                borderRadius: "50%", width: 40, height: 40,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", transition: "all 0.2s ease",
+                fontSize: "1.2rem", color: "#fff",
+                backdropFilter: "blur(8px)",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.3)"; e.currentTarget.style.transform = "scale(1.1)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.15)"; e.currentTarget.style.transform = ""; }}
+            >
+              🏠
+            </button>
+            <GroupView
+              groups={groups}
+              selectedTeamCode={state.teamInfo?.fifaCode}
+              themeColor={themeColor}
+              onTeamClick={handleTeamClick}
+            />
+          </>
         ) : showBracket ? (
-          <TournamentBracket
-            matches={filteredMatches}
-            selectedTeamCode={state.teamInfo?.fifaCode}
-            themeColor={themeColor}
-            onPhaseClick={handlePhaseClick}
-          />
+          <>
+            <button
+              onClick={goHome}
+              title="Back to Home"
+              style={{
+                position: "fixed", top: "1rem", left: "1rem", zIndex: 30,
+                background: "rgba(255,255,255,0.15)",
+                border: "1px solid rgba(255,255,255,0.25)",
+                borderRadius: "50%", width: 40, height: 40,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", transition: "all 0.2s ease",
+                fontSize: "1.2rem", color: "#fff",
+                backdropFilter: "blur(8px)",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.3)"; e.currentTarget.style.transform = "scale(1.1)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.15)"; e.currentTarget.style.transform = ""; }}
+            >
+              🏠
+            </button>
+            <TournamentBracket
+              matches={filteredMatches}
+              selectedTeamCode={state.teamInfo?.fifaCode}
+              themeColor={themeColor}
+              onPhaseClick={handlePhaseClick}
+            />
+          </>
         ) : hasTeam ? (
           isMobile ? (
             /* Mobile: single-column tab-based layout */
