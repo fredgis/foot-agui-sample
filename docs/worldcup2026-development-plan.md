@@ -213,8 +213,12 @@ agent/
 /
 ├── .github/
 │   └── workflows/
-│       └── deploy-azure.yml    ← NOUVEAU — CI/CD Azure SWA + Container Apps — WS8
-├── .env.example                ← NOUVEAU — Template frontend — WS8
+│       └── deploy-azure.yml          ← NOUVEAU — CI/CD Azure SWA + Container Apps — WS8
+├── .env.example                      ← NOUVEAU — Template frontend — WS8
+├── scripts/
+│   ├── deploy.sh                     ← NOUVEAU — One-click deploy Bash — WS9
+│   ├── deploy.ps1                    ← NOUVEAU — One-click deploy PowerShell — WS9
+│   └── deploy-config.env.example     ← NOUVEAU — Template config déploiement — WS9
 ├── docs/
 │   └── worldcup2026-development-plan.md  ← CE FICHIER
 └── ... (fichiers existants conservés)
@@ -1013,6 +1017,334 @@ az staticwebapp create \
 
 ---
 
+## 📋 Workstream 9 — 🖱️ One-Click Deployment (Script Idempotent)
+
+> **Priorité** : 🟠 Haute  
+> **Dépendances** : WS8 (infrastructure Azure définie)  
+> **Parallélisable** : ⚠️ Après WS8
+
+### Objectif
+
+Créer un script de déploiement **idempotent** (ré-entrant) qui provisionne et déploie l'intégralité de l'infrastructure Azure en une seule commande. Le script peut être relancé à tout moment sans effet de bord — il crée ce qui manque, met à jour ce qui existe, et ne casse rien.
+
+### Fichiers
+
+| Fichier | Description |
+|---------|-------------|
+| `scripts/deploy.sh` | Script principal Bash — one-click deploy (Linux/macOS/WSL) |
+| `scripts/deploy.ps1` | Équivalent PowerShell pour Windows natif |
+| `scripts/deploy-config.env.example` | Template des variables de configuration |
+
+### Principe d'idempotence
+
+Chaque étape du script suit le pattern **« check-then-create-or-update »** :
+
+```bash
+# Pattern idempotent pour chaque ressource Azure
+if az resource show ... &>/dev/null; then
+  echo "✅ [resource] exists — updating..."
+  az resource update ...
+else
+  echo "🔨 [resource] not found — creating..."
+  az resource create ...
+fi
+```
+
+Le script peut être relancé :
+- **1ère exécution** : crée tout de zéro (Resource Group, ACR, Container Apps Env, Container App, Static Web App)
+- **2ème exécution** : détecte que tout existe, rebuild et redéploie uniquement le code
+- **Après un échec partiel** : reprend là où ça a échoué, recrée ce qui manque
+- **Après un changement de config** : met à jour les ressources concernées
+
+### Script `scripts/deploy.sh`
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ══════════════════════════════════════════════════════════════
+# 🏆 FIFA World Cup 2026 — One-Click Azure Deployment
+# ══════════════════════════════════════════════════════════════
+# Ce script est IDEMPOTENT : il peut être relancé à tout moment.
+# Il crée ce qui manque, met à jour ce qui existe, ne casse rien.
+# ══════════════════════════════════════════════════════════════
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# ── Charger la configuration ──
+CONFIG_FILE="${SCRIPT_DIR}/deploy-config.env"
+if [[ ! -f "$CONFIG_FILE" ]]; then
+  echo "❌ Fichier de configuration manquant : $CONFIG_FILE"
+  echo "   Copiez deploy-config.env.example → deploy-config.env et renseignez vos valeurs."
+  exit 1
+fi
+source "$CONFIG_FILE"
+
+# ── Variables avec valeurs par défaut ──
+RG="${AZURE_RESOURCE_GROUP:-rg-worldcup2026}"
+LOCATION="${AZURE_LOCATION:-eastus2}"
+ACR_NAME="${AZURE_ACR_NAME:-wc2026acr}"
+CA_ENV="${AZURE_CA_ENV:-wc2026-env}"
+CA_NAME="${AZURE_CA_NAME:-wc2026-agent}"
+SWA_NAME="${AZURE_SWA_NAME:-wc2026}"
+IMAGE_TAG="${IMAGE_TAG:-$(git rev-parse --short HEAD 2>/dev/null || echo 'latest')}"
+
+echo ""
+echo "🏆 ═══════════════════════════════════════════════════"
+echo "   FIFA World Cup 2026 — Azure Deployment"
+echo "   Resource Group: $RG | Region: $LOCATION"
+echo "   Image Tag: $IMAGE_TAG"
+echo "🏆 ═══════════════════════════════════════════════════"
+echo ""
+
+# ── Pré-requis : vérifier que az CLI est connecté ──
+echo "🔐 Vérification de la connexion Azure..."
+if ! az account show &>/dev/null; then
+  echo "⚠️  Non connecté à Azure. Lancement de 'az login'..."
+  az login
+fi
+SUBSCRIPTION=$(az account show --query name -o tsv)
+echo "✅ Connecté à Azure — Subscription: $SUBSCRIPTION"
+
+# ══════════════════════════════════════════════════════
+# ÉTAPE 1 : Resource Group
+# ══════════════════════════════════════════════════════
+echo ""
+echo "📦 [1/7] Resource Group: $RG"
+if az group show --name "$RG" &>/dev/null; then
+  echo "   ✅ Existe déjà"
+else
+  echo "   🔨 Création..."
+  az group create --name "$RG" --location "$LOCATION" --output none
+  echo "   ✅ Créé"
+fi
+
+# ══════════════════════════════════════════════════════
+# ÉTAPE 2 : Azure Container Registry
+# ══════════════════════════════════════════════════════
+echo ""
+echo "📦 [2/7] Container Registry: $ACR_NAME"
+if az acr show --name "$ACR_NAME" --resource-group "$RG" &>/dev/null; then
+  echo "   ✅ Existe déjà"
+else
+  echo "   🔨 Création..."
+  az acr create --name "$ACR_NAME" --resource-group "$RG" \
+    --sku Basic --admin-enabled true --output none
+  echo "   ✅ Créé"
+fi
+
+echo "   🔑 Login ACR..."
+az acr login --name "$ACR_NAME" --output none
+
+# ══════════════════════════════════════════════════════
+# ÉTAPE 3 : Build & Push Docker image (agent backend)
+# ══════════════════════════════════════════════════════
+echo ""
+echo "🐳 [3/7] Build & Push image Docker: wc2026-agent:$IMAGE_TAG"
+FULL_IMAGE="$ACR_NAME.azurecr.io/wc2026-agent:$IMAGE_TAG"
+LATEST_IMAGE="$ACR_NAME.azurecr.io/wc2026-agent:latest"
+
+docker build \
+  -t "$FULL_IMAGE" \
+  -t "$LATEST_IMAGE" \
+  -f "$PROJECT_ROOT/agent/Dockerfile" \
+  "$PROJECT_ROOT/agent/"
+
+docker push "$FULL_IMAGE"
+docker push "$LATEST_IMAGE"
+echo "   ✅ Image poussée : $FULL_IMAGE"
+
+# ══════════════════════════════════════════════════════
+# ÉTAPE 4 : Container Apps Environment
+# ══════════════════════════════════════════════════════
+echo ""
+echo "📦 [4/7] Container Apps Environment: $CA_ENV"
+if az containerapp env show --name "$CA_ENV" --resource-group "$RG" &>/dev/null; then
+  echo "   ✅ Existe déjà"
+else
+  echo "   🔨 Création..."
+  az containerapp env create --name "$CA_ENV" --resource-group "$RG" \
+    --location "$LOCATION" --output none
+  echo "   ✅ Créé"
+fi
+
+# ══════════════════════════════════════════════════════
+# ÉTAPE 5 : Container App (agent backend)
+# ══════════════════════════════════════════════════════
+echo ""
+echo "📦 [5/7] Container App: $CA_NAME"
+ACR_SERVER="$ACR_NAME.azurecr.io"
+ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query "passwords[0].value" -o tsv)
+
+if az containerapp show --name "$CA_NAME" --resource-group "$RG" &>/dev/null; then
+  echo "   ✅ Existe déjà — mise à jour de l'image..."
+  az containerapp update \
+    --name "$CA_NAME" --resource-group "$RG" \
+    --image "$FULL_IMAGE" --output none
+else
+  echo "   🔨 Création..."
+  az containerapp create \
+    --name "$CA_NAME" --resource-group "$RG" \
+    --environment "$CA_ENV" \
+    --image "$FULL_IMAGE" \
+    --target-port 8000 \
+    --ingress external \
+    --min-replicas 0 --max-replicas 3 \
+    --cpu 0.5 --memory 1Gi \
+    --registry-server "$ACR_SERVER" \
+    --registry-username "$ACR_NAME" \
+    --registry-password "$ACR_PASSWORD" \
+    --output none
+fi
+
+# Injecter les secrets Azure OpenAI (idempotent : set remplace si existe)
+if [[ -n "${AZURE_OPENAI_ENDPOINT:-}" ]]; then
+  echo "   🔑 Configuration des secrets Azure OpenAI..."
+  az containerapp update \
+    --name "$CA_NAME" --resource-group "$RG" \
+    --set-env-vars \
+      "AZURE_OPENAI_ENDPOINT=$AZURE_OPENAI_ENDPOINT" \
+      "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME=${AZURE_OPENAI_CHAT_DEPLOYMENT_NAME:-gpt-4o}" \
+      "AGENT_HOST=0.0.0.0" \
+      "AGENT_PORT=8000" \
+    --output none
+fi
+
+AGENT_FQDN=$(az containerapp show --name "$CA_NAME" --resource-group "$RG" \
+  --query "properties.configuration.ingress.fqdn" -o tsv)
+AGENT_URL="https://$AGENT_FQDN"
+echo "   ✅ Agent URL: $AGENT_URL"
+
+# ══════════════════════════════════════════════════════
+# ÉTAPE 6 : Build Frontend (Next.js)
+# ══════════════════════════════════════════════════════
+echo ""
+echo "🏗️  [6/7] Build Frontend Next.js"
+cd "$PROJECT_ROOT"
+npm ci --silent
+AGENT_URL="$AGENT_URL" npm run build
+echo "   ✅ Build terminé"
+
+# ══════════════════════════════════════════════════════
+# ÉTAPE 7 : Azure Static Web Apps
+# ══════════════════════════════════════════════════════
+echo ""
+echo "📦 [7/7] Static Web App: $SWA_NAME"
+if az staticwebapp show --name "$SWA_NAME" --resource-group "$RG" &>/dev/null; then
+  echo "   ✅ Existe déjà"
+else
+  echo "   🔨 Création..."
+  az staticwebapp create \
+    --name "$SWA_NAME" --resource-group "$RG" \
+    --location "$LOCATION" \
+    --output none
+  echo "   ✅ Créé"
+fi
+
+# Configurer AGENT_URL dans les app settings
+echo "   ⚙️  Configuration AGENT_URL..."
+az staticwebapp appsettings set \
+  --name "$SWA_NAME" --resource-group "$RG" \
+  --setting-names "AGENT_URL=$AGENT_URL" --output none
+
+# Déployer le build
+SWA_TOKEN=$(az staticwebapp secrets list --name "$SWA_NAME" --resource-group "$RG" \
+  --query "properties.apiKey" -o tsv)
+
+if command -v swa &>/dev/null; then
+  echo "   🚀 Déploiement via SWA CLI..."
+  swa deploy .next --deployment-token "$SWA_TOKEN" --env production
+else
+  echo "   ⚠️  SWA CLI non installé. Installation..."
+  npm install -g @azure/static-web-apps-cli
+  swa deploy .next --deployment-token "$SWA_TOKEN" --env production
+fi
+
+SWA_URL=$(az staticwebapp show --name "$SWA_NAME" --resource-group "$RG" \
+  --query "defaultHostname" -o tsv)
+
+# ══════════════════════════════════════════════════════
+# RÉSUMÉ
+# ══════════════════════════════════════════════════════
+echo ""
+echo "🏆 ═══════════════════════════════════════════════════"
+echo "   ✅ DÉPLOIEMENT TERMINÉ !"
+echo "🏆 ═══════════════════════════════════════════════════"
+echo ""
+echo "   🌐 Frontend :  https://$SWA_URL"
+echo "   🤖 Agent    :  $AGENT_URL"
+echo "   📦 Registry :  $ACR_NAME.azurecr.io"
+echo "   📁 Resources:  $RG ($LOCATION)"
+echo ""
+echo "   Pour supprimer toute l'infra :"
+echo "   az group delete --name $RG --yes --no-wait"
+echo ""
+```
+
+### Script `scripts/deploy-config.env.example`
+
+```env
+# ══════════════════════════════════════════════════════
+# 🏆 FIFA World Cup 2026 — Configuration de déploiement
+# ══════════════════════════════════════════════════════
+# Copiez ce fichier en deploy-config.env et renseignez vos valeurs.
+# Ce fichier est dans .gitignore — ne JAMAIS committer.
+
+# ── Azure Infrastructure ──
+AZURE_RESOURCE_GROUP=rg-worldcup2026
+AZURE_LOCATION=eastus2
+AZURE_ACR_NAME=wc2026acr
+AZURE_CA_ENV=wc2026-env
+AZURE_CA_NAME=wc2026-agent
+AZURE_SWA_NAME=wc2026
+
+# ── Azure OpenAI (provisionné par l'utilisateur) ──
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+AZURE_OPENAI_CHAT_DEPLOYMENT_NAME=gpt-4o
+```
+
+### Comportement ré-entrant (idempotence)
+
+| Scénario | Comportement |
+|----------|-------------|
+| **1ère exécution** | Crée : RG → ACR → Image → CA Env → CA → Build → SWA. Tout de zéro. |
+| **2ème exécution (rien n'a changé)** | Détecte que tout existe, rebuild l'image et le frontend, redéploie le code uniquement. |
+| **Après un échec à l'étape 4** | Étapes 1-3 détectées comme existantes (skip), reprend à l'étape 4. |
+| **Changement de code** | Rebuild image Docker + frontend, déploie les nouvelles versions. Infra intacte. |
+| **Changement de config** (deploy-config.env) | Met à jour les secrets/env vars sur les ressources existantes. |
+| **Suppression accidentelle d'une ressource** | Recrée uniquement la ressource manquante, laisse le reste intact. |
+
+### Pré-requis utilisateur
+
+```bash
+# Outils nécessaires (le script vérifie leur présence)
+az --version        # Azure CLI >= 2.50
+docker --version    # Docker Desktop ou CLI
+node --version      # Node.js >= 20
+npm --version       # npm >= 10
+
+# Configuration unique (1ère fois)
+cp scripts/deploy-config.env.example scripts/deploy-config.env
+# → Éditer deploy-config.env avec vos valeurs Azure OpenAI
+
+# Lancement
+./scripts/deploy.sh
+```
+
+### Critères d'acceptation
+
+- [ ] Le script crée toute l'infrastructure Azure de zéro en une seule commande
+- [ ] Le script est **ré-entrant** : relancer après succès ne crée pas de doublons ni d'erreurs
+- [ ] Le script **reprend après échec** : relancer après un échec partiel continue là où ça a échoué
+- [ ] Le script détecte les pré-requis manquants (az, docker, node) et affiche un message clair
+- [ ] Le script affiche un résumé final avec les URLs de l'app déployée
+- [ ] Le `deploy-config.env` est dans `.gitignore` (pas de secrets commités)
+- [ ] Un équivalent PowerShell (`deploy.ps1`) est disponible pour Windows natif
+- [ ] La commande de suppression complète est documentée (`az group delete`)
+
+---
+
 ## 🗓️ Matrice de Parallélisation
 
 ```
@@ -1031,12 +1363,15 @@ Phase 3 (intégration finale — après WS2-WS6) :
 
 Phase 4 (déploiement — après WS7) :
   └── 🤖 Agent Copilot #8 → WS8 (Azure Static Web Apps + Container Apps + CI/CD)
+
+Phase 5 (one-click deploy — après WS8) :
+  └── 🤖 Agent Copilot #9 → WS9 (Script de déploiement idempotent)
 ```
 
 ### Diagramme temporel
 
 ```
-Temps →    T0              T1                  T2                  T3
+Temps →    T0              T1                  T2                  T3                  T4
           ┌──────────────┐
 WS1 DATA  │ Types + DB   │ ✅
           └──────────────┘
@@ -1059,8 +1394,11 @@ WS2 AGENT                │ Agent Python refonte          │ ✅
 WS7 PAGE                                      │ Orchestration    │ ✅
                                               └──────────────────┘
                                                           ┌──────────────────┐
-WS8 DEPLOY                                               │ Azure SWA + CA │ ✅
+WS8 DEPLOY                                               │ Azure SWA + CA   │ ✅
                                                           └──────────────────┘
+                                                                        ┌──────────────────┐
+WS9 1-CLICK                                                             │ Deploy script    │ ✅
+                                                                        └──────────────────┘
 ```
 
 ---
@@ -1097,6 +1435,6 @@ WS8 DEPLOY                                               │ Azure SWA + CA │ 
 ## 📝 Prochaines Étapes
 
 1. ✅ **Valider ce plan** — Lecture et feedback
-2. **Créer les 8 issues GitHub** — Une par workstream avec labels, descriptions et critères d'acceptation
+2. **Créer les 9 issues GitHub** — Une par workstream avec labels, descriptions et critères d'acceptation
 3. **Lancer les agents Copilot** — Phase 1 en parallèle (WS1 + WS3-WS6)
-4. **Intégration progressive** — WS2 → WS7 → WS8
+4. **Intégration progressive** — WS2 → WS7 → WS8 → WS9
