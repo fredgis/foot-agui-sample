@@ -1,10 +1,14 @@
 "use client";
 
 import { ClubInfoCard } from "@/components/clubinfo";
+import { GroupView } from "@/components/group-view";
+import { TournamentBracket } from "@/components/tournament-bracket";
 import { WeatherCard } from "@/components/weather";
 import { MoonCard } from "@/components/moon";
-import { AgentState } from "@/lib/types";
-import { useCoAgent, useCopilotAction } from "@copilotkit/react-core";
+import { AgentState, MatchPhase } from "@/lib/types";
+import { groups, matches } from "@/lib/worldcup-data";
+import { useCoAgent, useCopilotAction, useCopilotChat } from "@copilotkit/react-core";
+import { TextMessage, Role } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
 import { useState } from "react";
 
@@ -224,7 +228,34 @@ function YourMainContent({
       tournamentView: null,
       highlightedCity: null,
     },
-  })
+  });
+
+  // Chat hook to programmatically send messages (cross-component interactions)
+  const { appendMessage } = useCopilotChat();
+
+  // Local state: selected phase for bracket cross-component filtering
+  const [selectedPhase, setSelectedPhase] = useState<MatchPhase | null>(null);
+
+  // Cross-component: clicking a team in GroupView triggers compare_teams in chat
+  const handleTeamClick = (teamCode: string) => {
+    const currentTeam = state.teamInfo?.name ?? state.teamInfo?.fifaCode;
+    const message = currentTeam
+      ? `Compare ${currentTeam} and ${teamCode}`
+      : `Tell me about ${teamCode}`;
+    appendMessage(
+      new TextMessage({ role: Role.User, content: message })
+    );
+  };
+
+  // Cross-component: clicking a phase in TournamentBracket filters the schedule
+  const handlePhaseClick = (phase: MatchPhase) => {
+    setSelectedPhase((prev) => (prev === phase ? null : phase));
+  };
+
+  // Filtered matches for bracket phase selection (available for MatchSchedule WS4)
+  const filteredMatches = selectedPhase
+    ? matches.filter((m) => m.phase === selectedPhase)
+    : matches;
 
   //🪁 Generative UI: https://docs.copilotkit.ai/microsoft-agent-framework/generative-ui
   useCopilotAction({
@@ -437,9 +468,23 @@ function YourMainContent({
         </>
       )}
 
-      {/* Carte des infos du club OU Page d'accueil attractive */}
-      <div style={{ position: 'relative', zIndex: 10, width: '90%', maxWidth: '1400px', marginTop: clubName ? '200px' : '0' }}>
-        {clubName ? (
+      {/* Carte des infos du club, vue tournoi, ou page d'accueil */}
+      <div style={{ position: 'relative', zIndex: 10, width: '90%', maxWidth: '1400px', marginTop: clubName && !state.tournamentView ? '200px' : '20px', overflowY: 'auto', maxHeight: state.tournamentView ? '90vh' : undefined }}>
+        {state.tournamentView === "group" ? (
+          <GroupView
+            groups={groups}
+            selectedTeamCode={state.teamInfo?.fifaCode}
+            themeColor={themeColor}
+            onTeamClick={handleTeamClick}
+          />
+        ) : state.tournamentView === "bracket" ? (
+          <TournamentBracket
+            matches={filteredMatches}
+            selectedTeamCode={state.teamInfo?.fifaCode}
+            themeColor={themeColor}
+            onPhaseClick={handlePhaseClick}
+          />
+        ) : clubName ? (
           <ClubInfoCard clubData={null} themeColor={themeColor} />
         ) : (
           <WelcomeScreen />
