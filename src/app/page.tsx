@@ -920,8 +920,11 @@ function YourMainContent({
     description: "Switch frontend to the tournament bracket (knockout stage) view.",
     available: "disabled",
     parameters: [],
-    handler: async () => {
-      setState({ ...state, teamInfo: null, matches: [], selectedStadium: null, tournamentView: "bracket", highlightedCity: null });
+    render: ({ status }) => {
+      if (status === "complete" && state.tournamentView !== "bracket") {
+        setState({ ...state, teamInfo: null, matches: [], selectedStadium: null, tournamentView: "bracket", highlightedCity: null });
+      }
+      return <div className="p-2 text-sm">🏆 {status === "inProgress" ? "Loading bracket..." : "Bracket view activated!"}</div>;
     },
   }, [state, setState]);
 
@@ -933,8 +936,11 @@ function YourMainContent({
     parameters: [
       { name: "group", type: "string", description: "Group letter A–L", required: true },
     ],
-    handler: async () => {
-      setState({ ...state, teamInfo: null, matches: [], selectedStadium: null, tournamentView: "group", highlightedCity: null });
+    render: ({ status }) => {
+      if (status === "complete" && state.tournamentView !== "group") {
+        setState({ ...state, teamInfo: null, matches: [], selectedStadium: null, tournamentView: "group", highlightedCity: null });
+      }
+      return <div className="p-2 text-sm">🌍 {status === "inProgress" ? "Loading groups..." : "Group view activated!"}</div>;
     },
   }, [state, setState]);
 
