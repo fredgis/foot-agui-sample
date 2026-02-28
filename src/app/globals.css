@@ -168,13 +168,15 @@ html {
   border-radius: 0.5rem;
 }
 
-/* ── CopilotKit sidebar — desktop ────────────────────────────────────────────── */
+/* ── CopilotKit sidebar — desktop (wider) ────────────────────────────────────── */
 .copilot-sidebar-custom {
   background: linear-gradient(180deg, rgba(10, 12, 20, 0.98) 0%, rgba(18, 24, 38, 0.98) 100%) !important;
   backdrop-filter: blur(30px) saturate(180%) !important;
   border-left: none !important;
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6) !important;
   border-left: 2px solid color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 30%, transparent) !important;
+  width: 480px !important;
+  max-width: 45vw !important;
 }
 
 /* ── CopilotKit popup — mobile ───────────────────────────────────────────────── */

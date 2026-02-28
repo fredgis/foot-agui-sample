@@ -637,6 +637,7 @@ function YourMainContent({
   }, [setState]);
 
   // 🔄 Auto-detect team from agent messages → update page
+  const lastDetectedTeam = useRef<string | null>(null);
   useEffect(() => {
     if (!visibleMessages || visibleMessages.length === 0) return;
     // Find last assistant text message
@@ -645,13 +646,17 @@ function YourMainContent({
       if (msg.isTextMessage() && msg.role === MessageRole.Assistant) {
         const content = (msg as TextMessage).content;
         if (!content || content.length < 10) break; // still streaming, wait
-        // Look for first FIFA code in parentheses like "(POR)", "(FRA)"
+        // Look for FIFA codes in parentheses like "(POR)", "(FRA)"
         const codeMatches = content.match(/\(([A-Z]{3})\)/g);
         if (codeMatches) {
-          for (const m of codeMatches) {
-            const code = m.slice(1, 4);
-            if (fifaCodesSet.current.has(code) && code !== state.teamInfo?.fifaCode) {
-              loadTeamByCode(code);
+          // Find the LAST mentioned team code (most relevant)
+          for (let j = codeMatches.length - 1; j >= 0; j--) {
+            const code = codeMatches[j].slice(1, 4);
+            if (fifaCodesSet.current.has(code)) {
+              if (code !== lastDetectedTeam.current) {
+                lastDetectedTeam.current = code;
+                loadTeamByCode(code);
+              }
               return;
             }
           }
@@ -659,7 +664,18 @@ function YourMainContent({
         break;
       }
     }
-  }, [visibleMessages, state.teamInfo?.fifaCode, loadTeamByCode]);
+  }, [visibleMessages, loadTeamByCode]);
+
+  // 🏠 Return to welcome screen
+  const goHome = useCallback(() => {
+    setState({ teamInfo: null, matches: [], selectedStadium: null, tournamentView: null, highlightedCity: null });
+    setClubName("");
+    setCountryFlag("");
+    setThemeColor("#6366f1");
+    setSecondaryColor("#ffffff");
+    setBackgroundImage("");
+    lastDetectedTeam.current = null;
+  }, [setState, setClubName, setCountryFlag, setThemeColor, setSecondaryColor, setBackgroundImage]);
 
   // Cross-component: clicking a team in GroupView triggers compare_teams in chat
   const handleTeamClick = (teamCode: string) => {
@@ -783,18 +799,27 @@ function YourMainContent({
         background: `linear-gradient(135deg, ${themeColor}15 0%, #0a0a0a 60%, ${themeColor}08 100%)`,
       }}
     >
-      {/* Background image overlay */}
-      {backgroundImage && (
+      {/* Background image overlay — stadium for team context */}
+      {hasTeam && (
         <div
           style={{
             position: "absolute",
             inset: 0,
-            backgroundImage: `url(${backgroundImage})`,
+            backgroundImage: "url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1920&q=80')",
             backgroundSize: "cover",
-            backgroundPosition: "center",
-            filter: "brightness(0.7)",
+            backgroundPosition: "center 40%",
+            filter: "brightness(0.12) saturate(1.3)",
             transition: "all 0.8s ease",
             zIndex: 0,
+          }}
+        />
+      )}
+      {hasTeam && (
+        <div
+          style={{
+            position: "absolute", inset: 0, zIndex: 0,
+            background: `radial-gradient(ellipse at 50% 0%, ${themeColor}20 0%, transparent 60%), radial-gradient(ellipse at 50% 100%, ${themeColor}10 0%, transparent 60%)`,
+            transition: "background 0.6s ease",
           }}
         />
       )}
@@ -811,6 +836,24 @@ function YourMainContent({
           }}
         >
           <div className="flex items-center justify-center gap-3">
+            {/* Home button */}
+            <button
+              onClick={goHome}
+              title="Back to Home"
+              style={{
+                position: "absolute", left: "1rem",
+                background: "rgba(255,255,255,0.15)",
+                border: "1px solid rgba(255,255,255,0.25)",
+                borderRadius: "50%", width: 36, height: 36,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", transition: "all 0.2s ease",
+                fontSize: "1.1rem", color: "#fff",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.3)"; e.currentTarget.style.transform = "scale(1.1)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.15)"; e.currentTarget.style.transform = ""; }}
+            >
+              🏠
+            </button>
             {state.teamInfo?.fifaCode && <FlagImg fifaCode={state.teamInfo.fifaCode} width={32} height={22} />}
             <h1
               className="text-2xl md:text-4xl font-bold tracking-wide"
