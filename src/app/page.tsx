@@ -265,6 +265,7 @@ function WelcomeScreen({
             { name: "MetLife Stadium", city: "New York", img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&q=80", capacity: "82,500" },
             { name: "SoFi Stadium", city: "Los Angeles", img: "https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&q=80", capacity: "70,240" },
             { name: "AT&T Stadium", city: "Dallas", img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&q=80", capacity: "80,000" },
+            { name: "Hard Rock Stadium", city: "Miami", img: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&q=80", capacity: "64,767" },
           ].map((stadium) => (
             <div key={stadium.name} style={{
               flex: "0 0 280px", borderRadius: "1rem", overflow: "hidden", position: "relative",
