@@ -189,23 +189,8 @@ function buildCopaTools() {
         const teamMatches = matches.filter(
           (m) => m.homeTeam === team.fifaCode || m.awayTeam === team.fifaCode
         );
-        return JSON.stringify({
-          team: {
-            name: team.name,
-            fifaCode: team.fifaCode,
-            flag: team.flag,
-            coach: team.coach,
-            fifaRanking: team.fifaRanking,
-            confederation: team.confederation,
-            keyPlayers: team.keyPlayers,
-            worldCupHistory: team.worldCupHistory,
-          },
-          matches: teamMatches.map((m) => ({
-            id: m.id, date: m.date, time: m.time,
-            homeTeam: m.homeTeam, awayTeam: m.awayTeam,
-            stadiumName: m.stadiumName, group: m.group,
-          })),
-        });
+        // Return full team object — STATE_DELTA in tool.execution_complete will parse this
+        return JSON.stringify({ team, matches: teamMatches });
       },
     }),
   ];
@@ -428,9 +413,12 @@ export class CopilotSDKAgent extends AbstractAgent {
     });
 
     // Tool execution start → AG-UI TOOL_CALL_START + TOOL_CALL_ARGS
+    // Track tool names by callId for state updates on completion
+    const toolCallNames = new Map<string, string>();
     session.on("tool.execution_start", (event) => {
       const toolCallId = event.data.toolCallId;
       const toolName = event.data.toolName;
+      toolCallNames.set(toolCallId, toolName);
       console.log(`[CopilotSDKAgent] Tool call: ${toolName} (${toolCallId})`);
       emit({
         type: EventType.TOOL_CALL_START,
@@ -449,9 +437,52 @@ export class CopilotSDKAgent extends AbstractAgent {
       }
     });
 
-    // Tool execution complete → AG-UI TOOL_CALL_END
+    // Tool execution complete → AG-UI TOOL_CALL_END + STATE_DELTA for UI tools
     session.on("tool.execution_complete", (event) => {
-      emit({ type: EventType.TOOL_CALL_END, toolCallId: event.data.toolCallId });
+      const toolCallId = event.data.toolCallId;
+      emit({ type: EventType.TOOL_CALL_END, toolCallId });
+
+      // Emit STATE_DELTA for tools that need frontend state changes
+      const toolName = toolCallNames.get(toolCallId);
+      const resultStr = typeof event.data.result === "string"
+        ? event.data.result
+        : event.data.result?.content ?? "";
+      if (toolName === "update_team_info" && resultStr) {
+        try {
+          const parsed = JSON.parse(resultStr);
+          if (parsed.team) {
+            emit({
+              type: EventType.STATE_DELTA,
+              delta: [
+                { op: "replace", path: "/teamInfo", value: parsed.team },
+                { op: "replace", path: "/matches", value: parsed.matches ?? [] },
+                { op: "replace", path: "/selectedStadium", value: null },
+                { op: "replace", path: "/tournamentView", value: null },
+                { op: "replace", path: "/highlightedCity", value: null },
+              ],
+            });
+            console.log(`[CopilotSDKAgent] STATE_DELTA emitted for team: ${parsed.team.name}`);
+          }
+        } catch { /* ignore parse errors */ }
+      } else if (toolName === "show_tournament_bracket") {
+        emit({
+          type: EventType.STATE_DELTA,
+          delta: [
+            { op: "replace", path: "/teamInfo", value: null },
+            { op: "replace", path: "/matches", value: [] },
+            { op: "replace", path: "/tournamentView", value: "bracket" },
+          ],
+        });
+      } else if (toolName === "get_group_standings") {
+        emit({
+          type: EventType.STATE_DELTA,
+          delta: [
+            { op: "replace", path: "/teamInfo", value: null },
+            { op: "replace", path: "/matches", value: [] },
+            { op: "replace", path: "/tournamentView", value: "group" },
+          ],
+        });
+      }
     });
 
     // Errors
