@@ -54,3 +54,6 @@ bun.lockb
 venv
 .venv
 __pycache__
+
+# deployment config (contains secrets — never commit)
+scripts/deploy-config.env
