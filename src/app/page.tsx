@@ -4,9 +4,9 @@ import { ClubInfoCard } from "@/components/clubinfo";
 import { WeatherCard } from "@/components/weather";
 import { MoonCard } from "@/components/moon";
 import { AgentState } from "@/lib/types";
-import { useCoAgent, useCopilotAction, useCopilotContext } from "@copilotkit/react-core";
+import { useCoAgent, useCopilotAction } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 // Composant page d'accueil attractive
 function WelcomeScreen() {
@@ -154,33 +154,6 @@ export default function CopilotKitPage() {
   const [backgroundImage, setBackgroundImage] = useState<string>("");
   const [countryFlag, setCountryFlag] = useState<string>("");
 
-  // 📊 Récupération du state agent pour détecter les changements de club
-  const { state } = useCopilotContext();
-  const agentState = state as unknown as AgentState;
-
-  // ⚡ Applique automatiquement le thème quand clubInfo change (100% dynamique)
-  useEffect(() => {
-    console.log("🔍 DEBUG - agentState:", agentState);
-    console.log("🔍 DEBUG - clubInfo:", agentState?.clubInfo);
-    
-    if (agentState?.clubInfo && agentState.clubInfo.name) {
-      console.log("✅ Club détecté:", agentState.clubInfo.name);
-      
-      // 🎨 Extraction dynamique des couleurs via GPT
-      const colors = extractColors(agentState.clubInfo.colors || "blue and white");
-      console.log("🎨 Couleurs extraites:", colors);
-      
-      setThemeColor(colors.primary);
-      setSecondaryColor(colors.secondary);
-      setClubName(agentState.clubInfo.name);
-      setClubLogo(agentState.clubInfo.logo || null);
-      setBackgroundImage(agentState.clubInfo.background || "");
-      setCountryFlag(agentState.clubInfo.country || "");
-    } else {
-      console.log("⏳ En attente de clubInfo...");
-    }
-  }, [agentState?.clubInfo]);
-
   // 🪁 Frontend Actions: https://docs.copilotkit.ai/microsoft-agent-framework/frontend-actions
   useCopilotAction({
     name: "setThemeColor",
@@ -245,7 +218,11 @@ function YourMainContent({
   const { state, setState } = useCoAgent<AgentState>({
     name: "my_agent",
     initialState: {
-      clubInfo: null,
+      teamInfo: null,
+      matches: [],
+      selectedStadium: null,
+      tournamentView: null,
+      highlightedCity: null,
     },
   })
 
@@ -281,27 +258,24 @@ function YourMainContent({
       description: "Complete club information",
       required: true,
     }],
-    handler({ club_info }) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    handler(args: any) {
+      const club_info = args?.club_info as Record<string, unknown> | undefined;
       console.log("🎯 FRONTEND ACTION - update_club_info appelé avec:", club_info);
-      console.log("🚩 DEBUG - countryFlag reçu:", club_info?.countryFlag);
-      console.log("🌍 DEBUG - country reçu:", club_info?.country);
-      if (club_info && club_info.name) {
+      const name = typeof club_info?.name === "string" ? club_info.name : "";
+      const colors = typeof club_info?.colors === "string" ? club_info.colors : "blue white";
+      const country = typeof club_info?.country === "string" ? club_info.country : "";
+      if (name) {
         // 🎨 Génération dynamique des couleurs depuis GPT
-        console.log("🎨 Génération dynamique des couleurs depuis:", club_info.colors);
-        const colors = extractColors(club_info.colors || "blue white");
-        setThemeColor(colors.primary);
-        setSecondaryColor(colors.secondary);
-        setClubLogo(null); // Pas de logo, on affichera le maillot SVG
-        setBackgroundImage(""); // Pas d'image de fond spécifique
-        
-        // Applique toujours le nom et le pays en texte
-        setClubName(club_info.name);
-        const countryName = club_info.country || "";
-        console.log("🌍 Pays détecté:", countryName);
-        setCountryFlag(countryName);
-        
-        // Met à jour aussi l'état de l'agent
-        setState({ clubInfo: club_info });
+        const extracted = extractColors(colors);
+        setThemeColor(extracted.primary);
+        setSecondaryColor(extracted.secondary);
+        setClubLogo(null);
+        setBackgroundImage("");
+        setClubName(name);
+        setCountryFlag(country);
+        // Met à jour le teamInfo dans l'état de l'agent
+        setState({ teamInfo: null, matches: [], selectedStadium: null, tournamentView: null, highlightedCity: null });
       }
     },
   }, [setThemeColor, setSecondaryColor, setClubName, setClubLogo, setBackgroundImage, setCountryFlag, setState]);
@@ -466,7 +440,7 @@ function YourMainContent({
       {/* Carte des infos du club OU Page d'accueil attractive */}
       <div style={{ position: 'relative', zIndex: 10, width: '90%', maxWidth: '1400px', marginTop: clubName ? '200px' : '0' }}>
         {clubName ? (
-          <ClubInfoCard clubData={state.clubInfo} themeColor={themeColor} />
+          <ClubInfoCard clubData={null} themeColor={themeColor} />
         ) : (
           <WelcomeScreen />
         )}

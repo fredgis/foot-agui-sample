@@ -1,0 +1,1039 @@
+"""
+FIFA World Cup 2026 static data — Python mirror of src/lib/worldcup-data.ts.
+
+Usage:
+    from data.worldcup2026 import teams, stadiums, groups, matches
+"""
+
+from __future__ import annotations
+
+from typing import Literal, TypedDict
+
+# ─── Types ────────────────────────────────────────────────────────────────────
+
+Confederation = Literal["UEFA", "CONMEBOL", "CAF", "AFC", "CONCACAF", "OFC"]
+MatchPhase = Literal[
+    "group", "round_of_32", "round_of_16", "quarter_final", "semi_final", "third_place", "final"
+]
+
+
+class PlayerInfo(TypedDict):
+    name: str
+    position: str
+    club: str
+
+
+class WorldCupHistory(TypedDict):
+    participations: int
+    titles: int
+    bestResult: str
+
+
+class TeamInfo(TypedDict):
+    name: str
+    fifaCode: str
+    flag: str
+    confederation: Confederation
+    fifaRanking: int
+    primaryColor: str
+    secondaryColor: str
+    coach: str
+    keyPlayers: list[PlayerInfo]
+    worldCupHistory: WorldCupHistory
+
+
+class StadiumInfo(TypedDict):
+    name: str
+    city: str
+    country: Literal["USA", "Canada", "Mexico"]
+    capacity: int
+    lat: float
+    lng: float
+    timezone: str
+    description: str
+
+
+class MatchInfo(TypedDict, total=False):
+    id: str
+    date: str
+    time: str
+    homeTeam: str | None
+    awayTeam: str | None
+    stadiumName: str
+    phase: MatchPhase
+    group: str
+
+
+class GroupInfo(TypedDict):
+    name: str
+    teams: list[str]
+
+
+# ─── 48 Teams ─────────────────────────────────────────────────────────────────
+
+teams: list[TeamInfo] = [
+    # ── UEFA (16 teams) ──────────────────────────────────────────────────────
+    {
+        "name": "Germany", "fifaCode": "GER", "flag": "🇩🇪",
+        "confederation": "UEFA", "fifaRanking": 16,
+        "primaryColor": "#000000", "secondaryColor": "#FFFFFF",
+        "coach": "Julian Nagelsmann",
+        "keyPlayers": [
+            {"name": "Manuel Neuer",   "position": "GK", "club": "Bayern Munich"},
+            {"name": "Florian Wirtz",  "position": "MF", "club": "Bayer Leverkusen"},
+            {"name": "Kai Havertz",    "position": "FW", "club": "Arsenal"},
+            {"name": "Jamal Musiala",  "position": "MF", "club": "Bayern Munich"},
+            {"name": "Leroy Sané",     "position": "FW", "club": "Bayern Munich"},
+        ],
+        "worldCupHistory": {"participations": 20, "titles": 4, "bestResult": "Winner (1954, 1974, 1990, 2014)"},
+    },
+    {
+        "name": "Spain", "fifaCode": "ESP", "flag": "🇪🇸",
+        "confederation": "UEFA", "fifaRanking": 6,
+        "primaryColor": "#AA151B", "secondaryColor": "#F1BF00",
+        "coach": "Luis de la Fuente",
+        "keyPlayers": [
+            {"name": "Unai Simón",     "position": "GK", "club": "Athletic Bilbao"},
+            {"name": "Pedri",          "position": "MF", "club": "FC Barcelona"},
+            {"name": "Lamine Yamal",   "position": "FW", "club": "FC Barcelona"},
+            {"name": "Álvaro Morata",  "position": "FW", "club": "AC Milan"},
+            {"name": "Rodri",          "position": "MF", "club": "Manchester City"},
+        ],
+        "worldCupHistory": {"participations": 16, "titles": 1, "bestResult": "Winner (2010)"},
+    },
+    {
+        "name": "France", "fifaCode": "FRA", "flag": "🇫🇷",
+        "confederation": "UEFA", "fifaRanking": 2,
+        "primaryColor": "#0055A4", "secondaryColor": "#EF4135",
+        "coach": "Didier Deschamps",
+        "keyPlayers": [
+            {"name": "Mike Maignan",         "position": "GK", "club": "AC Milan"},
+            {"name": "Kylian Mbappé",         "position": "FW", "club": "Real Madrid"},
+            {"name": "Antoine Griezmann",     "position": "MF", "club": "Atlético Madrid"},
+            {"name": "Aurélien Tchouaméni",   "position": "MF", "club": "Real Madrid"},
+            {"name": "William Saliba",        "position": "DF", "club": "Arsenal"},
+        ],
+        "worldCupHistory": {"participations": 16, "titles": 2, "bestResult": "Winner (1998, 2018)"},
+    },
+    {
+        "name": "England", "fifaCode": "ENG", "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+        "confederation": "UEFA", "fifaRanking": 5,
+        "primaryColor": "#FFFFFF", "secondaryColor": "#012169",
+        "coach": "Gareth Southgate",
+        "keyPlayers": [
+            {"name": "Jordan Pickford", "position": "GK", "club": "Everton"},
+            {"name": "Harry Kane",      "position": "FW", "club": "Bayern Munich"},
+            {"name": "Jude Bellingham", "position": "MF", "club": "Real Madrid"},
+            {"name": "Phil Foden",      "position": "MF", "club": "Manchester City"},
+            {"name": "Bukayo Saka",     "position": "FW", "club": "Arsenal"},
+        ],
+        "worldCupHistory": {"participations": 16, "titles": 1, "bestResult": "Winner (1966)"},
+    },
+    {
+        "name": "Portugal", "fifaCode": "POR", "flag": "🇵🇹",
+        "confederation": "UEFA", "fifaRanking": 6,
+        "primaryColor": "#006600", "secondaryColor": "#FF0000",
+        "coach": "Roberto Martínez",
+        "keyPlayers": [
+            {"name": "Diogo Costa",      "position": "GK", "club": "FC Porto"},
+            {"name": "Cristiano Ronaldo","position": "FW", "club": "Al-Nassr"},
+            {"name": "Bruno Fernandes",  "position": "MF", "club": "Manchester United"},
+            {"name": "Rafael Leão",      "position": "FW", "club": "AC Milan"},
+            {"name": "Rúben Dias",       "position": "DF", "club": "Manchester City"},
+        ],
+        "worldCupHistory": {"participations": 8, "titles": 0, "bestResult": "3rd Place (1966)"},
+    },
+    {
+        "name": "Netherlands", "fifaCode": "NED", "flag": "🇳🇱",
+        "confederation": "UEFA", "fifaRanking": 7,
+        "primaryColor": "#FF6600", "secondaryColor": "#FFFFFF",
+        "coach": "Ronald Koeman",
+        "keyPlayers": [
+            {"name": "Bart Verbruggen",  "position": "GK", "club": "Brighton"},
+            {"name": "Virgil van Dijk",  "position": "DF", "club": "Liverpool"},
+            {"name": "Memphis Depay",    "position": "FW", "club": "Atlético Madrid"},
+            {"name": "Cody Gakpo",       "position": "FW", "club": "Liverpool"},
+            {"name": "Frenkie de Jong",  "position": "MF", "club": "FC Barcelona"},
+        ],
+        "worldCupHistory": {"participations": 11, "titles": 0, "bestResult": "Runner-up (1974, 1978, 2010)"},
+    },
+    {
+        "name": "Belgium", "fifaCode": "BEL", "flag": "🇧🇪",
+        "confederation": "UEFA", "fifaRanking": 3,
+        "primaryColor": "#000000", "secondaryColor": "#FFD700",
+        "coach": "Domenico Tedesco",
+        "keyPlayers": [
+            {"name": "Koen Casteels",  "position": "GK", "club": "VfL Wolfsburg"},
+            {"name": "Kevin De Bruyne","position": "MF", "club": "Manchester City"},
+            {"name": "Romelu Lukaku",  "position": "FW", "club": "Roma"},
+            {"name": "Dries Mertens",  "position": "FW", "club": "Galatasaray"},
+            {"name": "Axel Witsel",    "position": "MF", "club": "Atlético Madrid"},
+        ],
+        "worldCupHistory": {"participations": 14, "titles": 0, "bestResult": "3rd Place (1986, 2018)"},
+    },
+    {
+        "name": "Croatia", "fifaCode": "CRO", "flag": "🇭🇷",
+        "confederation": "UEFA", "fifaRanking": 10,
+        "primaryColor": "#FF0000", "secondaryColor": "#FFFFFF",
+        "coach": "Zlatko Dalić",
+        "keyPlayers": [
+            {"name": "Dominik Livaković", "position": "GK", "club": "Fenerbahçe"},
+            {"name": "Luka Modrić",       "position": "MF", "club": "Real Madrid"},
+            {"name": "Ivan Perišić",      "position": "MF", "club": "Hajduk Split"},
+            {"name": "Mateo Kovačić",     "position": "MF", "club": "Manchester City"},
+            {"name": "Andrej Kramarić",   "position": "FW", "club": "Hoffenheim"},
+        ],
+        "worldCupHistory": {"participations": 7, "titles": 0, "bestResult": "Runner-up (2018)"},
+    },
+    {
+        "name": "Switzerland", "fifaCode": "SUI", "flag": "🇨🇭",
+        "confederation": "UEFA", "fifaRanking": 19,
+        "primaryColor": "#FF0000", "secondaryColor": "#FFFFFF",
+        "coach": "Murat Yakin",
+        "keyPlayers": [
+            {"name": "Yann Sommer",      "position": "GK", "club": "Inter Milan"},
+            {"name": "Granit Xhaka",     "position": "MF", "club": "Bayer Leverkusen"},
+            {"name": "Xherdan Shaqiri",  "position": "MF", "club": "Chicago Fire"},
+            {"name": "Haris Seferović",  "position": "FW", "club": "Galatasaray"},
+            {"name": "Manuel Akanji",    "position": "DF", "club": "Manchester City"},
+        ],
+        "worldCupHistory": {"participations": 12, "titles": 0, "bestResult": "Quarter-final (1934, 1938, 1954)"},
+    },
+    {
+        "name": "Austria", "fifaCode": "AUT", "flag": "🇦🇹",
+        "confederation": "UEFA", "fifaRanking": 25,
+        "primaryColor": "#ED2939", "secondaryColor": "#FFFFFF",
+        "coach": "Ralf Rangnick",
+        "keyPlayers": [
+            {"name": "Patrick Pentz",        "position": "GK", "club": "Bayer Leverkusen"},
+            {"name": "David Alaba",           "position": "DF", "club": "Real Madrid"},
+            {"name": "Marcel Sabitzer",       "position": "MF", "club": "Borussia Dortmund"},
+            {"name": "Marko Arnautović",      "position": "FW", "club": "Inter Milan"},
+            {"name": "Christoph Baumgartner", "position": "MF", "club": "RB Leipzig"},
+        ],
+        "worldCupHistory": {"participations": 7, "titles": 0, "bestResult": "3rd Place (1954)"},
+    },
+    {
+        "name": "Denmark", "fifaCode": "DEN", "flag": "🇩🇰",
+        "confederation": "UEFA", "fifaRanking": 21,
+        "primaryColor": "#C60C30", "secondaryColor": "#FFFFFF",
+        "coach": "Kasper Hjulmand",
+        "keyPlayers": [
+            {"name": "Kasper Schmeichel",    "position": "GK", "club": "Anderlecht"},
+            {"name": "Christian Eriksen",    "position": "MF", "club": "Manchester United"},
+            {"name": "Pierre-Emile Højbjerg","position": "MF", "club": "Atlético Madrid"},
+            {"name": "Rasmus Højlund",       "position": "FW", "club": "Manchester United"},
+            {"name": "Simon Kjær",           "position": "DF", "club": "AC Milan"},
+        ],
+        "worldCupHistory": {"participations": 6, "titles": 0, "bestResult": "Quarter-final (1998)"},
+    },
+    {
+        "name": "Serbia", "fifaCode": "SRB", "flag": "🇷🇸",
+        "confederation": "UEFA", "fifaRanking": 33,
+        "primaryColor": "#C6363C", "secondaryColor": "#0C4076",
+        "coach": "Dragan Stojković",
+        "keyPlayers": [
+            {"name": "Predrag Rajković",         "position": "GK", "club": "Mallorca"},
+            {"name": "Dušan Vlahović",            "position": "FW", "club": "Juventus"},
+            {"name": "Dušan Tadić",               "position": "MF", "club": "Fenerbahçe"},
+            {"name": "Aleksandar Mitrović",       "position": "FW", "club": "Al-Hilal"},
+            {"name": "Sergej Milinković-Savić",   "position": "MF", "club": "Al-Hilal"},
+        ],
+        "worldCupHistory": {"participations": 13, "titles": 0, "bestResult": "Runner-up (1930, 1962, as Yugoslavia)"},
+    },
+    {
+        "name": "Poland", "fifaCode": "POL", "flag": "🇵🇱",
+        "confederation": "UEFA", "fifaRanking": 29,
+        "primaryColor": "#DC143C", "secondaryColor": "#FFFFFF",
+        "coach": "Michał Probierz",
+        "keyPlayers": [
+            {"name": "Wojciech Szczęsny",  "position": "GK", "club": "FC Barcelona"},
+            {"name": "Robert Lewandowski", "position": "FW", "club": "FC Barcelona"},
+            {"name": "Piotr Zieliński",    "position": "MF", "club": "Inter Milan"},
+            {"name": "Jakub Kiwior",       "position": "DF", "club": "Arsenal"},
+            {"name": "Nicola Zalewski",    "position": "MF", "club": "Roma"},
+        ],
+        "worldCupHistory": {"participations": 9, "titles": 0, "bestResult": "3rd Place (1974, 1982)"},
+    },
+    {
+        "name": "Ukraine", "fifaCode": "UKR", "flag": "🇺🇦",
+        "confederation": "UEFA", "fifaRanking": 22,
+        "primaryColor": "#005BBB", "secondaryColor": "#FFD500",
+        "coach": "Serhiy Rebrov",
+        "keyPlayers": [
+            {"name": "Andriy Lunin",        "position": "GK", "club": "Real Madrid"},
+            {"name": "Mykhailo Mudryk",     "position": "FW", "club": "Chelsea"},
+            {"name": "Viktor Tsygankov",    "position": "MF", "club": "Girona"},
+            {"name": "Oleksandr Zinchenko", "position": "DF", "club": "Arsenal"},
+            {"name": "Roman Yaremchuk",     "position": "FW", "club": "Valencia"},
+        ],
+        "worldCupHistory": {"participations": 2, "titles": 0, "bestResult": "Quarter-final (2006)"},
+    },
+    {
+        "name": "Turkey", "fifaCode": "TUR", "flag": "🇹🇷",
+        "confederation": "UEFA", "fifaRanking": 40,
+        "primaryColor": "#E30A17", "secondaryColor": "#FFFFFF",
+        "coach": "Vincenzo Montella",
+        "keyPlayers": [
+            {"name": "Mert Günok",          "position": "GK", "club": "Beşiktaş"},
+            {"name": "Hakan Çalhanoğlu",    "position": "MF", "club": "Inter Milan"},
+            {"name": "Arda Güler",          "position": "MF", "club": "Real Madrid"},
+            {"name": "Kerem Aktürkoğlu",    "position": "FW", "club": "Galatasaray"},
+            {"name": "Samet Akaydın",       "position": "DF", "club": "Sevilla"},
+        ],
+        "worldCupHistory": {"participations": 2, "titles": 0, "bestResult": "3rd Place (2002)"},
+    },
+    {
+        "name": "Scotland", "fifaCode": "SCO", "flag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+        "confederation": "UEFA", "fifaRanking": 38,
+        "primaryColor": "#003B6D", "secondaryColor": "#FFD700",
+        "coach": "Steve Clarke",
+        "keyPlayers": [
+            {"name": "Angus Gunn",       "position": "GK", "club": "Norwich City"},
+            {"name": "Andy Robertson",   "position": "DF", "club": "Liverpool"},
+            {"name": "Scott McTominay",  "position": "MF", "club": "Napoli"},
+            {"name": "Callum McGregor",  "position": "MF", "club": "Celtic"},
+            {"name": "Che Adams",        "position": "FW", "club": "Torino"},
+        ],
+        "worldCupHistory": {"participations": 8, "titles": 0, "bestResult": "Group Stage"},
+    },
+
+    # ── CONMEBOL (6 teams) ────────────────────────────────────────────────────
+    {
+        "name": "Brazil", "fifaCode": "BRA", "flag": "🇧🇷",
+        "confederation": "CONMEBOL", "fifaRanking": 5,
+        "primaryColor": "#009B3A", "secondaryColor": "#FEDF00",
+        "coach": "Dorival Júnior",
+        "keyPlayers": [
+            {"name": "Alisson Becker", "position": "GK", "club": "Liverpool"},
+            {"name": "Vinícius Jr",    "position": "FW", "club": "Real Madrid"},
+            {"name": "Rodrygo",        "position": "FW", "club": "Real Madrid"},
+            {"name": "Casemiro",       "position": "MF", "club": "Manchester United"},
+            {"name": "Marquinhos",     "position": "DF", "club": "PSG"},
+        ],
+        "worldCupHistory": {"participations": 22, "titles": 5, "bestResult": "Winner (1958, 1962, 1970, 1994, 2002)"},
+    },
+    {
+        "name": "Argentina", "fifaCode": "ARG", "flag": "🇦🇷",
+        "confederation": "CONMEBOL", "fifaRanking": 1,
+        "primaryColor": "#75AADB", "secondaryColor": "#FFFFFF",
+        "coach": "Lionel Scaloni",
+        "keyPlayers": [
+            {"name": "Emiliano Martínez",  "position": "GK", "club": "Aston Villa"},
+            {"name": "Lionel Messi",       "position": "FW", "club": "Inter Miami"},
+            {"name": "Julián Álvarez",     "position": "FW", "club": "Atlético Madrid"},
+            {"name": "Rodrigo De Paul",    "position": "MF", "club": "Atlético Madrid"},
+            {"name": "Alexis Mac Allister","position": "MF", "club": "Liverpool"},
+        ],
+        "worldCupHistory": {"participations": 18, "titles": 3, "bestResult": "Winner (1978, 1986, 2022)"},
+    },
+    {
+        "name": "Uruguay", "fifaCode": "URU", "flag": "🇺🇾",
+        "confederation": "CONMEBOL", "fifaRanking": 14,
+        "primaryColor": "#5BBD71", "secondaryColor": "#FFFFFF",
+        "coach": "Marcelo Bielsa",
+        "keyPlayers": [
+            {"name": "Sergio Rochet",     "position": "GK", "club": "Internacional"},
+            {"name": "Darwin Núñez",      "position": "FW", "club": "Liverpool"},
+            {"name": "Federico Valverde", "position": "MF", "club": "Real Madrid"},
+            {"name": "Ronald Araújo",     "position": "DF", "club": "FC Barcelona"},
+            {"name": "Rodrigo Bentancur", "position": "MF", "club": "Tottenham"},
+        ],
+        "worldCupHistory": {"participations": 14, "titles": 2, "bestResult": "Winner (1930, 1950)"},
+    },
+    {
+        "name": "Colombia", "fifaCode": "COL", "flag": "🇨🇴",
+        "confederation": "CONMEBOL", "fifaRanking": 11,
+        "primaryColor": "#FCD116", "secondaryColor": "#003087",
+        "coach": "Néstor Lorenzo",
+        "keyPlayers": [
+            {"name": "David Ospina",       "position": "GK", "club": "Al-Qadsiah"},
+            {"name": "Luis Díaz",          "position": "FW", "club": "Liverpool"},
+            {"name": "James Rodríguez",    "position": "MF", "club": "Rayo Vallecano"},
+            {"name": "Richard Ríos",       "position": "MF", "club": "Palmeiras"},
+            {"name": "Dávinson Sánchez",   "position": "DF", "club": "Galatasaray"},
+        ],
+        "worldCupHistory": {"participations": 7, "titles": 0, "bestResult": "Quarter-final (2014)"},
+    },
+    {
+        "name": "Ecuador", "fifaCode": "ECU", "flag": "🇪🇨",
+        "confederation": "CONMEBOL", "fifaRanking": 44,
+        "primaryColor": "#FFD100", "secondaryColor": "#034EA2",
+        "coach": "Sebastián Beccacece",
+        "keyPlayers": [
+            {"name": "Hernán Galíndez", "position": "GK", "club": "Aucas"},
+            {"name": "Enner Valencia",  "position": "FW", "club": "Independiente del Valle"},
+            {"name": "Moisés Caicedo",  "position": "MF", "club": "Chelsea"},
+            {"name": "Gonzalo Plata",   "position": "FW", "club": "Al-Qadsiah"},
+            {"name": "Piero Hincapié",  "position": "DF", "club": "Bayer Leverkusen"},
+        ],
+        "worldCupHistory": {"participations": 4, "titles": 0, "bestResult": "Round of 16 (2006)"},
+    },
+    {
+        "name": "Chile", "fifaCode": "CHI", "flag": "🇨🇱",
+        "confederation": "CONMEBOL", "fifaRanking": 57,
+        "primaryColor": "#D52B1E", "secondaryColor": "#FFFFFF",
+        "coach": "Ricardo Gareca",
+        "keyPlayers": [
+            {"name": "Claudio Bravo",   "position": "GK", "club": "Real Betis"},
+            {"name": "Alexis Sánchez",  "position": "FW", "club": "Inter Milan"},
+            {"name": "Arturo Vidal",    "position": "MF", "club": "Colo-Colo"},
+            {"name": "Charles Aránguiz","position": "MF", "club": "Bayer Leverkusen"},
+            {"name": "Gary Medel",      "position": "DF", "club": "Boca Juniors"},
+        ],
+        "worldCupHistory": {"participations": 9, "titles": 0, "bestResult": "3rd Place (1962)"},
+    },
+
+    # ── CAF (9 teams) ─────────────────────────────────────────────────────────
+    {
+        "name": "Morocco", "fifaCode": "MAR", "flag": "🇲🇦",
+        "confederation": "CAF", "fifaRanking": 13,
+        "primaryColor": "#C1272D", "secondaryColor": "#006233",
+        "coach": "Walid Regragui",
+        "keyPlayers": [
+            {"name": "Yassine Bounou",  "position": "GK", "club": "Al-Hilal"},
+            {"name": "Achraf Hakimi",   "position": "DF", "club": "PSG"},
+            {"name": "Hakim Ziyech",    "position": "MF", "club": "Galatasaray"},
+            {"name": "Youssef En-Nesyri","position": "FW", "club": "Fenerbahçe"},
+            {"name": "Sofyan Amrabat",  "position": "MF", "club": "Al-Shabab"},
+        ],
+        "worldCupHistory": {"participations": 7, "titles": 0, "bestResult": "Semi-final (2022)"},
+    },
+    {
+        "name": "Senegal", "fifaCode": "SEN", "flag": "🇸🇳",
+        "confederation": "CAF", "fifaRanking": 18,
+        "primaryColor": "#00853F", "secondaryColor": "#FDEF42",
+        "coach": "Aliou Cissé",
+        "keyPlayers": [
+            {"name": "Édouard Mendy",   "position": "GK", "club": "Al-Ahli"},
+            {"name": "Sadio Mané",      "position": "FW", "club": "Al-Nassr"},
+            {"name": "Kalidou Koulibaly","position": "DF", "club": "Al-Hilal"},
+            {"name": "Idrissa Gueye",   "position": "MF", "club": "Everton"},
+            {"name": "Ismaïla Sarr",    "position": "FW", "club": "Crystal Palace"},
+        ],
+        "worldCupHistory": {"participations": 3, "titles": 0, "bestResult": "Quarter-final (2002)"},
+    },
+    {
+        "name": "Nigeria", "fifaCode": "NGA", "flag": "🇳🇬",
+        "confederation": "CAF", "fifaRanking": 28,
+        "primaryColor": "#008751", "secondaryColor": "#FFFFFF",
+        "coach": "José Peseiro",
+        "keyPlayers": [
+            {"name": "Stanley Nwabali",      "position": "GK", "club": "Chippa United"},
+            {"name": "Victor Osimhen",       "position": "FW", "club": "Galatasaray"},
+            {"name": "Alex Iwobi",           "position": "MF", "club": "Fulham"},
+            {"name": "William Troost-Ekong", "position": "DF", "club": "Watford"},
+            {"name": "Wilfred Ndidi",        "position": "MF", "club": "Leicester City"},
+        ],
+        "worldCupHistory": {"participations": 7, "titles": 0, "bestResult": "Round of 16 (1994, 1998, 2014)"},
+    },
+    {
+        "name": "Ivory Coast", "fifaCode": "CIV", "flag": "🇨🇮",
+        "confederation": "CAF", "fifaRanking": 30,
+        "primaryColor": "#F77F00", "secondaryColor": "#009A44",
+        "coach": "Emerse Faé",
+        "keyPlayers": [
+            {"name": "Yahia Fofana",    "position": "GK", "club": "Chelsea"},
+            {"name": "Sébastien Haller","position": "FW", "club": "Borussia Dortmund"},
+            {"name": "Franck Kessié",   "position": "MF", "club": "Al-Ahli"},
+            {"name": "Nicolas Pépé",    "position": "FW", "club": "Trabzonspor"},
+            {"name": "Serge Aurier",    "position": "DF", "club": "Villarreal"},
+        ],
+        "worldCupHistory": {"participations": 3, "titles": 0, "bestResult": "Group Stage"},
+    },
+    {
+        "name": "Cameroon", "fifaCode": "CMR", "flag": "🇨🇲",
+        "confederation": "CAF", "fifaRanking": 43,
+        "primaryColor": "#007A5E", "secondaryColor": "#CE1126",
+        "coach": "Marc Brys",
+        "keyPlayers": [
+            {"name": "André Onana",      "position": "GK", "club": "Manchester United"},
+            {"name": "Vincent Aboubakar","position": "FW", "club": "Besiktas"},
+            {"name": "Bryan Mbeumo",     "position": "FW", "club": "Brentford"},
+            {"name": "Nicolas Nkoulou",  "position": "DF", "club": "Hatayspor"},
+            {"name": "Samuel Gouet",     "position": "MF", "club": "Club Brugge"},
+        ],
+        "worldCupHistory": {"participations": 8, "titles": 0, "bestResult": "Quarter-final (1990)"},
+    },
+    {
+        "name": "Egypt", "fifaCode": "EGY", "flag": "🇪🇬",
+        "confederation": "CAF", "fifaRanking": 36,
+        "primaryColor": "#CE1126", "secondaryColor": "#FFFFFF",
+        "coach": "Rui Vitória",
+        "keyPlayers": [
+            {"name": "Mohamed El-Shenawy","position": "GK", "club": "Al-Ahly"},
+            {"name": "Mohamed Salah",     "position": "FW", "club": "Liverpool"},
+            {"name": "Omar Marmoush",     "position": "FW", "club": "Manchester City"},
+            {"name": "Ahmed Hegazi",      "position": "DF", "club": "Al-Ittihad"},
+            {"name": "Tarek Hamed",       "position": "MF", "club": "Al-Zamalek"},
+        ],
+        "worldCupHistory": {"participations": 3, "titles": 0, "bestResult": "Group Stage"},
+    },
+    {
+        "name": "Algeria", "fifaCode": "ALG", "flag": "🇩🇿",
+        "confederation": "CAF", "fifaRanking": 49,
+        "primaryColor": "#006233", "secondaryColor": "#FFFFFF",
+        "coach": "Vladimir Petkovic",
+        "keyPlayers": [
+            {"name": "Rais M'Bolhi",    "position": "GK", "club": "Al-Qadsiah"},
+            {"name": "Riyad Mahrez",    "position": "FW", "club": "Al-Ahli"},
+            {"name": "Ismaël Bennacer", "position": "MF", "club": "AC Milan"},
+            {"name": "Youcef Atal",     "position": "DF", "club": "Nice"},
+            {"name": "Baghdad Bounedjah","position": "FW", "club": "Al-Sadd"},
+        ],
+        "worldCupHistory": {"participations": 4, "titles": 0, "bestResult": "Round of 16 (2014)"},
+    },
+    {
+        "name": "South Africa", "fifaCode": "RSA", "flag": "🇿🇦",
+        "confederation": "CAF", "fifaRanking": 59,
+        "primaryColor": "#007A4D", "secondaryColor": "#FFB81C",
+        "coach": "Hugo Broos",
+        "keyPlayers": [
+            {"name": "Ronwen Williams", "position": "GK", "club": "Mamelodi Sundowns"},
+            {"name": "Percy Tau",       "position": "FW", "club": "Al-Ahly"},
+            {"name": "Themba Zwane",    "position": "MF", "club": "Mamelodi Sundowns"},
+            {"name": "Siyanda Xulu",    "position": "DF", "club": "Al-Tai"},
+            {"name": "Teboho Mokoena",  "position": "MF", "club": "Mamelodi Sundowns"},
+        ],
+        "worldCupHistory": {"participations": 3, "titles": 0, "bestResult": "Group Stage"},
+    },
+    {
+        "name": "Tunisia", "fifaCode": "TUN", "flag": "🇹🇳",
+        "confederation": "CAF", "fifaRanking": 34,
+        "primaryColor": "#E70013", "secondaryColor": "#FFFFFF",
+        "coach": "Jalel Kadri",
+        "keyPlayers": [
+            {"name": "Aymen Dahmen",      "position": "GK", "club": "Montpellier"},
+            {"name": "Wahbi Khazri",      "position": "FW", "club": "Al-Qadsiah"},
+            {"name": "Hannibal Mejbri",   "position": "MF", "club": "Birmingham City"},
+            {"name": "Yassine Meriah",    "position": "DF", "club": "Lecce"},
+            {"name": "Anis Ben Slimane",  "position": "MF", "club": "Brighton"},
+        ],
+        "worldCupHistory": {"participations": 6, "titles": 0, "bestResult": "Group Stage"},
+    },
+
+    # ── AFC (8 teams) ─────────────────────────────────────────────────────────
+    {
+        "name": "Japan", "fifaCode": "JPN", "flag": "🇯🇵",
+        "confederation": "AFC", "fifaRanking": 17,
+        "primaryColor": "#003087", "secondaryColor": "#FFFFFF",
+        "coach": "Hajime Moriyasu",
+        "keyPlayers": [
+            {"name": "Shuichi Gonda",    "position": "GK", "club": "Shimizu S-Pulse"},
+            {"name": "Takumi Minamino",  "position": "MF", "club": "Monaco"},
+            {"name": "Kaoru Mitoma",     "position": "FW", "club": "Brighton"},
+            {"name": "Wataru Endō",      "position": "MF", "club": "Liverpool"},
+            {"name": "Takehiro Tomiyasu","position": "DF", "club": "Arsenal"},
+        ],
+        "worldCupHistory": {"participations": 7, "titles": 0, "bestResult": "Round of 16 (2002, 2010, 2018, 2022)"},
+    },
+    {
+        "name": "South Korea", "fifaCode": "KOR", "flag": "🇰🇷",
+        "confederation": "AFC", "fifaRanking": 23,
+        "primaryColor": "#C60C30", "secondaryColor": "#FFFFFF",
+        "coach": "Hong Myung-bo",
+        "keyPlayers": [
+            {"name": "Kim Seung-gyu",  "position": "GK", "club": "Vissel Kobe"},
+            {"name": "Son Heung-min",  "position": "FW", "club": "Tottenham"},
+            {"name": "Hwang Hee-chan", "position": "FW", "club": "Wolverhampton"},
+            {"name": "Lee Kang-in",    "position": "MF", "club": "PSG"},
+            {"name": "Kim Min-jae",    "position": "DF", "club": "Bayern Munich"},
+        ],
+        "worldCupHistory": {"participations": 11, "titles": 0, "bestResult": "Semi-final (2002)"},
+    },
+    {
+        "name": "Iran", "fifaCode": "IRN", "flag": "🇮🇷",
+        "confederation": "AFC", "fifaRanking": 24,
+        "primaryColor": "#239F40", "secondaryColor": "#FFFFFF",
+        "coach": "Amir Ghalenoei",
+        "keyPlayers": [
+            {"name": "Alireza Beiranvand",  "position": "GK", "club": "Persepolis"},
+            {"name": "Mehdi Taremi",        "position": "FW", "club": "Inter Milan"},
+            {"name": "Sardar Azmoun",       "position": "FW", "club": "Bayer Leverkusen"},
+            {"name": "Alireza Jahanbakhsh", "position": "MF", "club": "Feyenoord"},
+            {"name": "Saman Ghoddos",       "position": "MF", "club": "Brentford"},
+        ],
+        "worldCupHistory": {"participations": 6, "titles": 0, "bestResult": "Group Stage"},
+    },
+    {
+        "name": "Australia", "fifaCode": "AUS", "flag": "🇦🇺",
+        "confederation": "AFC", "fifaRanking": 27,
+        "primaryColor": "#FFD700", "secondaryColor": "#00843D",
+        "coach": "Tony Popovic",
+        "keyPlayers": [
+            {"name": "Mathew Ryan",    "position": "GK", "club": "Real Sociedad"},
+            {"name": "Mathew Leckie",  "position": "FW", "club": "Melbourne City"},
+            {"name": "Jackson Irvine", "position": "MF", "club": "FC St. Pauli"},
+            {"name": "Aziz Behich",    "position": "DF", "club": "Dundee United"},
+            {"name": "Riley McGree",   "position": "MF", "club": "Middlesbrough"},
+        ],
+        "worldCupHistory": {"participations": 6, "titles": 0, "bestResult": "Quarter-final (2006)"},
+    },
+    {
+        "name": "Saudi Arabia", "fifaCode": "KSA", "flag": "🇸🇦",
+        "confederation": "AFC", "fifaRanking": 56,
+        "primaryColor": "#006C35", "secondaryColor": "#FFFFFF",
+        "coach": "Hervé Renard",
+        "keyPlayers": [
+            {"name": "Mohammed Al-Owais", "position": "GK", "club": "Al-Hilal"},
+            {"name": "Salem Al-Dawsari",  "position": "FW", "club": "Al-Hilal"},
+            {"name": "Saleh Al-Shehri",   "position": "FW", "club": "Al-Hilal"},
+            {"name": "Ali Al-Bulayhi",    "position": "DF", "club": "Al-Hilal"},
+            {"name": "Riyadh Sharahili",  "position": "MF", "club": "Al-Ahli"},
+        ],
+        "worldCupHistory": {"participations": 6, "titles": 0, "bestResult": "Round of 16 (1994)"},
+    },
+    {
+        "name": "Qatar", "fifaCode": "QAT", "flag": "🇶🇦",
+        "confederation": "AFC", "fifaRanking": 37,
+        "primaryColor": "#8D1B3D", "secondaryColor": "#FFFFFF",
+        "coach": "Marquez López",
+        "keyPlayers": [
+            {"name": "Meshaal Barsham",  "position": "GK", "club": "Al-Sadd"},
+            {"name": "Akram Afif",       "position": "FW", "club": "Al-Sadd"},
+            {"name": "Almoez Ali",       "position": "FW", "club": "Al-Duhail"},
+            {"name": "Hassan Al-Haydos", "position": "MF", "club": "Al-Sadd"},
+            {"name": "Bassam Al-Rawi",   "position": "DF", "club": "Al-Rayyan"},
+        ],
+        "worldCupHistory": {"participations": 2, "titles": 0, "bestResult": "Group Stage"},
+    },
+    {
+        "name": "China", "fifaCode": "CHN", "flag": "🇨🇳",
+        "confederation": "AFC", "fifaRanking": 93,
+        "primaryColor": "#DE2910", "secondaryColor": "#FFDE00",
+        "coach": "Branko Ivanković",
+        "keyPlayers": [
+            {"name": "Wang Dalei",     "position": "GK", "club": "Shandong Taishan"},
+            {"name": "Wu Lei",         "position": "FW", "club": "RCD Espanyol"},
+            {"name": "Zhang Linpeng",  "position": "DF", "club": "Guangzhou FC"},
+            {"name": "Xu Xin",         "position": "MF", "club": "Wuhan Three Towns"},
+            {"name": "Liu Yang",       "position": "DF", "club": "Zhejiang FC"},
+        ],
+        "worldCupHistory": {"participations": 1, "titles": 0, "bestResult": "Group Stage (2002)"},
+    },
+    {
+        "name": "Uzbekistan", "fifaCode": "UZB", "flag": "🇺🇿",
+        "confederation": "AFC", "fifaRanking": 67,
+        "primaryColor": "#1EB53A", "secondaryColor": "#FFFFFF",
+        "coach": "Timur Kapadze",
+        "keyPlayers": [
+            {"name": "Eldor Shomurodov",    "position": "FW", "club": "Roma"},
+            {"name": "Abbosbek Fayzullaev", "position": "MF", "club": "CSKA Moscow"},
+            {"name": "Jasurbek Yakhshiboev","position": "FW", "club": "Anzhi"},
+            {"name": "Otabek Shukurov",     "position": "DF", "club": "Lokomotiv Tashkent"},
+            {"name": "Sardor Rashidov",     "position": "MF", "club": "Pakhtakor"},
+        ],
+        "worldCupHistory": {"participations": 0, "titles": 0, "bestResult": "First participation"},
+    },
+
+    # ── CONCACAF (8 teams) ────────────────────────────────────────────────────
+    {
+        "name": "USA", "fifaCode": "USA", "flag": "🇺🇸",
+        "confederation": "CONCACAF", "fifaRanking": 11,
+        "primaryColor": "#002868", "secondaryColor": "#BF0A30",
+        "coach": "Gregg Berhalter",
+        "keyPlayers": [
+            {"name": "Matt Turner",       "position": "GK", "club": "Crystal Palace"},
+            {"name": "Christian Pulisic", "position": "FW", "club": "AC Milan"},
+            {"name": "Weston McKennie",   "position": "MF", "club": "Juventus"},
+            {"name": "Tyler Adams",       "position": "MF", "club": "Bournemouth"},
+            {"name": "Sergiño Dest",      "position": "DF", "club": "PSV Eindhoven"},
+        ],
+        "worldCupHistory": {"participations": 11, "titles": 0, "bestResult": "Semi-final (1930)"},
+    },
+    {
+        "name": "Mexico", "fifaCode": "MEX", "flag": "🇲🇽",
+        "confederation": "CONCACAF", "fifaRanking": 15,
+        "primaryColor": "#006847", "secondaryColor": "#FFFFFF",
+        "coach": "Javier Aguirre",
+        "keyPlayers": [
+            {"name": "Guillermo Ochoa", "position": "GK", "club": "Club América"},
+            {"name": "Hirving Lozano",  "position": "FW", "club": "PSV Eindhoven"},
+            {"name": "Raúl Jiménez",    "position": "FW", "club": "Fulham"},
+            {"name": "Edson Álvarez",   "position": "MF", "club": "West Ham"},
+            {"name": "César Montes",    "position": "DF", "club": "Espanyol"},
+        ],
+        "worldCupHistory": {"participations": 17, "titles": 0, "bestResult": "Quarter-final (1970, 1986)"},
+    },
+    {
+        "name": "Canada", "fifaCode": "CAN", "flag": "🇨🇦",
+        "confederation": "CONCACAF", "fifaRanking": 47,
+        "primaryColor": "#FF0000", "secondaryColor": "#FFFFFF",
+        "coach": "Jesse Marsch",
+        "keyPlayers": [
+            {"name": "Milan Borjan",     "position": "GK", "club": "Red Star Belgrade"},
+            {"name": "Alphonso Davies",  "position": "DF", "club": "Bayern Munich"},
+            {"name": "Jonathan David",   "position": "FW", "club": "Lille"},
+            {"name": "Tajon Buchanan",   "position": "FW", "club": "Inter Milan"},
+            {"name": "Atiba Hutchinson", "position": "MF", "club": "Besiktas"},
+        ],
+        "worldCupHistory": {"participations": 2, "titles": 0, "bestResult": "Group Stage (1986, 2022)"},
+    },
+    {
+        "name": "Costa Rica", "fifaCode": "CRC", "flag": "🇨🇷",
+        "confederation": "CONCACAF", "fifaRanking": 54,
+        "primaryColor": "#002B7F", "secondaryColor": "#CE1126",
+        "coach": "Gustavo Alfaro",
+        "keyPlayers": [
+            {"name": "Keylor Navas",   "position": "GK", "club": "Newell's Old Boys"},
+            {"name": "Bryan Ruiz",     "position": "MF", "club": "Alajuelense"},
+            {"name": "Joel Campbell",  "position": "FW", "club": "Alajuelense"},
+            {"name": "Celso Borges",   "position": "MF", "club": "Alajuelense"},
+            {"name": "Francisco Calvo","position": "DF", "club": "Columbus Crew"},
+        ],
+        "worldCupHistory": {"participations": 6, "titles": 0, "bestResult": "Quarter-final (2014)"},
+    },
+    {
+        "name": "Panama", "fifaCode": "PAN", "flag": "🇵🇦",
+        "confederation": "CONCACAF", "fifaRanking": 72,
+        "primaryColor": "#DA121A", "secondaryColor": "#FFFFFF",
+        "coach": "Thomas Christiansen",
+        "keyPlayers": [
+            {"name": "Luis Mejía",              "position": "GK", "club": "Olimpia"},
+            {"name": "Rolando Blackburn",       "position": "FW", "club": "Nashville SC"},
+            {"name": "Adalberto Carrasquilla",  "position": "MF", "club": "Houston Dynamo"},
+            {"name": "Eric Davis",              "position": "DF", "club": "New York Red Bulls"},
+            {"name": "Valentín Pimentel",       "position": "MF", "club": "Olimpia"},
+        ],
+        "worldCupHistory": {"participations": 1, "titles": 0, "bestResult": "Group Stage (2018)"},
+    },
+    {
+        "name": "Jamaica", "fifaCode": "JAM", "flag": "🇯🇲",
+        "confederation": "CONCACAF", "fifaRanking": 53,
+        "primaryColor": "#000000", "secondaryColor": "#FED100",
+        "coach": "Heimir Hallgrímsson",
+        "keyPlayers": [
+            {"name": "Andre Blake",          "position": "GK", "club": "Philadelphia Union"},
+            {"name": "Michail Antonio",      "position": "FW", "club": "West Ham"},
+            {"name": "Bobby De Cordova-Reid","position": "MF", "club": "Fulham"},
+            {"name": "Leon Bailey",          "position": "FW", "club": "Aston Villa"},
+            {"name": "Demarai Gray",         "position": "FW", "club": "Fenerbahçe"},
+        ],
+        "worldCupHistory": {"participations": 1, "titles": 0, "bestResult": "Group Stage (1998)"},
+    },
+    {
+        "name": "Honduras", "fifaCode": "HON", "flag": "🇭🇳",
+        "confederation": "CONCACAF", "fifaRanking": 80,
+        "primaryColor": "#0073CF", "secondaryColor": "#FFFFFF",
+        "coach": "Reinaldo Rueda",
+        "keyPlayers": [
+            {"name": "Luis López",       "position": "GK", "club": "Columbus Crew"},
+            {"name": "Alberth Elis",     "position": "FW", "club": "Bordeaux"},
+            {"name": "Romell Quioto",    "position": "MF", "club": "CF Montréal"},
+            {"name": "Maynor Figueroa",  "position": "DF", "club": "FC Dallas"},
+            {"name": "Jorge Benguché",   "position": "FW", "club": "Comunicaciones"},
+        ],
+        "worldCupHistory": {"participations": 3, "titles": 0, "bestResult": "Group Stage"},
+    },
+    {
+        "name": "Trinidad and Tobago", "fifaCode": "TRI", "flag": "🇹🇹",
+        "confederation": "CONCACAF", "fifaRanking": 100,
+        "primaryColor": "#CE1126", "secondaryColor": "#000000",
+        "coach": "Dwight Yorke",
+        "keyPlayers": [
+            {"name": "Marvin Phillip",  "position": "GK", "club": "Central FC"},
+            {"name": "Levi García",     "position": "FW", "club": "PAOK"},
+            {"name": "Kevin Molino",    "position": "MF", "club": "Minnesota United"},
+            {"name": "Alvin Jones",     "position": "DF", "club": "Morecambe"},
+            {"name": "Joevin Jones",    "position": "MF", "club": "Club Warspite"},
+        ],
+        "worldCupHistory": {"participations": 1, "titles": 0, "bestResult": "Group Stage (2006)"},
+    },
+
+    # ── OFC (1 team) ──────────────────────────────────────────────────────────
+    {
+        "name": "New Zealand", "fifaCode": "NZL", "flag": "🇳🇿",
+        "confederation": "OFC", "fifaRanking": 99,
+        "primaryColor": "#FFFFFF", "secondaryColor": "#000000",
+        "coach": "Darren Bazeley",
+        "keyPlayers": [
+            {"name": "Stefan Marinovic","position": "GK", "club": "Red Star Belgrade"},
+            {"name": "Sarpreet Singh",  "position": "MF", "club": "FC Juniors OÖ"},
+            {"name": "Chris Wood",      "position": "FW", "club": "Nottingham Forest"},
+            {"name": "Winston Reid",    "position": "DF", "club": "Brentford"},
+            {"name": "Liberato Cacace", "position": "DF", "club": "Southampton"},
+        ],
+        "worldCupHistory": {"participations": 3, "titles": 0, "bestResult": "Group Stage"},
+    },
+]
+
+# ─── 16 Stadiums ──────────────────────────────────────────────────────────────
+
+stadiums: list[StadiumInfo] = [
+    # ── USA ───────────────────────────────────────────────────────────────────
+    {
+        "name": "MetLife Stadium",
+        "city": "New York / New Jersey", "country": "USA",
+        "capacity": 82500, "lat": 40.8135, "lng": -74.0745,
+        "timezone": "America/New_York",
+        "description": "Home of the NFL Giants and Jets, hosting the World Cup Final.",
+    },
+    {
+        "name": "Rose Bowl Stadium",
+        "city": "Los Angeles", "country": "USA",
+        "capacity": 92542, "lat": 34.1614, "lng": -118.1676,
+        "timezone": "America/Los_Angeles",
+        "description": "Iconic Pasadena stadium that hosted the 1994 World Cup Final.",
+    },
+    {
+        "name": "AT&T Stadium",
+        "city": "Dallas", "country": "USA",
+        "capacity": 80000, "lat": 32.7473, "lng": -97.0945,
+        "timezone": "America/Chicago",
+        "description": "State-of-the-art NFL Cowboys stadium in Arlington, Texas.",
+    },
+    {
+        "name": "SoFi Stadium",
+        "city": "Los Angeles", "country": "USA",
+        "capacity": 70240, "lat": 33.9535, "lng": -118.3392,
+        "timezone": "America/Los_Angeles",
+        "description": "Modern open-air stadium in Inglewood home to the Rams and Chargers.",
+    },
+    {
+        "name": "Levi's Stadium",
+        "city": "San Francisco Bay Area", "country": "USA",
+        "capacity": 68500, "lat": 37.4033, "lng": -121.9694,
+        "timezone": "America/Los_Angeles",
+        "description": "Home of the NFL San Francisco 49ers in Santa Clara.",
+    },
+    {
+        "name": "Mercedes-Benz Stadium",
+        "city": "Atlanta", "country": "USA",
+        "capacity": 71000, "lat": 33.7554, "lng": -84.4008,
+        "timezone": "America/New_York",
+        "description": "Multi-purpose retractable-roof stadium home to Atlanta United FC.",
+    },
+    {
+        "name": "Arrowhead Stadium",
+        "city": "Kansas City", "country": "USA",
+        "capacity": 76416, "lat": 39.0489, "lng": -94.4839,
+        "timezone": "America/Chicago",
+        "description": "Home of the NFL Kansas City Chiefs, known for its loud atmosphere.",
+    },
+    {
+        "name": "NRG Stadium",
+        "city": "Houston", "country": "USA",
+        "capacity": 72220, "lat": 29.6847, "lng": -95.4107,
+        "timezone": "America/Chicago",
+        "description": "Retractable-roof stadium home of the NFL Houston Texans.",
+    },
+    {
+        "name": "Gillette Stadium",
+        "city": "Boston", "country": "USA",
+        "capacity": 65878, "lat": 42.0909, "lng": -71.2643,
+        "timezone": "America/New_York",
+        "description": "Home of the NFL New England Patriots in Foxborough.",
+    },
+    {
+        "name": "Lincoln Financial Field",
+        "city": "Philadelphia", "country": "USA",
+        "capacity": 69796, "lat": 39.9008, "lng": -75.1675,
+        "timezone": "America/New_York",
+        "description": "Home of the NFL Philadelphia Eagles and Penn FC.",
+    },
+    {
+        "name": "Allegiant Stadium",
+        "city": "Las Vegas", "country": "USA",
+        "capacity": 65000, "lat": 36.0909, "lng": -115.1839,
+        "timezone": "America/Los_Angeles",
+        "description": "Home of the NFL Las Vegas Raiders and Inter Las Vegas.",
+    },
+    # ── Canada ────────────────────────────────────────────────────────────────
+    {
+        "name": "BC Place",
+        "city": "Vancouver", "country": "Canada",
+        "capacity": 54500, "lat": 49.2767, "lng": -123.1115,
+        "timezone": "America/Vancouver",
+        "description": "Multi-purpose stadium in downtown Vancouver with retractable roof.",
+    },
+    {
+        "name": "BMO Field",
+        "city": "Toronto", "country": "Canada",
+        "capacity": 30000, "lat": 43.6333, "lng": -79.4189,
+        "timezone": "America/Toronto",
+        "description": "Home of Toronto FC expanded for the 2026 World Cup.",
+    },
+    # ── Mexico ────────────────────────────────────────────────────────────────
+    {
+        "name": "Estadio Azteca",
+        "city": "Mexico City", "country": "Mexico",
+        "capacity": 87523, "lat": 19.3029, "lng": -99.1505,
+        "timezone": "America/Mexico_City",
+        "description": "Historic stadium that hosted 1970 and 1986 World Cup Finals.",
+    },
+    {
+        "name": "Estadio BBVA",
+        "city": "Monterrey", "country": "Mexico",
+        "capacity": 53500, "lat": 25.6693, "lng": -100.2467,
+        "timezone": "America/Monterrey",
+        "description": "Modern stadium home of Club de Fútbol Monterrey.",
+    },
+    {
+        "name": "Estadio Akron",
+        "city": "Guadalajara", "country": "Mexico",
+        "capacity": 46232, "lat": 20.6719, "lng": -103.4715,
+        "timezone": "America/Mexico_City",
+        "description": "Home of Club Deportivo Guadalajara (Chivas) opened in 2010.",
+    },
+]
+
+# ─── 12 Groups ────────────────────────────────────────────────────────────────
+
+groups: list[GroupInfo] = [
+    {"name": "A", "teams": ["USA", "BRA", "MAR", "EGY"]},
+    {"name": "B", "teams": ["MEX", "ARG", "FRA", "ENG"]},
+    {"name": "C", "teams": ["CAN", "URU", "GER", "JPN"]},
+    {"name": "D", "teams": ["ESP", "COL", "SEN", "TUN"]},
+    {"name": "E", "teams": ["POR", "NED", "NGA", "AUS"]},
+    {"name": "F", "teams": ["BEL", "CRO", "KOR", "IRN"]},
+    {"name": "G", "teams": ["SUI", "CIV", "QAT", "UZB"]},
+    {"name": "H", "teams": ["POL", "CMR", "KSA", "CHN"]},
+    {"name": "I", "teams": ["UKR", "DEN", "ECU", "ALG"]},
+    {"name": "J", "teams": ["TUR", "AUT", "CHI", "JAM"]},
+    {"name": "K", "teams": ["SCO", "SRB", "RSA", "TRI"]},
+    {"name": "L", "teams": ["CRC", "PAN", "HON", "NZL"]},
+]
+
+# ─── 104 Matches ──────────────────────────────────────────────────────────────
+
+matches: list[MatchInfo] = [
+    # ── Group A ───────────────────────────────────────────────────────────────
+    {"id": "A1", "date": "2026-06-11", "time": "19:00", "homeTeam": "USA", "awayTeam": "BRA",    "stadiumName": "MetLife Stadium",        "phase": "group", "group": "A"},
+    {"id": "A2", "date": "2026-06-12", "time": "16:00", "homeTeam": "MAR", "awayTeam": "EGY",    "stadiumName": "Rose Bowl Stadium",      "phase": "group", "group": "A"},
+    {"id": "A3", "date": "2026-06-16", "time": "16:00", "homeTeam": "USA", "awayTeam": "MAR",    "stadiumName": "Mercedes-Benz Stadium",  "phase": "group", "group": "A"},
+    {"id": "A4", "date": "2026-06-16", "time": "19:00", "homeTeam": "BRA", "awayTeam": "EGY",    "stadiumName": "AT&T Stadium",           "phase": "group", "group": "A"},
+    {"id": "A5", "date": "2026-06-20", "time": "19:00", "homeTeam": "USA", "awayTeam": "EGY",    "stadiumName": "MetLife Stadium",        "phase": "group", "group": "A"},
+    {"id": "A6", "date": "2026-06-20", "time": "19:00", "homeTeam": "BRA", "awayTeam": "MAR",    "stadiumName": "SoFi Stadium",           "phase": "group", "group": "A"},
+
+    # ── Group B ───────────────────────────────────────────────────────────────
+    {"id": "B1", "date": "2026-06-12", "time": "19:00", "homeTeam": "MEX", "awayTeam": "ARG",    "stadiumName": "Estadio Azteca",         "phase": "group", "group": "B"},
+    {"id": "B2", "date": "2026-06-13", "time": "16:00", "homeTeam": "FRA", "awayTeam": "ENG",    "stadiumName": "MetLife Stadium",        "phase": "group", "group": "B"},
+    {"id": "B3", "date": "2026-06-17", "time": "16:00", "homeTeam": "MEX", "awayTeam": "FRA",    "stadiumName": "Estadio Azteca",         "phase": "group", "group": "B"},
+    {"id": "B4", "date": "2026-06-17", "time": "19:00", "homeTeam": "ARG", "awayTeam": "ENG",    "stadiumName": "MetLife Stadium",        "phase": "group", "group": "B"},
+    {"id": "B5", "date": "2026-06-21", "time": "19:00", "homeTeam": "MEX", "awayTeam": "ENG",    "stadiumName": "Estadio Azteca",         "phase": "group", "group": "B"},
+    {"id": "B6", "date": "2026-06-21", "time": "19:00", "homeTeam": "ARG", "awayTeam": "FRA",    "stadiumName": "Rose Bowl Stadium",      "phase": "group", "group": "B"},
+
+    # ── Group C ───────────────────────────────────────────────────────────────
+    {"id": "C1", "date": "2026-06-13", "time": "13:00", "homeTeam": "CAN", "awayTeam": "URU",    "stadiumName": "BC Place",               "phase": "group", "group": "C"},
+    {"id": "C2", "date": "2026-06-13", "time": "19:00", "homeTeam": "GER", "awayTeam": "JPN",    "stadiumName": "AT&T Stadium",           "phase": "group", "group": "C"},
+    {"id": "C3", "date": "2026-06-17", "time": "13:00", "homeTeam": "CAN", "awayTeam": "GER",    "stadiumName": "BMO Field",              "phase": "group", "group": "C"},
+    {"id": "C4", "date": "2026-06-17", "time": "16:00", "homeTeam": "URU", "awayTeam": "JPN",    "stadiumName": "Mercedes-Benz Stadium",  "phase": "group", "group": "C"},
+    {"id": "C5", "date": "2026-06-21", "time": "16:00", "homeTeam": "CAN", "awayTeam": "JPN",    "stadiumName": "BC Place",               "phase": "group", "group": "C"},
+    {"id": "C6", "date": "2026-06-21", "time": "16:00", "homeTeam": "URU", "awayTeam": "GER",    "stadiumName": "Levi's Stadium",         "phase": "group", "group": "C"},
+
+    # ── Group D ───────────────────────────────────────────────────────────────
+    {"id": "D1", "date": "2026-06-14", "time": "16:00", "homeTeam": "ESP", "awayTeam": "COL",    "stadiumName": "SoFi Stadium",           "phase": "group", "group": "D"},
+    {"id": "D2", "date": "2026-06-14", "time": "19:00", "homeTeam": "SEN", "awayTeam": "TUN",    "stadiumName": "NRG Stadium",            "phase": "group", "group": "D"},
+    {"id": "D3", "date": "2026-06-18", "time": "16:00", "homeTeam": "ESP", "awayTeam": "SEN",    "stadiumName": "Rose Bowl Stadium",      "phase": "group", "group": "D"},
+    {"id": "D4", "date": "2026-06-18", "time": "19:00", "homeTeam": "COL", "awayTeam": "TUN",    "stadiumName": "AT&T Stadium",           "phase": "group", "group": "D"},
+    {"id": "D5", "date": "2026-06-22", "time": "19:00", "homeTeam": "ESP", "awayTeam": "TUN",    "stadiumName": "MetLife Stadium",        "phase": "group", "group": "D"},
+    {"id": "D6", "date": "2026-06-22", "time": "19:00", "homeTeam": "COL", "awayTeam": "SEN",    "stadiumName": "Levi's Stadium",         "phase": "group", "group": "D"},
+
+    # ── Group E ───────────────────────────────────────────────────────────────
+    {"id": "E1", "date": "2026-06-14", "time": "13:00", "homeTeam": "POR", "awayTeam": "NED",    "stadiumName": "Gillette Stadium",       "phase": "group", "group": "E"},
+    {"id": "E2", "date": "2026-06-15", "time": "16:00", "homeTeam": "NGA", "awayTeam": "AUS",    "stadiumName": "Mercedes-Benz Stadium",  "phase": "group", "group": "E"},
+    {"id": "E3", "date": "2026-06-19", "time": "16:00", "homeTeam": "POR", "awayTeam": "NGA",    "stadiumName": "Lincoln Financial Field","phase": "group", "group": "E"},
+    {"id": "E4", "date": "2026-06-19", "time": "19:00", "homeTeam": "NED", "awayTeam": "AUS",    "stadiumName": "NRG Stadium",            "phase": "group", "group": "E"},
+    {"id": "E5", "date": "2026-06-23", "time": "19:00", "homeTeam": "POR", "awayTeam": "AUS",    "stadiumName": "Gillette Stadium",       "phase": "group", "group": "E"},
+    {"id": "E6", "date": "2026-06-23", "time": "19:00", "homeTeam": "NED", "awayTeam": "NGA",    "stadiumName": "AT&T Stadium",           "phase": "group", "group": "E"},
+
+    # ── Group F ───────────────────────────────────────────────────────────────
+    {"id": "F1", "date": "2026-06-15", "time": "13:00", "homeTeam": "BEL", "awayTeam": "CRO",    "stadiumName": "Lincoln Financial Field","phase": "group", "group": "F"},
+    {"id": "F2", "date": "2026-06-15", "time": "19:00", "homeTeam": "KOR", "awayTeam": "IRN", "stadiumName": "SoFi Stadium", "phase": "group", "group": "F"},
+    {"id": "F3", "date": "2026-06-19", "time": "13:00", "homeTeam": "BEL", "awayTeam": "KOR",    "stadiumName": "Arrowhead Stadium",      "phase": "group", "group": "F"},
+    {"id": "F4", "date": "2026-06-19", "time": "16:00", "homeTeam": "CRO", "awayTeam": "IRN",    "stadiumName": "BC Place",               "phase": "group", "group": "F"},
+    {"id": "F5", "date": "2026-06-23", "time": "16:00", "homeTeam": "BEL", "awayTeam": "IRN",    "stadiumName": "MetLife Stadium",        "phase": "group", "group": "F"},
+    {"id": "F6", "date": "2026-06-23", "time": "16:00", "homeTeam": "CRO", "awayTeam": "KOR",    "stadiumName": "Arrowhead Stadium",      "phase": "group", "group": "F"},
+
+    # ── Group G ───────────────────────────────────────────────────────────────
+    {"id": "G1", "date": "2026-06-15", "time": "16:00", "homeTeam": "SUI", "awayTeam": "CIV",    "stadiumName": "Estadio Azteca",         "phase": "group", "group": "G"},
+    {"id": "G2", "date": "2026-06-16", "time": "13:00", "homeTeam": "QAT", "awayTeam": "UZB",    "stadiumName": "Levi's Stadium",         "phase": "group", "group": "G"},
+    {"id": "G3", "date": "2026-06-20", "time": "13:00", "homeTeam": "SUI", "awayTeam": "QAT",    "stadiumName": "Estadio Akron",          "phase": "group", "group": "G"},
+    {"id": "G4", "date": "2026-06-20", "time": "16:00", "homeTeam": "CIV", "awayTeam": "UZB",    "stadiumName": "Rose Bowl Stadium",      "phase": "group", "group": "G"},
+    {"id": "G5", "date": "2026-06-24", "time": "19:00", "homeTeam": "SUI", "awayTeam": "UZB",    "stadiumName": "Estadio BBVA",           "phase": "group", "group": "G"},
+    {"id": "G6", "date": "2026-06-24", "time": "19:00", "homeTeam": "CIV", "awayTeam": "QAT",    "stadiumName": "Mercedes-Benz Stadium",  "phase": "group", "group": "G"},
+
+    # ── Group H ───────────────────────────────────────────────────────────────
+    {"id": "H1", "date": "2026-06-16", "time": "16:00", "homeTeam": "POL", "awayTeam": "CMR",    "stadiumName": "NRG Stadium",            "phase": "group", "group": "H"},
+    {"id": "H2", "date": "2026-06-16", "time": "19:00", "homeTeam": "KSA", "awayTeam": "CHN",    "stadiumName": "SoFi Stadium",           "phase": "group", "group": "H"},
+    {"id": "H3", "date": "2026-06-20", "time": "16:00", "homeTeam": "POL", "awayTeam": "KSA",    "stadiumName": "Lincoln Financial Field","phase": "group", "group": "H"},
+    {"id": "H4", "date": "2026-06-20", "time": "19:00", "homeTeam": "CMR", "awayTeam": "CHN",    "stadiumName": "Arrowhead Stadium",      "phase": "group", "group": "H"},
+    {"id": "H5", "date": "2026-06-24", "time": "16:00", "homeTeam": "POL", "awayTeam": "CHN",    "stadiumName": "MetLife Stadium",        "phase": "group", "group": "H"},
+    {"id": "H6", "date": "2026-06-24", "time": "16:00", "homeTeam": "CMR", "awayTeam": "KSA",    "stadiumName": "AT&T Stadium",           "phase": "group", "group": "H"},
+
+    # ── Group I ───────────────────────────────────────────────────────────────
+    {"id": "I1", "date": "2026-06-17", "time": "13:00", "homeTeam": "UKR", "awayTeam": "DEN",    "stadiumName": "BMO Field",              "phase": "group", "group": "I"},
+    {"id": "I2", "date": "2026-06-17", "time": "16:00", "homeTeam": "ECU", "awayTeam": "ALG",    "stadiumName": "Gillette Stadium",       "phase": "group", "group": "I"},
+    {"id": "I3", "date": "2026-06-21", "time": "13:00", "homeTeam": "UKR", "awayTeam": "ECU",    "stadiumName": "Estadio BBVA",           "phase": "group", "group": "I"},
+    {"id": "I4", "date": "2026-06-21", "time": "16:00", "homeTeam": "DEN", "awayTeam": "ALG",    "stadiumName": "Levi's Stadium",         "phase": "group", "group": "I"},
+    {"id": "I5", "date": "2026-06-25", "time": "19:00", "homeTeam": "UKR", "awayTeam": "ALG",    "stadiumName": "Lincoln Financial Field","phase": "group", "group": "I"},
+    {"id": "I6", "date": "2026-06-25", "time": "19:00", "homeTeam": "DEN", "awayTeam": "ECU",    "stadiumName": "SoFi Stadium",           "phase": "group", "group": "I"},
+
+    # ── Group J ───────────────────────────────────────────────────────────────
+    {"id": "J1", "date": "2026-06-18", "time": "13:00", "homeTeam": "TUR", "awayTeam": "AUT",    "stadiumName": "Estadio Azteca",         "phase": "group", "group": "J"},
+    {"id": "J2", "date": "2026-06-18", "time": "16:00", "homeTeam": "CHI", "awayTeam": "JAM",    "stadiumName": "NRG Stadium",            "phase": "group", "group": "J"},
+    {"id": "J3", "date": "2026-06-22", "time": "13:00", "homeTeam": "TUR", "awayTeam": "CHI",    "stadiumName": "Estadio BBVA",           "phase": "group", "group": "J"},
+    {"id": "J4", "date": "2026-06-22", "time": "16:00", "homeTeam": "AUT", "awayTeam": "JAM",    "stadiumName": "Arrowhead Stadium",      "phase": "group", "group": "J"},
+    {"id": "J5", "date": "2026-06-26", "time": "19:00", "homeTeam": "TUR", "awayTeam": "JAM",    "stadiumName": "Estadio Akron",          "phase": "group", "group": "J"},
+    {"id": "J6", "date": "2026-06-26", "time": "19:00", "homeTeam": "AUT", "awayTeam": "CHI",    "stadiumName": "BC Place",               "phase": "group", "group": "J"},
+
+    # ── Group K ───────────────────────────────────────────────────────────────
+    {"id": "K1", "date": "2026-06-18", "time": "19:00", "homeTeam": "SCO", "awayTeam": "SRB",    "stadiumName": "Gillette Stadium",       "phase": "group", "group": "K"},
+    {"id": "K2", "date": "2026-06-19", "time": "13:00", "homeTeam": "RSA", "awayTeam": "TRI",    "stadiumName": "Mercedes-Benz Stadium",  "phase": "group", "group": "K"},
+    {"id": "K3", "date": "2026-06-23", "time": "13:00", "homeTeam": "SCO", "awayTeam": "RSA",    "stadiumName": "Rose Bowl Stadium",      "phase": "group", "group": "K"},
+    {"id": "K4", "date": "2026-06-23", "time": "13:00", "homeTeam": "SRB", "awayTeam": "TRI",    "stadiumName": "BMO Field",              "phase": "group", "group": "K"},
+    {"id": "K5", "date": "2026-06-27", "time": "19:00", "homeTeam": "SCO", "awayTeam": "TRI",    "stadiumName": "Lincoln Financial Field","phase": "group", "group": "K"},
+    {"id": "K6", "date": "2026-06-27", "time": "19:00", "homeTeam": "SRB", "awayTeam": "RSA",    "stadiumName": "NRG Stadium",            "phase": "group", "group": "K"},
+
+    # ── Group L ───────────────────────────────────────────────────────────────
+    {"id": "L1", "date": "2026-06-19", "time": "19:00", "homeTeam": "CRC", "awayTeam": "PAN",    "stadiumName": "Estadio Azteca",         "phase": "group", "group": "L"},
+    {"id": "L2", "date": "2026-06-20", "time": "13:00", "homeTeam": "NZL", "awayTeam": "HON",    "stadiumName": "Estadio Akron",          "phase": "group", "group": "L"},
+    {"id": "L3", "date": "2026-06-24", "time": "13:00", "homeTeam": "CRC", "awayTeam": "NZL",    "stadiumName": "Rose Bowl Stadium",      "phase": "group", "group": "L"},
+    {"id": "L4", "date": "2026-06-24", "time": "16:00", "homeTeam": "PAN", "awayTeam": "HON",    "stadiumName": "Estadio BBVA",           "phase": "group", "group": "L"},
+    {"id": "L5", "date": "2026-06-28", "time": "19:00", "homeTeam": "CRC", "awayTeam": "HON",    "stadiumName": "Estadio Azteca",         "phase": "group", "group": "L"},
+    {"id": "L6", "date": "2026-06-28", "time": "19:00", "homeTeam": "PAN", "awayTeam": "NZL",    "stadiumName": "Estadio BBVA",           "phase": "group", "group": "L"},
+
+    # ── Round of 32 (16 matches — 32 qualifiers → 16 teams) ──────────────────
+    {"id": "R32-1",  "date": "2026-07-02", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "MetLife Stadium",         "phase": "round_of_32"},
+    {"id": "R32-2",  "date": "2026-07-02", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "AT&T Stadium",            "phase": "round_of_32"},
+    {"id": "R32-3",  "date": "2026-07-03", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Rose Bowl Stadium",       "phase": "round_of_32"},
+    {"id": "R32-4",  "date": "2026-07-03", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "SoFi Stadium",            "phase": "round_of_32"},
+    {"id": "R32-5",  "date": "2026-07-04", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Estadio Azteca",          "phase": "round_of_32"},
+    {"id": "R32-6",  "date": "2026-07-04", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Mercedes-Benz Stadium",   "phase": "round_of_32"},
+    {"id": "R32-7",  "date": "2026-07-05", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Levi's Stadium",          "phase": "round_of_32"},
+    {"id": "R32-8",  "date": "2026-07-05", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Gillette Stadium",        "phase": "round_of_32"},
+    {"id": "R32-9",  "date": "2026-07-06", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "NRG Stadium",             "phase": "round_of_32"},
+    {"id": "R32-10", "date": "2026-07-06", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Arrowhead Stadium",       "phase": "round_of_32"},
+    {"id": "R32-11", "date": "2026-07-07", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "BC Place",                "phase": "round_of_32"},
+    {"id": "R32-12", "date": "2026-07-07", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Lincoln Financial Field", "phase": "round_of_32"},
+    {"id": "R32-13", "date": "2026-07-08", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Estadio Azteca",          "phase": "round_of_32"},
+    {"id": "R32-14", "date": "2026-07-08", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "AT&T Stadium",            "phase": "round_of_32"},
+    {"id": "R32-15", "date": "2026-07-09", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "MetLife Stadium",         "phase": "round_of_32"},
+    {"id": "R32-16", "date": "2026-07-09", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Rose Bowl Stadium",       "phase": "round_of_32"},
+
+    # ── Round of 16 (8 matches — 16 teams → 8 teams) ─────────────────────────
+    {"id": "R16-1", "date": "2026-07-12", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "MetLife Stadium",        "phase": "round_of_16"},
+    {"id": "R16-2", "date": "2026-07-12", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "AT&T Stadium",           "phase": "round_of_16"},
+    {"id": "R16-3", "date": "2026-07-13", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Rose Bowl Stadium",      "phase": "round_of_16"},
+    {"id": "R16-4", "date": "2026-07-13", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "SoFi Stadium",           "phase": "round_of_16"},
+    {"id": "R16-5", "date": "2026-07-14", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Estadio Azteca",         "phase": "round_of_16"},
+    {"id": "R16-6", "date": "2026-07-14", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Mercedes-Benz Stadium",  "phase": "round_of_16"},
+    {"id": "R16-7", "date": "2026-07-15", "time": "16:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Levi's Stadium",         "phase": "round_of_16"},
+    {"id": "R16-8", "date": "2026-07-15", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Gillette Stadium",       "phase": "round_of_16"},
+
+    # ── Quarter-finals (4 matches) ────────────────────────────────────────────
+    {"id": "QF-1", "date": "2026-07-18", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "MetLife Stadium",      "phase": "quarter_final"},
+    {"id": "QF-2", "date": "2026-07-18", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Rose Bowl Stadium",    "phase": "quarter_final"},
+    {"id": "QF-3", "date": "2026-07-19", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "AT&T Stadium",         "phase": "quarter_final"},
+    {"id": "QF-4", "date": "2026-07-19", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Estadio Azteca",       "phase": "quarter_final"},
+
+    # ── Semi-finals (2 matches) ───────────────────────────────────────────────
+    {"id": "SF-1", "date": "2026-07-22", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "MetLife Stadium",   "phase": "semi_final"},
+    {"id": "SF-2", "date": "2026-07-23", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "Rose Bowl Stadium", "phase": "semi_final"},
+
+    # ── Third place play-off ──────────────────────────────────────────────────
+    {"id": "3RD",   "date": "2026-07-25", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "AT&T Stadium",      "phase": "third_place"},
+
+    # ── Final ─────────────────────────────────────────────────────────────────
+    {"id": "FINAL", "date": "2026-07-26", "time": "19:00", "homeTeam": None, "awayTeam": None, "stadiumName": "MetLife Stadium",   "phase": "final"},
+]
