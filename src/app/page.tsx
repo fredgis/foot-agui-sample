@@ -13,7 +13,7 @@ import { FlagImg, getFlagUrl } from "@/lib/flags";
 import { useCoAgent, useCopilotAction, useCopilotChat, useCopilotMessagesContext } from "@copilotkit/react-core";
 import { TextMessage, MessageRole, ActionExecutionMessage } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar } from "@copilotkit/react-ui";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
 // ── Mobile detection ──────────────────────────────────────────────────────────
 function useIsMobile() {
@@ -820,7 +820,13 @@ function YourMainContent({
   const showGroupView = state.tournamentView === "group";
   const showBracket = state.tournamentView === "bracket";
   const hasTeam = !!state.teamInfo;
-  const safeMatches = state.matches ?? [];
+  // Derive matches from teamInfo.fifaCode so the map always updates even if
+  // AG-UI state sync resets state.matches after server tools complete.
+  const safeMatches = useMemo(() => {
+    const code = state.teamInfo?.fifaCode;
+    if (!code) return [];
+    return matches.filter((m) => m.homeTeam === code || m.awayTeam === code);
+  }, [state.teamInfo?.fifaCode]);
   const hasMatches = safeMatches.length > 0;
 
   return (
