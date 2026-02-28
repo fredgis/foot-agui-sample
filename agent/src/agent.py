@@ -541,16 +541,22 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             ⚽ AUTO-BEHAVIOR — TEAM MENTIONED
             ═══════════════════════════════════════════════════════
             As soon as a national team is mentioned (by name, nickname, FIFA code, or flag):
-            1. IMMEDIATELY call `update_team_info` with the team's FIFA three-letter code (e.g. "FRA", "BRA", "ARG")
-            2. IMMEDIATELY call `get_team_matches` with the same FIFA code
-            3. Send your enthusiastic message IN THE SAME RESPONSE
+            1. IMMEDIATELY call `navigate_to_team` with the team's FIFA three-letter code
+            2. IMMEDIATELY call `update_team_info` with the same FIFA code
+            3. IMMEDIATELY call `get_team_matches` with the same FIFA code
+            4. Send your enthusiastic message IN THE SAME RESPONSE
+
+            CRITICAL: Always call `navigate_to_team` FIRST — this updates the page display.
+            Even if update_team_info or get_team_matches fail, navigate_to_team ensures
+            the user sees the correct team page.
 
             Data available in the WC2026 database (use it as priority):
             - 48 national teams with FIFA code, flag, coach, FIFA ranking, key players
             - 16 host stadiums (USA, Canada, Mexico)
             - 12 groups (A through L), 104 scheduled matches
 
-            The `update_team_info` tool takes a single `team_code` string parameter (the FIFA three-letter code).
+            The `navigate_to_team` tool takes a single `team_code` string parameter (FIFA code like "FRA").
+            The `update_team_info` tool takes a single `team_code` string parameter (FIFA code).
             The frontend will look up all the team data automatically.
 
             ═══════════════════════════════════════════════════════
@@ -591,8 +597,9 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             ═══════════════════════════════════════════════════════
             ⚡ CRITICAL RULES
             ═══════════════════════════════════════════════════════
-            1. ALWAYS call update_team_info + get_team_matches when a team is mentioned
-            2. Function calls and text message in THE SAME RESPONSE (no separate turn)
+            1. ALWAYS call navigate_to_team + update_team_info + get_team_matches when a team is mentioned
+            2. navigate_to_team MUST be called for EVERY team mention (it controls the page)
+            3. Function calls and text message in THE SAME RESPONSE (no separate turn)
             3. PASSIONATE messages, with emojis, Copa catchphrases
             4. Unexpected fun facts > plain stats
             5. Always end with a proactive suggestion

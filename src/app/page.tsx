@@ -734,6 +734,16 @@ function YourMainContent({
 
   // 🪁 Generative UI
   useCopilotAction({
+    name: "navigate_to_team",
+    description: "Navigate the main page to show a specific WC2026 team. Call this whenever a team is discussed.",
+    parameters: [{ name: "team_code", type: "string", description: "FIFA three-letter code (e.g. FRA, BRA, ENG)", required: true }],
+    handler({ team_code }) {
+      console.log(`[Copa] navigate_to_team called with: ${team_code}`);
+      loadTeamByCode(team_code);
+    },
+  }, [loadTeamByCode]);
+
+  useCopilotAction({
     name: "get_weather",
     description: "Get the weather for a given location.",
     available: "disabled",
