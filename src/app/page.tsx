@@ -914,6 +914,30 @@ function YourMainContent({
     },
   }, []);
 
+  // 🏆 Frontend handler: show_tournament_bracket → switch UI to bracket view
+  useCopilotAction({
+    name: "show_tournament_bracket",
+    description: "Switch frontend to the tournament bracket (knockout stage) view.",
+    available: "disabled",
+    parameters: [],
+    handler: async () => {
+      setState({ ...state, teamInfo: null, matches: [], selectedStadium: null, tournamentView: "bracket", highlightedCity: null });
+    },
+  }, [state, setState]);
+
+  // 🌍 Frontend handler: get_group_standings → switch UI to group view
+  useCopilotAction({
+    name: "get_group_standings",
+    description: "Show group standings view.",
+    available: "disabled",
+    parameters: [
+      { name: "group", type: "string", description: "Group letter A–L", required: true },
+    ],
+    handler: async () => {
+      setState({ ...state, teamInfo: null, matches: [], selectedStadium: null, tournamentView: "group", highlightedCity: null });
+    },
+  }, [state, setState]);
+
   // 📅 Match click → highlight city on map
   function handleMatchClick(match: MatchInfo) {
     const stadiumDetails = allStadiums.find((s) => s.name === match.stadiumName);
