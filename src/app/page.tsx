@@ -16,14 +16,15 @@ import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar, useCopilotChatSu
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
 // ── TeamLoaderEffect: triggers loadTeamByCode when a tool call is detected ──
-function TeamLoaderEffect({ teamCode, loadFn }: { teamCode: string; loadFn: (code: string) => void }) {
+function TeamLoaderEffect({ teamCode, loadFnRef }: { teamCode: string; loadFnRef: React.RefObject<((code: string) => void) | null> }) {
   const loadedRef = useRef<string | null>(null);
   useEffect(() => {
     if (teamCode && teamCode !== loadedRef.current) {
       loadedRef.current = teamCode;
-      loadFn(teamCode);
+      console.log(`[Copa] TeamLoaderEffect: loading ${teamCode}`);
+      loadFnRef.current?.(teamCode);
     }
-  }, [teamCode, loadFn]);
+  }, [teamCode, loadFnRef]);
   return null;
 }
 
@@ -715,6 +716,10 @@ function YourMainContent({
     });
   }, [setState]);
 
+  // Stable ref for loadTeamByCode (avoids useCopilotAction dep changes)
+  const loadTeamByCodeRef = useRef(loadTeamByCode);
+  loadTeamByCodeRef.current = loadTeamByCode;
+
   // Known FIFA codes for team detection
   const fifaCodesSet = useRef(new Set(teams.map((t) => t.fifaCode)));
   const lastDetectedTeam = useRef<string | null>(null);
@@ -869,13 +874,13 @@ function YourMainContent({
     },
     render: ({ args, status }) => {
       return (
-        <>
-          {args.team_code && <TeamLoaderEffect teamCode={args.team_code} loadFn={loadTeamByCode} />}
-          {status === "inProgress" && <div className="p-2 text-sm opacity-60">⚽ Loading team…</div>}
-        </>
+        <div className="p-2 text-sm">
+          {args.team_code && <TeamLoaderEffect teamCode={args.team_code} loadFnRef={loadTeamByCodeRef} />}
+          ⚽ {status === "inProgress" ? `Loading ${args.team_code || "team"}…` : `${args.team_code || "Team"} loaded ✓`}
+        </div>
       );
     },
-  }, [setState, loadTeamByCode]);
+  }, [setState]);
 
   // 🏟️ Generative UI: render rich stadium card in chat when agent calls get_stadium_info
   useCopilotAction({
