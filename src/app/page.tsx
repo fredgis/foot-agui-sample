@@ -102,11 +102,12 @@ function WelcomeScreen({
         {/* WC2026 Official Logo */}
         <div style={{ marginBottom: "1.5rem" }}>
           <img
-            src="https://digitalhub.fifa.com/transform/3b120024-a9e9-48a0-8a34-4afec1e8dfd0/FIFA26-Landscape-Color"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/2026_FIFA_World_Cup_emblem_%28with_wordmark%29.svg/480px-2026_FIFA_World_Cup_emblem_%28with_wordmark%29.svg.png"
             alt="FIFA World Cup 2026 Logo"
-            width={320}
-            height={120}
-            style={{ margin: "0 auto", display: "block", maxWidth: "80%", height: "auto" }}
+            width={280}
+            height={280}
+            style={{ margin: "0 auto", display: "block", maxWidth: "60%", height: "auto" }}
+            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
           />
         </div>
         <div className="text-4xl md:text-7xl font-black mb-2 wc-gradient-text tracking-tight" style={{ lineHeight: 1.1 }}>
@@ -539,6 +540,33 @@ function YourMainContent({
       setActiveTab("team");
     }
   }, [state.teamInfo, setThemeColor, setSecondaryColor, setClubName, setCountryFlag]);
+
+  // 🏳️ Frontend action: update_team_info — called by the agent to switch team view
+  useCopilotAction({
+    name: "update_team_info",
+    description: "Load a national team into the frontend. Pass the FIFA three-letter code (e.g. FRA, BRA, ARG) or team name.",
+    parameters: [{ name: "team_code", type: "string", description: "FIFA code or team name", required: true }],
+    handler({ team_code }: { team_code: string }) {
+      const query = (team_code ?? "").trim();
+      const team = teams.find(
+        (t) =>
+          t.fifaCode.toUpperCase() === query.toUpperCase() ||
+          t.name.toLowerCase() === query.toLowerCase()
+      );
+      if (!team) return `Team '${query}' not found in WC2026 roster.`;
+      const teamMatches = matches.filter(
+        (m) => m.homeTeam === team.fifaCode || m.awayTeam === team.fifaCode
+      );
+      setState({
+        teamInfo: team,
+        matches: teamMatches,
+        selectedStadium: null,
+        tournamentView: null,
+        highlightedCity: null,
+      });
+      return `✅ Team ${team.name} (${team.fifaCode}) loaded with ${teamMatches.length} matches.`;
+    },
+  }, [setState]);
 
   // 🪁 Generative UI
   useCopilotAction({

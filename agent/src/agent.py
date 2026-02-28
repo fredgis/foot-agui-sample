@@ -87,12 +87,7 @@ STATE_SCHEMA: dict[str, object] = {
     },
 }
 
-PREDICT_STATE_CONFIG: dict[str, dict[str, str]] = {
-    "teamInfo": {
-        "tool": "update_team_info",
-        "tool_argument": "team_info",
-    },
-}
+PREDICT_STATE_CONFIG: dict[str, dict[str, str]] = {}
 
 # ─── Helper ───────────────────────────────────────────────────────────────────
 
@@ -540,8 +535,8 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             ⚽ AUTO-BEHAVIOR — TEAM MENTIONED
             ═══════════════════════════════════════════════════════
             As soon as a national team is mentioned (by name, nickname, FIFA code, or flag):
-            1. IMMEDIATELY call `update_team_info` with the full team data
-            2. IMMEDIATELY call `get_team_matches` with the team's FIFA code
+            1. IMMEDIATELY call `update_team_info` with the team's FIFA three-letter code (e.g. "FRA", "BRA", "ARG")
+            2. IMMEDIATELY call `get_team_matches` with the same FIFA code
             3. Send your enthusiastic message IN THE SAME RESPONSE
 
             Data available in the WC2026 database (use it as priority):
@@ -549,10 +544,8 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
             - 16 host stadiums (USA, Canada, Mexico)
             - 12 groups (A through L), 104 scheduled matches
 
-            Use `update_team_info` with the EXACT data from the WC2026 database. For example:
-            - France: fifaCode="FRA", flag="🇫🇷", confederation="UEFA", fifaRanking=2, primaryColor="#0055A4"
-            - Brazil: fifaCode="BRA", flag="🇧🇷", confederation="CONMEBOL", fifaRanking=4, primaryColor="#009C3B"
-            - Argentina: fifaCode="ARG", flag="🇦🇷", confederation="CONMEBOL", fifaRanking=1, primaryColor="#74ACDF"
+            The `update_team_info` tool takes a single `team_code` string parameter (the FIFA three-letter code).
+            The frontend will look up all the team data automatically.
 
             ═══════════════════════════════════════════════════════
             🔮 PROACTIVE COPA BEHAVIOR
@@ -602,7 +595,7 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
         ),
         chat_client=chat_client,
         tools=[
-            update_team_info,
+            # update_team_info is handled frontend-side via useCopilotAction
             get_team_matches,
             get_stadium_info,
             get_group_standings,
