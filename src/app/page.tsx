@@ -13,7 +13,7 @@ import { FlagImg, getFlagUrl } from "@/lib/flags";
 import { useCoAgent, useCopilotAction, useCopilotChat } from "@copilotkit/react-core";
 import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar } from "@copilotkit/react-ui";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 // ── Mobile detection ──────────────────────────────────────────────────────────
 function useIsMobile() {
@@ -25,19 +25,6 @@ function useIsMobile() {
     return () => window.removeEventListener("resize", check);
   }, []);
   return isMobile;
-}
-
-// ── Side-effect component: updates state when agent calls update_team_info ────
-function TeamStateSync({ teamCode, onTeamLoaded }: { teamCode: string; onTeamLoaded: (code: string) => void }) {
-  const lastCode = useRef("");
-  useEffect(() => {
-    const code = (teamCode ?? "").trim().toUpperCase();
-    if (code && code !== lastCode.current) {
-      lastCode.current = code;
-      onTeamLoaded(code);
-    }
-  }, [teamCode, onTeamLoaded]);
-  return <></>;
 }
 
 // ── WelcomeScreen WC2026 ──────────────────────────────────────────────────────
@@ -551,6 +538,7 @@ function YourMainContent({
       ? `Compare ${currentTeam} and ${teamCode}`
       : `Tell me about ${teamCode}`;
     appendMessage(new TextMessage({ role: MessageRole.User, content: message }));
+    if (!currentTeam) loadTeamByCode(teamCode);
   };
 
   // Cross-component: clicking a phase in TournamentBracket filters the schedule
@@ -574,8 +562,8 @@ function YourMainContent({
     }
   }, [state.teamInfo, setThemeColor, setSecondaryColor, setClubName, setCountryFlag]);
 
-  // 🏳️ Callback: load a team by code into the frontend state
-  const handleAgentTeamUpdate = useRef((code: string) => {
+  // 🏳️ Helper: load a team by code into state
+  const loadTeamByCode = useCallback((code: string) => {
     const team = teams.find(
       (t) => t.fifaCode.toUpperCase() === code.toUpperCase() || t.name.toLowerCase() === code.toLowerCase()
     );
@@ -590,34 +578,7 @@ function YourMainContent({
       tournamentView: null,
       highlightedCity: null,
     });
-  });
-  handleAgentTeamUpdate.current = (code: string) => {
-    const team = teams.find(
-      (t) => t.fifaCode.toUpperCase() === code.toUpperCase() || t.name.toLowerCase() === code.toLowerCase()
-    );
-    if (!team) return;
-    const teamMatches = matches.filter(
-      (m) => m.homeTeam === team.fifaCode || m.awayTeam === team.fifaCode
-    );
-    setState({
-      teamInfo: team,
-      matches: teamMatches,
-      selectedStadium: null,
-      tournamentView: null,
-      highlightedCity: null,
-    });
-  };
-
-  // 🏳️ Generative UI: when agent calls update_team_info, render a hidden component that syncs state
-  useCopilotAction({
-    name: "update_team_info",
-    description: "Load a national team into the frontend.",
-    available: "disabled",
-    parameters: [{ name: "team_code", type: "string", description: "FIFA code or team name", required: true }],
-    render: ({ args }) => (
-      <TeamStateSync teamCode={args.team_code ?? ""} onTeamLoaded={(c) => handleAgentTeamUpdate.current(c)} />
-    ),
-  }, []);
+  }, [setState]);
 
   // 🪁 Generative UI
   useCopilotAction({
@@ -943,6 +904,7 @@ function YourMainContent({
               appendMessage(new TextMessage({ role: MessageRole.User, content: msg }))
             }
             onTeamClick={(fifaCode) => {
+              loadTeamByCode(fifaCode);
               const team = teams.find((t) => t.fifaCode === fifaCode);
               const teamName = team?.name ?? fifaCode;
               appendMessage(
