@@ -175,8 +175,8 @@ html {
   border-left: none !important;
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6) !important;
   border-left: 2px solid color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 30%, transparent) !important;
-  width: 480px !important;
-  max-width: 45vw !important;
+  width: 540px !important;
+  max-width: 50vw !important;
   height: 100vh !important;
   max-height: 100vh !important;
 }

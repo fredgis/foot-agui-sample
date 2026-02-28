@@ -15,18 +15,7 @@ import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
-// ── TeamLoaderEffect: triggers loadTeamByCode when a tool call is detected ──
-function TeamLoaderEffect({ teamCode, loadFnRef }: { teamCode: string; loadFnRef: React.RefObject<((code: string) => void) | null> }) {
-  const loadedRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (teamCode && teamCode !== loadedRef.current) {
-      loadedRef.current = teamCode;
-      console.log(`[Copa] TeamLoaderEffect: loading ${teamCode}`);
-      loadFnRef.current?.(teamCode);
-    }
-  }, [teamCode, loadFnRef]);
-  return null;
-}
+
 
 // ── Mobile detection ──────────────────────────────────────────────────────────
 function useIsMobile() {
@@ -723,24 +712,25 @@ function YourMainContent({
   // Known FIFA codes for team detection
   const fifaCodesSet = useRef(new Set(teams.map((t) => t.fifaCode)));
   const lastDetectedTeam = useRef<string | null>(null);
+  // Guard for render-based team loading (setTimeout from useCopilotAction render)
+  const lastRenderLoadedTeam = useRef<string | null>(null);
 
   // 🔄 Text-based fallback: detect team from agent response and load it
   // STATE_DELTA from AG-UI doesn't reliably reach CopilotKit client, so we
-  // scan the latest assistant message for a FIFA code like "(FRA)".
+  // scan the latest assistant message for a standalone FIFA code (e.g. "FRA", "CIV").
   const { messages: contextMessages } = useCopilotMessagesContext();
 
   useEffect(() => {
     if (!contextMessages || contextMessages.length === 0) return;
-    // Only scan the most recent assistant message
     for (let i = contextMessages.length - 1; i >= 0; i--) {
       const msg = contextMessages[i];
       if (msg.isTextMessage() && (msg as TextMessage).role === MessageRole.Assistant) {
         const content = (msg as TextMessage).content;
         if (!content || content.length < 20) break;
-        const codeMatches = content.match(/\(([A-Z]{3})\)/g);
+        // Match standalone 3-letter uppercase words (FIFA codes)
+        const codeMatches = content.match(/\b[A-Z]{3}\b/g);
         if (codeMatches) {
-          for (const m of codeMatches) {
-            const code = m.slice(1, 4);
+          for (const code of codeMatches) {
             if (fifaCodesSet.current.has(code) && code !== lastDetectedTeam.current) {
               console.log(`[Copa] Text fallback: ${lastDetectedTeam.current} → ${code}`);
               lastDetectedTeam.current = code;
@@ -763,6 +753,7 @@ function YourMainContent({
     setSecondaryColor("#ffffff");
     setBackgroundImage("");
     lastDetectedTeam.current = null;
+    lastRenderLoadedTeam.current = null;
   }, [setState, setClubName, setCountryFlag, setThemeColor, setSecondaryColor, setBackgroundImage]);
 
   // Cross-component: clicking a team in GroupView triggers compare_teams in chat
@@ -873,9 +864,17 @@ function YourMainContent({
       return JSON.stringify({ team, matches: teamMatches });
     },
     render: ({ args, status }) => {
+      // CopilotKit doesn't mount render output as real React components (no useEffect),
+      // so we use setTimeout to bridge from render to state update.
+      if (status === "complete" && args.team_code && args.team_code !== lastRenderLoadedTeam.current) {
+        lastRenderLoadedTeam.current = args.team_code;
+        setTimeout(() => {
+          console.log(`[Copa] Render-based team load: ${args.team_code}`);
+          loadTeamByCodeRef.current?.(args.team_code);
+        }, 0);
+      }
       return (
         <div className="p-2 text-sm">
-          {args.team_code && <TeamLoaderEffect teamCode={args.team_code} loadFnRef={loadTeamByCodeRef} />}
           ⚽ {status === "inProgress" ? `Loading ${args.team_code || "team"}…` : `${args.team_code || "Team"} loaded ✓`}
         </div>
       );
