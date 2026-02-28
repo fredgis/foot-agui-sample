@@ -68,7 +68,7 @@ $AZURE_OPENAI_CHAT_DEPLOYMENT_NAME = Require-Env 'AZURE_OPENAI_CHAT_DEPLOYMENT_N
 function Check-Prereqs {
     $missing = $false
 
-    foreach ($cmd in @('az', 'docker', 'node', 'npm')) {
+    foreach ($cmd in @('az', 'docker', 'node', 'npm', 'git')) {
         if (-not (Get-Command $cmd -ErrorAction SilentlyContinue)) {
             Write-Host "❌  Missing prerequisite: $cmd"
             $missing = $true
@@ -195,11 +195,12 @@ $null = az containerapp show `
     --name $CONTAINER_APP_NAME `
     --resource-group $RESOURCE_GROUP 2>$null
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "  ✅  exists — updating image..."
+    Write-Host "  ✅  exists — updating image + secrets..."
     az containerapp update `
         --name $CONTAINER_APP_NAME `
         --resource-group $RESOURCE_GROUP `
         --image $FULL_IMAGE `
+        --set-env-vars "AZURE_OPENAI_ENDPOINT=secretref:azure-openai-endpoint" "AZURE_OPENAI_API_KEY=secretref:azure-openai-api-key" "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME=secretref:azure-openai-deployment" `
         --output none
     Write-Host "  ✅  updated"
 } else {

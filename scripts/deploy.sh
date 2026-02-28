@@ -49,7 +49,7 @@ source "${CONFIG_FILE}"
 # ---------------------------------------------------------------------------
 check_prereqs() {
   local missing=0
-  for cmd in az docker node npm; do
+  for cmd in az docker node npm git; do
     if ! command -v "${cmd}" &>/dev/null; then
       echo "❌  Missing prerequisite: ${cmd}"
       missing=1
@@ -185,11 +185,12 @@ ENV_VARS_ARGS=(
 if az containerapp show \
     --name "${CONTAINER_APP_NAME}" \
     --resource-group "${RESOURCE_GROUP}" &>/dev/null; then
-  echo "  ✅  exists — updating image..."
+  echo "  ✅  exists — updating image + secrets..."
   az containerapp update \
     --name "${CONTAINER_APP_NAME}" \
     --resource-group "${RESOURCE_GROUP}" \
     --image "${FULL_IMAGE}" \
+    --set-env-vars "${ENV_VARS_ARGS[@]}" \
     --output none
   echo "  ✅  updated"
 else
