@@ -176,28 +176,29 @@ def _find_team(query: str) -> dict | None:
     description=(
         "Load a national team into the frontend state. "
         "MUST be called IMMEDIATELY whenever a national team is mentioned. "
-        "Accepts either the FIFA code (e.g. 'FRA') or the team name (e.g. 'France')."
+        "Accepts the FIFA three-letter code (e.g. 'FRA', 'BRA', 'ARG') or the team name (e.g. 'France')."
     ),
 )
 def update_team_info(
-    team_info: Annotated[
-        dict | None,
+    team_code: Annotated[
+        str,
         Field(
-            description=(
-                "Complete TeamInfo object for the national team "
-                "(name, fifaCode, flag, confederation, fifaRanking, primaryColor, secondaryColor, "
-                "coach, keyPlayers, worldCupHistory). Set to null to clear."
-            )
+            description="FIFA three-letter code (e.g. 'FRA') or team name (e.g. 'France')."
         ),
     ],
 ) -> str:
-    """Push national team data into the frontend teamInfo state."""
-    print(f"🔔 UPDATE_TEAM_INFO called: {team_info}")
-    if team_info is None:
-        return "Team information cleared."
-    name = team_info.get("name", "the team")
-    print(f"✅ teamInfo → {name}")
-    return f"✅ Team info updated for {name}. The frontend now displays their colors and squad."
+    """Look up a national team and push it into the frontend teamInfo state."""
+    team = _find_team(team_code)
+    if team is None:
+        return f"Team '{team_code}' not found in WC2026 roster. Available: {', '.join(_TEAMS_BY_CODE.keys())}."
+    code = team["fifaCode"]
+    team_matches = [
+        m for m in matches
+        if m.get("homeTeam") == code or m.get("awayTeam") == code
+    ]
+    print(f"✅ update_team_info({code}) → {team['name']} with {len(team_matches)} matches")
+    import json
+    return json.dumps({"team": team, "matches": team_matches}, default=str)
 
 
 @ai_function(
@@ -595,7 +596,7 @@ def create_agent(chat_client: ChatClientProtocol) -> AgentFrameworkAgent:
         ),
         chat_client=chat_client,
         tools=[
-            # update_team_info is handled frontend-side via useCopilotAction
+            update_team_info,
             get_team_matches,
             get_stadium_info,
             get_group_standings,

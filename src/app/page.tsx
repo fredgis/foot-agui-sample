@@ -13,7 +13,7 @@ import { FlagImg, getFlagUrl } from "@/lib/flags";
 import { useCoAgent, useCopilotAction, useCopilotChat } from "@copilotkit/react-core";
 import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar } from "@copilotkit/react-ui";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // ── Mobile detection ──────────────────────────────────────────────────────────
 function useIsMobile() {
@@ -25,6 +25,19 @@ function useIsMobile() {
     return () => window.removeEventListener("resize", check);
   }, []);
   return isMobile;
+}
+
+// ── Side-effect component: updates state when agent calls update_team_info ────
+function TeamStateSync({ teamCode, onTeamLoaded }: { teamCode: string; onTeamLoaded: (code: string) => void }) {
+  const lastCode = useRef("");
+  useEffect(() => {
+    const code = (teamCode ?? "").trim().toUpperCase();
+    if (code && code !== lastCode.current) {
+      lastCode.current = code;
+      onTeamLoaded(code);
+    }
+  }, [teamCode, onTeamLoaded]);
+  return <></>;
 }
 
 // ── WelcomeScreen WC2026 ──────────────────────────────────────────────────────
@@ -96,28 +109,47 @@ function WelcomeScreen({
   ];
 
   return (
-    <div className="welcome-fade-in min-h-screen pb-16 px-4 md:px-8" style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(200,16,46,0.08) 0%, transparent 50%), radial-gradient(ellipse at 50% 100%, rgba(0,122,61,0.08) 0%, transparent 50%)" }}>
-      {/* ── Hero ── */}
-      <div className="text-center py-8 md:py-12">
-        {/* WC2026 Official Logo */}
-        <div style={{ marginBottom: "1.5rem" }}>
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/2026_FIFA_World_Cup_emblem_%28with_wordmark%29.svg/480px-2026_FIFA_World_Cup_emblem_%28with_wordmark%29.svg.png"
-            alt="FIFA World Cup 2026 Logo"
-            width={280}
-            height={280}
-            style={{ margin: "0 auto", display: "block", maxWidth: "60%", height: "auto" }}
-            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-          />
-        </div>
-        <div className="text-4xl md:text-7xl font-black mb-2 wc-gradient-text tracking-tight" style={{ lineHeight: 1.1 }}>
-          FIFA WORLD CUP
-        </div>
-        <div className="text-4xl md:text-7xl font-black mb-4 wc-gradient-text tracking-tight" style={{ lineHeight: 1.1 }}>
-          2026 ⚽
-        </div>
-        <div className="flex items-center justify-center gap-6 mb-3">
-          {HOST_FLAGS.map((iso, i) => (
+    <div className="welcome-fade-in min-h-screen pb-16 px-4 md:px-8" style={{
+      background: "radial-gradient(ellipse at 50% 0%, rgba(200,16,46,0.12) 0%, transparent 50%), radial-gradient(ellipse at 50% 100%, rgba(0,122,61,0.12) 0%, transparent 50%)",
+    }}>
+      {/* ── Hero with stadium background ── */}
+      <div style={{ position: "relative", overflow: "hidden", borderRadius: "1.5rem", margin: "1rem auto", maxWidth: "1100px" }}>
+        {/* Stadium background image */}
+        <div style={{
+          position: "absolute", inset: 0, zIndex: 0,
+          backgroundImage: "url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/MetLife_Stadium_%28Aerial_View%29.jpg/1280px-MetLife_Stadium_%28Aerial_View%29.jpg')",
+          backgroundSize: "cover", backgroundPosition: "center 40%",
+          filter: "brightness(0.3) saturate(1.2)",
+        }} />
+        {/* Gradient overlay */}
+        <div style={{
+          position: "absolute", inset: 0, zIndex: 1,
+          background: "linear-gradient(180deg, rgba(10,10,10,0.4) 0%, rgba(10,10,10,0.85) 100%)",
+        }} />
+        {/* Animated glow orbs */}
+        <div style={{ position: "absolute", top: "10%", left: "20%", width: 180, height: 180, borderRadius: "50%", background: "rgba(200,16,46,0.15)", filter: "blur(60px)", animation: "float 6s ease-in-out infinite", zIndex: 1 }} />
+        <div style={{ position: "absolute", bottom: "15%", right: "15%", width: 200, height: 200, borderRadius: "50%", background: "rgba(0,122,61,0.12)", filter: "blur(70px)", animation: "float 8s ease-in-out infinite reverse", zIndex: 1 }} />
+
+        <div className="text-center" style={{ position: "relative", zIndex: 2, padding: "3rem 1rem 2.5rem" }}>
+          {/* WC2026 Official Logo */}
+          <div style={{ marginBottom: "1rem" }}>
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/2026_FIFA_World_Cup_emblem_%28with_wordmark%29.svg/480px-2026_FIFA_World_Cup_emblem_%28with_wordmark%29.svg.png"
+              alt="FIFA World Cup 2026"
+              width={220}
+              height={220}
+              style={{ margin: "0 auto", display: "block", maxWidth: "50%", height: "auto", filter: "drop-shadow(0 4px 20px rgba(255,255,255,0.3))" }}
+              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+            />
+          </div>
+          <div className="text-4xl md:text-7xl font-black mb-1 wc-gradient-text tracking-tight" style={{ lineHeight: 1.1, textShadow: "0 4px 30px rgba(0,0,0,0.8)" }}>
+            FIFA WORLD CUP
+          </div>
+          <div className="text-4xl md:text-7xl font-black mb-4 wc-gradient-text tracking-tight" style={{ lineHeight: 1.1, textShadow: "0 4px 30px rgba(0,0,0,0.8)" }}>
+            2026 ⚽
+          </div>
+          <div className="flex items-center justify-center gap-6 mb-3">
+            {HOST_FLAGS.map((iso, i) => (
             <img
               key={iso}
               src={`https://flagcdn.com/w80/${iso}.png`}
@@ -187,6 +219,7 @@ function WelcomeScreen({
             ))}
           </div>
         )}
+        </div>
       </div>
 
       {/* ── Search ── */}
@@ -541,32 +574,50 @@ function YourMainContent({
     }
   }, [state.teamInfo, setThemeColor, setSecondaryColor, setClubName, setCountryFlag]);
 
-  // 🏳️ Frontend action: update_team_info — called by the agent to switch team view
+  // 🏳️ Callback: load a team by code into the frontend state
+  const handleAgentTeamUpdate = useRef((code: string) => {
+    const team = teams.find(
+      (t) => t.fifaCode.toUpperCase() === code.toUpperCase() || t.name.toLowerCase() === code.toLowerCase()
+    );
+    if (!team) return;
+    const teamMatches = matches.filter(
+      (m) => m.homeTeam === team.fifaCode || m.awayTeam === team.fifaCode
+    );
+    setState({
+      teamInfo: team,
+      matches: teamMatches,
+      selectedStadium: null,
+      tournamentView: null,
+      highlightedCity: null,
+    });
+  });
+  handleAgentTeamUpdate.current = (code: string) => {
+    const team = teams.find(
+      (t) => t.fifaCode.toUpperCase() === code.toUpperCase() || t.name.toLowerCase() === code.toLowerCase()
+    );
+    if (!team) return;
+    const teamMatches = matches.filter(
+      (m) => m.homeTeam === team.fifaCode || m.awayTeam === team.fifaCode
+    );
+    setState({
+      teamInfo: team,
+      matches: teamMatches,
+      selectedStadium: null,
+      tournamentView: null,
+      highlightedCity: null,
+    });
+  };
+
+  // 🏳️ Generative UI: when agent calls update_team_info, render a hidden component that syncs state
   useCopilotAction({
     name: "update_team_info",
-    description: "Load a national team into the frontend. Pass the FIFA three-letter code (e.g. FRA, BRA, ARG) or team name.",
+    description: "Load a national team into the frontend.",
+    available: "disabled",
     parameters: [{ name: "team_code", type: "string", description: "FIFA code or team name", required: true }],
-    handler({ team_code }: { team_code: string }) {
-      const query = (team_code ?? "").trim();
-      const team = teams.find(
-        (t) =>
-          t.fifaCode.toUpperCase() === query.toUpperCase() ||
-          t.name.toLowerCase() === query.toLowerCase()
-      );
-      if (!team) return `Team '${query}' not found in WC2026 roster.`;
-      const teamMatches = matches.filter(
-        (m) => m.homeTeam === team.fifaCode || m.awayTeam === team.fifaCode
-      );
-      setState({
-        teamInfo: team,
-        matches: teamMatches,
-        selectedStadium: null,
-        tournamentView: null,
-        highlightedCity: null,
-      });
-      return `✅ Team ${team.name} (${team.fifaCode}) loaded with ${teamMatches.length} matches.`;
-    },
-  }, [setState]);
+    render: ({ args }) => (
+      <TeamStateSync teamCode={args.team_code ?? ""} onTeamLoaded={(c) => handleAgentTeamUpdate.current(c)} />
+    ),
+  }, []);
 
   // 🪁 Generative UI
   useCopilotAction({
