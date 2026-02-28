@@ -96,147 +96,227 @@ function WelcomeScreen({
   ];
 
   return (
-    <div className="welcome-fade-in min-h-screen pb-16 px-4 md:px-8" style={{
-      background: "radial-gradient(ellipse at 50% 0%, rgba(200,16,46,0.12) 0%, transparent 50%), radial-gradient(ellipse at 50% 100%, rgba(0,122,61,0.12) 0%, transparent 50%)",
+    <div className="welcome-fade-in min-h-screen pb-16" style={{
+      background: "#0a0a0a",
     }}>
-      {/* ── Hero with stadium background ── */}
-      <div style={{ position: "relative", overflow: "hidden", borderRadius: "1.5rem", margin: "1rem auto", maxWidth: "1100px" }}>
-        {/* Stadium background image */}
+      {/* ── Full-screen Hero ── */}
+      <div style={{ position: "relative", overflow: "hidden", minHeight: "85vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        {/* Stadium background — full bleed */}
         <div style={{
           position: "absolute", inset: 0, zIndex: 0,
-          backgroundImage: "url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/MetLife_Stadium_%28Aerial_View%29.jpg/1280px-MetLife_Stadium_%28Aerial_View%29.jpg')",
-          backgroundSize: "cover", backgroundPosition: "center 40%",
-          filter: "brightness(0.3) saturate(1.2)",
+          backgroundImage: "url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1920&q=80')",
+          backgroundSize: "cover", backgroundPosition: "center 30%",
+          filter: "brightness(0.25) saturate(1.4)",
         }} />
-        {/* Gradient overlay */}
+        {/* Color overlays */}
         <div style={{
           position: "absolute", inset: 0, zIndex: 1,
-          background: "linear-gradient(180deg, rgba(10,10,10,0.4) 0%, rgba(10,10,10,0.85) 100%)",
+          background: "linear-gradient(180deg, rgba(200,16,46,0.15) 0%, rgba(10,10,10,0.7) 40%, rgba(0,122,61,0.15) 100%)",
+        }} />
+        <div style={{
+          position: "absolute", inset: 0, zIndex: 1,
+          background: "radial-gradient(ellipse at 50% 100%, rgba(10,10,10,0.95) 0%, transparent 70%)",
         }} />
         {/* Animated glow orbs */}
-        <div style={{ position: "absolute", top: "10%", left: "20%", width: 180, height: 180, borderRadius: "50%", background: "rgba(200,16,46,0.15)", filter: "blur(60px)", animation: "float 6s ease-in-out infinite", zIndex: 1 }} />
-        <div style={{ position: "absolute", bottom: "15%", right: "15%", width: 200, height: 200, borderRadius: "50%", background: "rgba(0,122,61,0.12)", filter: "blur(70px)", animation: "float 8s ease-in-out infinite reverse", zIndex: 1 }} />
+        <div style={{ position: "absolute", top: "5%", left: "10%", width: 300, height: 300, borderRadius: "50%", background: "rgba(200,16,46,0.12)", filter: "blur(100px)", animation: "float 8s ease-in-out infinite", zIndex: 1 }} />
+        <div style={{ position: "absolute", top: "20%", right: "5%", width: 250, height: 250, borderRadius: "50%", background: "rgba(0,85,164,0.10)", filter: "blur(80px)", animation: "float 10s ease-in-out infinite reverse", zIndex: 1 }} />
+        <div style={{ position: "absolute", bottom: "10%", left: "30%", width: 350, height: 350, borderRadius: "50%", background: "rgba(0,122,61,0.08)", filter: "blur(120px)", animation: "float 12s ease-in-out infinite", zIndex: 1 }} />
+        {/* Particle-like subtle dots */}
+        <div style={{ position: "absolute", inset: 0, zIndex: 1, opacity: 0.03,
+          backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }} />
 
-        <div className="text-center" style={{ position: "relative", zIndex: 2, padding: "3rem 1rem 2.5rem" }}>
+        <div className="text-center" style={{ position: "relative", zIndex: 2, padding: "2rem 1rem 3rem" }}>
           {/* WC2026 Official Logo */}
-          <div style={{ marginBottom: "1rem" }}>
+          <div style={{ marginBottom: "1.5rem" }}>
             <img
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/2026_FIFA_World_Cup_emblem_%28with_wordmark%29.svg/480px-2026_FIFA_World_Cup_emblem_%28with_wordmark%29.svg.png"
+              src="https://upload.wikimedia.org/wikipedia/en/thumb/1/17/2026_FIFA_World_Cup_emblem.svg/250px-2026_FIFA_World_Cup_emblem.svg.png"
               alt="FIFA World Cup 2026"
-              width={220}
-              height={220}
-              style={{ margin: "0 auto", display: "block", maxWidth: "50%", height: "auto", filter: "drop-shadow(0 4px 20px rgba(255,255,255,0.3))" }}
+              width={200}
+              height={260}
+              style={{
+                margin: "0 auto", display: "block", maxWidth: "45%", height: "auto",
+                filter: "drop-shadow(0 8px 40px rgba(255,255,255,0.25))",
+                animation: "heroLogoFloat 6s ease-in-out infinite",
+              }}
               onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
             />
           </div>
-          <div className="text-4xl md:text-7xl font-black mb-1 wc-gradient-text tracking-tight" style={{ lineHeight: 1.1, textShadow: "0 4px 30px rgba(0,0,0,0.8)" }}>
-            FIFA WORLD CUP
+
+          {/* Main title */}
+          <div className="text-5xl md:text-8xl font-black mb-2 wc-gradient-text tracking-tighter" style={{ lineHeight: 1.05, textShadow: "0 4px 40px rgba(0,0,0,0.9)" }}>
+            WORLD CUP
           </div>
-          <div className="text-4xl md:text-7xl font-black mb-4 wc-gradient-text tracking-tight" style={{ lineHeight: 1.1, textShadow: "0 4px 30px rgba(0,0,0,0.8)" }}>
-            2026 ⚽
+          <div className="text-5xl md:text-8xl font-black mb-2 tracking-tighter" style={{
+            lineHeight: 1.05,
+            background: "linear-gradient(90deg, #c8102e, #fff, #007a3d)",
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            textShadow: "none",
+          }}>
+            2026
           </div>
-          <div className="flex items-center justify-center gap-6 mb-3">
+
+          {/* Tagline */}
+          <p style={{
+            color: "rgba(255,255,255,0.6)", fontSize: "1rem", fontWeight: 300,
+            letterSpacing: "0.35em", textTransform: "uppercase", marginBottom: "2rem",
+          }}>
+            We Are 26
+          </p>
+
+          {/* Host flags with glowing highlight */}
+          <div className="flex items-center justify-center gap-8 mb-4">
             {HOST_FLAGS.map((iso, i) => (
-            <img
-              key={iso}
-              src={`https://flagcdn.com/w80/${iso}.png`}
-              alt={HOST_NAMES[i]}
-              width={60}
-              height={40}
-              style={{
-                opacity: flagIndex === i ? 1 : 0.3,
-                transform: flagIndex === i ? "scale(1.3)" : "scale(1)",
-                transition: "all 0.5s ease",
-                borderRadius: "4px",
-                boxShadow: flagIndex === i ? "0 4px 20px rgba(255,255,255,0.3)" : "none",
-              }}
-              title={HOST_NAMES[i]}
-            />
-          ))}
-        </div>
-        <p style={{ color: "#9ca3af", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1.5rem" }}>
-          {HOST_NAMES[flagIndex]} · June 11 – July 19, 2026
-        </p>
-        {/* Countdown */}
-        {mounted && (
-          <div className="flex gap-3 md:gap-5 justify-center flex-wrap mb-8">
-            {[
-              { label: "Days", value: timeLeft.days },
-              { label: "Hours", value: timeLeft.hours },
-              { label: "Minutes", value: timeLeft.minutes },
-              { label: "Seconds", value: timeLeft.seconds },
-            ].map(({ label, value }) => (
-              <div
-                key={label}
-                style={{
-                  background: `linear-gradient(135deg, ${themeColor}18, rgba(255,255,255,0.08))`,
-                  border: `2px solid ${themeColor}60`,
-                  borderRadius: "1rem",
-                  padding: "0.75rem 1rem",
-                  minWidth: "72px",
-                  textAlign: "center",
-                  backdropFilter: "blur(8px)",
-                }}
-              >
-                <div
+              <div key={iso} style={{ textAlign: "center", transition: "all 0.5s ease" }}>
+                <img
+                  src={`https://flagcdn.com/w80/${iso}.png`}
+                  alt={HOST_NAMES[i]}
+                  width={64}
+                  height={43}
                   style={{
-                    fontSize: "2rem",
-                    fontWeight: 900,
-                    lineHeight: 1,
-                    color: themeColor,
-                    fontVariantNumeric: "tabular-nums",
-                    textShadow: `0 0 20px ${themeColor}60`,
-                    animation: label === "Seconds" ? "countdownPulse 1s ease-in-out infinite" : undefined,
+                    opacity: flagIndex === i ? 1 : 0.35,
+                    transform: flagIndex === i ? "scale(1.25)" : "scale(0.95)",
+                    transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                    borderRadius: "6px",
+                    boxShadow: flagIndex === i ? `0 8px 32px rgba(255,255,255,0.25), 0 0 0 2px rgba(255,255,255,0.3)` : "none",
                   }}
-                >
-                  {String(value).padStart(2, "0")}
-                </div>
-                <div
-                  style={{
-                    fontSize: "0.6rem",
-                    color: "#9ca3af",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    marginTop: "4px",
-                  }}
-                >
-                  {label}
+                  title={HOST_NAMES[i]}
+                />
+                <div style={{
+                  marginTop: "6px", fontSize: "0.65rem", fontWeight: 600,
+                  color: flagIndex === i ? "#fff" : "rgba(255,255,255,0.3)",
+                  transition: "color 0.5s ease", textTransform: "uppercase", letterSpacing: "0.08em",
+                }}>
+                  {HOST_NAMES[i]}
                 </div>
               </div>
             ))}
           </div>
-        )}
+          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem", letterSpacing: "0.15em", marginBottom: "2.5rem" }}>
+            June 11 – July 19, 2026 · 48 Teams · 16 Stadiums · 3 Nations
+          </p>
+
+          {/* Countdown — glass morphism style */}
+          {mounted && (
+            <div className="flex gap-4 md:gap-6 justify-center flex-wrap mb-6">
+              {[
+                { label: "DAYS", value: timeLeft.days },
+                { label: "HRS", value: timeLeft.hours },
+                { label: "MIN", value: timeLeft.minutes },
+                { label: "SEC", value: timeLeft.seconds },
+              ].map(({ label, value }) => (
+                <div
+                  key={label}
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    borderRadius: "1.25rem",
+                    padding: "1rem 1.25rem",
+                    minWidth: "80px",
+                    textAlign: "center",
+                    backdropFilter: "blur(16px)",
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "2.5rem",
+                      fontWeight: 900,
+                      lineHeight: 1,
+                      color: "#fff",
+                      fontVariantNumeric: "tabular-nums",
+                      textShadow: `0 0 30px ${themeColor}80`,
+                      animation: label === "SEC" ? "countdownPulse 1s ease-in-out infinite" : undefined,
+                    }}
+                  >
+                    {String(value).padStart(2, "0")}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "0.55rem",
+                      color: "rgba(255,255,255,0.4)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.2em",
+                      marginTop: "6px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Scroll indicator */}
+          <div style={{ animation: "scrollBounce 2s ease-in-out infinite", marginTop: "1rem" }}>
+            <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "1.5rem" }}>↓</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Featured stadiums carousel ── */}
+      <div style={{ maxWidth: "1100px", margin: "-3rem auto 2rem", padding: "0 1rem", position: "relative", zIndex: 3 }}>
+        <div className="flex gap-3 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>
+          {[
+            { name: "MetLife Stadium", city: "New York", img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&q=80", capacity: "82,500" },
+            { name: "SoFi Stadium", city: "Los Angeles", img: "https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&q=80", capacity: "70,240" },
+            { name: "AT&T Stadium", city: "Dallas", img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&q=80", capacity: "80,000" },
+          ].map((stadium) => (
+            <div key={stadium.name} style={{
+              flex: "0 0 280px", borderRadius: "1rem", overflow: "hidden", position: "relative",
+              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+              cursor: "pointer", transition: "transform 0.3s ease, box-shadow 0.3s ease",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,0,0,0.5)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}
+            >
+              <div style={{
+                height: "140px", backgroundImage: `url('${stadium.img}')`,
+                backgroundSize: "cover", backgroundPosition: "center",
+                filter: "brightness(0.6) saturate(1.3)",
+              }} />
+              <div style={{ padding: "0.75rem 1rem" }}>
+                <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#fff" }}>{stadium.name}</div>
+                <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.5)" }}>{stadium.city} · {stadium.capacity}</div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* ── Search ── */}
-      <div style={{ maxWidth: "42rem", margin: "0 auto 2rem" }}>
+      <div style={{ maxWidth: "42rem", margin: "0 auto 2rem", padding: "0 1rem" }}>
         <input
           type="text"
-          placeholder="🔍 Filter teams... (e.g. France, BRA, UEFA)"
+          placeholder="🔍 Search teams... (e.g. France, BRA, UEFA)"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{
             width: "100%",
-            background: "rgba(255,255,255,0.08)",
-            border: `2px solid ${themeColor}40`,
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(255,255,255,0.12)",
             borderRadius: "2rem",
-            padding: "0.75rem 1.5rem",
+            padding: "0.85rem 1.5rem",
             color: "white",
-            fontSize: "1rem",
-            backdropFilter: "blur(8px)",
+            fontSize: "0.95rem",
+            backdropFilter: "blur(12px)",
             outline: "none",
-            transition: "border-color 0.3s ease",
+            transition: "all 0.3s ease",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
           }}
-          onFocus={(e) => (e.target.style.borderColor = themeColor)}
-          onBlur={(e) => (e.target.style.borderColor = `${themeColor}40`)}
+          onFocus={(e) => { e.target.style.borderColor = `${themeColor}80`; e.target.style.boxShadow = `0 4px 24px ${themeColor}20`; }}
+          onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.12)"; e.target.style.boxShadow = "0 4px 16px rgba(0,0,0,0.2)"; }}
         />
       </div>
 
       {/* ── Favorites ── */}
       {!search && (
-        <div style={{ maxWidth: "64rem", margin: "0 auto 2.5rem" }}>
-          <h2 style={{ fontSize: "0.875rem", fontWeight: 700, color: "#d1d5db", marginBottom: "0.75rem" }}>
+        <div style={{ maxWidth: "64rem", margin: "0 auto 2.5rem", padding: "0 1rem" }}>
+          <h2 style={{ fontSize: "0.8rem", fontWeight: 700, color: "rgba(255,255,255,0.5)", marginBottom: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase" }}>
             ⭐ Tournament Favorites
           </h2>
           <div className="flex flex-wrap gap-3 justify-center">
@@ -246,8 +326,8 @@ function WelcomeScreen({
                 onClick={() => onTeamClick?.(team.fifaCode)}
                 className="stagger-item"
                 style={{
-                  background: `linear-gradient(135deg, ${team.primaryColor}30, ${team.primaryColor}12)`,
-                  border: `2px solid ${team.primaryColor}70`,
+                  background: `linear-gradient(135deg, ${team.primaryColor}20, ${team.primaryColor}08)`,
+                  border: `1px solid ${team.primaryColor}50`,
                   borderRadius: "2rem",
                   padding: "0.5rem 1.2rem 0.5rem 0.5rem",
                   cursor: "pointer",
@@ -259,11 +339,13 @@ function WelcomeScreen({
                 }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.06) translateY(-2px)";
-                  (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 6px 24px ${team.primaryColor}50`;
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 8px 28px ${team.primaryColor}40`;
+                  (e.currentTarget as HTMLButtonElement).style.background = `${team.primaryColor}35`;
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLButtonElement).style.transform = "";
                   (e.currentTarget as HTMLButtonElement).style.boxShadow = "";
+                  (e.currentTarget as HTMLButtonElement).style.background = `linear-gradient(135deg, ${team.primaryColor}20, ${team.primaryColor}08)`;
                 }}
               >
                 <img
@@ -277,7 +359,7 @@ function WelcomeScreen({
                   <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "white", lineHeight: 1.1 }}>
                     {team.name}
                   </div>
-                  <div style={{ fontSize: "0.6rem", color: "#9ca3af" }}>#{team.fifaRanking} FIFA</div>
+                  <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.4)" }}>#{team.fifaRanking} FIFA</div>
                 </div>
               </button>
             ))}
@@ -286,14 +368,14 @@ function WelcomeScreen({
       )}
 
       {/* ── Teams by confederation ── */}
-      <div style={{ maxWidth: "64rem", margin: "0 auto" }}>
+      <div style={{ maxWidth: "64rem", margin: "0 auto", padding: "0 1rem" }}>
         {teamsByConf.map(({ conf, teams: confTeams }, gi) => (
           <div key={conf} style={{ marginBottom: "2rem" }}>
             <h2
               style={{
-                fontSize: "0.95rem",
+                fontSize: "0.85rem",
                 fontWeight: 700,
-                color: "#e5e7eb",
+                color: "rgba(255,255,255,0.7)",
                 marginBottom: "0.75rem",
                 display: "flex",
                 alignItems: "center",
@@ -302,7 +384,7 @@ function WelcomeScreen({
             >
               <span>{CONF_EMOJI[conf]}</span>
               <span>{conf}</span>
-              <span style={{ fontSize: "0.75rem", color: "#6b7280", fontWeight: 400 }}>
+              <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.3)", fontWeight: 400 }}>
                 ({confTeams.length} teams)
               </span>
             </h2>
@@ -313,8 +395,8 @@ function WelcomeScreen({
                   onClick={() => onTeamClick?.(team.fifaCode)}
                   className="stagger-item"
                   style={{
-                    background: "rgba(255,255,255,0.05)",
-                    border: `1px solid ${team.primaryColor}50`,
+                    background: "rgba(255,255,255,0.04)",
+                    border: `1px solid ${team.primaryColor}30`,
                     borderRadius: "0.75rem",
                     padding: "0.5rem 0.35rem",
                     cursor: "pointer",
@@ -323,19 +405,19 @@ function WelcomeScreen({
                     textAlign: "center",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background = `${team.primaryColor}25`;
+                    (e.currentTarget as HTMLButtonElement).style.background = `${team.primaryColor}20`;
                     (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.08)";
-                    (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 4px 16px ${team.primaryColor}40`;
+                    (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 4px 20px ${team.primaryColor}30`;
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.05)";
+                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.04)";
                     (e.currentTarget as HTMLButtonElement).style.transform = "";
                     (e.currentTarget as HTMLButtonElement).style.boxShadow = "";
                   }}
                   title={`${team.name} (${team.fifaCode})`}
                 >
                   <FlagImg fifaCode={team.fifaCode} width={40} height={28} style={{ borderRadius: "3px", margin: "0 auto 0.2rem", display: "block", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
-                  <div style={{ fontSize: "0.65rem", fontWeight: 600, color: "#e5e7eb", lineHeight: 1.2 }}>
+                  <div style={{ fontSize: "0.65rem", fontWeight: 600, color: "rgba(255,255,255,0.8)", lineHeight: 1.2 }}>
                     {team.name}
                   </div>
                 </button>
@@ -347,9 +429,9 @@ function WelcomeScreen({
 
       {/* ── Copa suggestions ── */}
       {onSuggestionClick && (
-        <div style={{ maxWidth: "42rem", margin: "2rem auto 0" }}>
-          <h2 style={{ fontSize: "0.875rem", fontWeight: 700, color: "#d1d5db", marginBottom: "0.75rem" }}>
-            💬 Copa Suggestions
+        <div style={{ maxWidth: "42rem", margin: "2rem auto 0", padding: "0 1rem" }}>
+          <h2 style={{ fontSize: "0.8rem", fontWeight: 700, color: "rgba(255,255,255,0.5)", marginBottom: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase" }}>
+            💬 Ask Copa
           </h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
             {copaSuggestions.map((s, i) => (
@@ -358,11 +440,11 @@ function WelcomeScreen({
                 onClick={() => onSuggestionClick(s)}
                 className="stagger-item"
                 style={{
-                  background: `linear-gradient(135deg, ${themeColor}15, ${themeColor}08)`,
-                  border: `1px solid ${themeColor}40`,
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.12)",
                   borderRadius: "2rem",
                   padding: "0.5rem 1rem",
-                  color: "#e5e7eb",
+                  color: "rgba(255,255,255,0.7)",
                   fontSize: "0.82rem",
                   cursor: "pointer",
                   transition: "all 0.2s ease",
@@ -372,11 +454,13 @@ function WelcomeScreen({
                   (e.currentTarget as HTMLButtonElement).style.background = themeColor;
                   (e.currentTarget as HTMLButtonElement).style.color = "white";
                   (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-2px)";
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 6px 20px ${themeColor}40`;
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.background = `linear-gradient(135deg, ${themeColor}15, ${themeColor}08)`;
-                  (e.currentTarget as HTMLButtonElement).style.color = "#e5e7eb";
+                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.05)";
+                  (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.7)";
                   (e.currentTarget as HTMLButtonElement).style.transform = "";
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow = "";
                 }}
               >
                 {s}

@@ -151,6 +151,16 @@ html {
   50% { transform: translateY(-20px) scale(1.05); }
 }
 
+@keyframes heroLogoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(8px); opacity: 0.7; }
+}
+
 /* ── Skeleton loaders ────────────────────────────────────────────────────────── */
 .skeleton-pulse {
   background: rgba(200, 200, 200, 0.15);
