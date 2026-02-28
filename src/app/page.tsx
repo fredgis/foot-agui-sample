@@ -469,7 +469,15 @@ function YourMainContent({
       )}
 
       {/* Carte des infos du club, vue tournoi, ou page d'accueil */}
-      <div style={{ position: 'relative', zIndex: 10, width: '90%', maxWidth: '1400px', marginTop: clubName && !state.tournamentView ? '200px' : '20px', overflowY: 'auto', maxHeight: state.tournamentView ? '90vh' : undefined }}>
+      <div style={{
+        position: 'relative',
+        zIndex: 10,
+        width: '90%',
+        maxWidth: '1400px',
+        marginTop: clubName && !state.tournamentView ? '200px' : '20px',
+        overflowY: 'auto',
+        maxHeight: state.tournamentView ? '90vh' : undefined,
+      }}>
         {state.tournamentView === "group" ? (
           <GroupView
             groups={groups}
