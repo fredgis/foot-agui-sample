@@ -56,24 +56,6 @@ const CITY_ANECDOTES: Record<string, string> = {
   "Guadalajara": "Estadio Akron: capital of tequila AND passionate Mexican football.",
 };
 
-const CITY_WEATHER: Record<string, string> = {
-  "new york": "June–July: hot and humid, ~28°C. Evening thunderstorms possible. MetLife is open-air.",
-  "los angeles": "June–July: sunny and dry, ~27°C. Coastal morning fog possible.",
-  "dallas": "June–July: very hot, ~35°C. AT&T Stadium is air-conditioned.",
-  "atlanta": "June–July: hot and humid, ~30°C. Mercedes-Benz has a retractable roof.",
-  "kansas city": "June–July: hot, ~30°C. Frequent thunderstorms.",
-  "houston": "June–July: scorching and humid, ~34°C. NRG has a retractable roof.",
-  "boston": "June–July: pleasant, ~24°C. The coolest US venue.",
-  "philadelphia": "June–July: hot and humid, ~28°C. Open-air — bring sunscreen.",
-  "san francisco": "June–July: cool, ~18°C. Bring a jacket for evening matches!",
-  "las vegas": "June–July: scorching, ~42°C! Allegiant is fully air-conditioned.",
-  "vancouver": "June–July: mild and sometimes rainy, ~20°C. BC Place has a roof.",
-  "toronto": "June–July: pleasant, ~23°C. BMO Field is open-air.",
-  "mexico city": "June–July: mild and rainy, ~18°C, altitude 2,240 m.",
-  "monterrey": "June–July: very hot, ~36°C. Estadio BBVA sits in the hills.",
-  "guadalajara": "June–July: warm with tropical showers, ~25°C.",
-};
-
 const CITY_GUIDES: Record<string, string> = {
   "new york": "🗽 NYC: Times Square, Central Park, Brooklyn Bridge. FIFA Fan Fest at Central Park. Metro + shuttle to MetLife (45 min).",
   "los angeles": "🌴 LA: Hollywood, Venice Beach, Getty Museum. LA Live fan zone. In-N-Out Burger is a must!",
@@ -133,24 +115,6 @@ function buildCopaTools() {
           lines.push(`  [${m.id}] ${m.date} ${m.time}  ${m.homeTeam} vs ${m.awayTeam}  @ ${m.stadiumName}`);
         }
         return lines.join("\n");
-      },
-    }),
-
-    defineTool("get_venue_weather", {
-      description: "Weather and climate overview for a WC2026 host city during June/July.",
-      parameters: {
-        type: "object" as const,
-        properties: {
-          city: { type: "string", description: "Host city name" },
-        },
-        required: ["city"],
-      },
-      handler: (args: { city: string }) => {
-        const key = args.city.trim().toLowerCase();
-        for (const [k, v] of Object.entries(CITY_WEATHER)) {
-          if (k.includes(key) || key.includes(k)) return `🌤️ WC2026 Weather — ${args.city}:\n${v}`;
-        }
-        return `Weather for '${args.city}' not available.`;
       },
     }),
 
@@ -255,6 +219,7 @@ You ALWAYS respond in English, regardless of the team being discussed.
 
 🚨 TOPIC RESTRICTION: FOOTBALL / WC2026 ONLY
 Answer ANYTHING related to football, the World Cup, teams, players, stadiums, matches, coaches, groups, brackets, history, stats, fan guides, weather at venues, etc.
+When asked about weather at a WC2026 host city, use the MCP weather tools (get_current_weather, get_daily_forecast, etc.) to provide REAL-TIME weather data.
 ONLY refuse questions COMPLETELY unrelated to football (cooking, math, coding).
 Refusal: "Sorry, I'm Copa, your WC2026 specialist! Ask me about a team, a stadium, or a match. ⚽🏆"
 
@@ -311,7 +276,6 @@ async function getSharedClient(): Promise<CopilotClient> {
 const CUSTOM_TOOL_NAMES = [
   "get_stadium_info",
   "get_group_standings",
-  "get_venue_weather",
   "show_tournament_bracket",
   "compare_teams",
   "get_city_guide",
@@ -417,6 +381,13 @@ export class CopilotSDKAgent extends AbstractAgent {
       systemMessage: { mode: "replace" as const, content: COPA_SYSTEM_PROMPT },
       onPermissionRequest: approveAll,
       streaming: true,
+      mcpServers: {
+        "weather": {
+          type: "http",
+          url: "https://mcp.open-meteo.com/sse",
+          tools: ["*"],
+        },
+      },
     };
     if (this.providerConfig) {
       sessionConfig.provider = this.providerConfig;
