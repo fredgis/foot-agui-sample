@@ -4,7 +4,6 @@ import os
 
 import uvicorn
 from agent_framework._clients import ChatClientProtocol
-from azure.identity import DefaultAzureCredential
 from agent_framework.azure import AzureOpenAIChatClient
 from agent_framework.openai import OpenAIChatClient
 from agent_framework_ag_ui import add_agent_framework_fastapi_endpoint
@@ -19,14 +18,26 @@ load_dotenv()
 def _build_chat_client() -> ChatClientProtocol:
     try:
         if bool(os.getenv("AZURE_OPENAI_ENDPOINT")):
-            # Azure OpenAI setup - uses environment variables by default
-            # Optionally can pass deployment_name explicitly
             deployment_name = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT_NAME", "gpt-4o-mini")
-            return AzureOpenAIChatClient(
-                credential=DefaultAzureCredential(),
-                deployment_name=deployment_name,
-                endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-            )
+            endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+            api_key = os.getenv("AZURE_OPENAI_API_KEY")
+
+            if api_key:
+                # API key auth — no az login needed
+                from azure.core.credentials import AzureKeyCredential
+                return AzureOpenAIChatClient(
+                    credential=AzureKeyCredential(api_key),
+                    deployment_name=deployment_name,
+                    endpoint=endpoint,
+                )
+            else:
+                # Managed Identity / az login
+                from azure.identity import DefaultAzureCredential
+                return AzureOpenAIChatClient(
+                    credential=DefaultAzureCredential(),
+                    deployment_name=deployment_name,
+                    endpoint=endpoint,
+                )
 
         if bool(os.getenv("OPENAI_API_KEY")):
             # OpenAI setup - requires explicit model_id and api_key

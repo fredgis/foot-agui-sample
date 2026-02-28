@@ -127,16 +127,26 @@ cp agent/.env.example agent/.env
 
 Puis éditez `agent/.env` avec **une** des deux options :
 
-#### Option A : Azure OpenAI (recommandé pour Azure)
+#### Option A : Azure OpenAI avec clé API (recommandé)
+
+```env
+AZURE_OPENAI_ENDPOINT=https://votre-resource.openai.azure.com/
+AZURE_OPENAI_API_KEY=votre-clé-api-azure
+AZURE_OPENAI_CHAT_DEPLOYMENT_NAME=gpt-4o-mini
+```
+
+> Pas besoin de `az login` — la clé API suffit.
+
+#### Option B : Azure OpenAI avec Managed Identity
 
 ```env
 AZURE_OPENAI_ENDPOINT=https://votre-resource.openai.azure.com/
 AZURE_OPENAI_CHAT_DEPLOYMENT_NAME=gpt-4o-mini
 ```
 
-> Avec Azure, l'authentification passe par `DefaultAzureCredential` — il suffit d'être connecté via `az login`. Aucune clé API nécessaire.
+> Sans `AZURE_OPENAI_API_KEY`, le code utilise `DefaultAzureCredential` (nécessite `az login` en local).
 
-#### Option B : OpenAI directement
+#### Option C : OpenAI directement
 
 ```env
 OPENAI_API_KEY=sk-proj-...votre-clé...
