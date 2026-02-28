@@ -10,8 +10,8 @@ import { VenueMap } from "@/components/venue-map";
 import { AgentState, Confederation, MatchInfo, MatchPhase, StadiumInfo } from "@/lib/types";
 import { stadiums as allStadiums, groups, matches, teams } from "@/lib/worldcup-data";
 import { FlagImg, getFlagUrl } from "@/lib/flags";
-import { useCoAgent, useCopilotAction, useCopilotChat } from "@copilotkit/react-core";
-import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
+import { useCoAgent, useCopilotAction, useCopilotChat, useCopilotMessagesContext } from "@copilotkit/react-core";
+import { TextMessage, MessageRole, ActionExecutionMessage } from "@copilotkit/runtime-client-gql";
 import { CopilotKitCSSProperties, CopilotPopup, CopilotSidebar } from "@copilotkit/react-ui";
 import { useState, useEffect, useCallback, useRef } from "react";
 
@@ -609,7 +609,7 @@ function YourMainContent({
     },
   });
 
-  const { visibleMessages, appendMessage } = useCopilotChat();
+  const { appendMessage } = useCopilotChat();
 
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<MobileTab>("team");
@@ -638,24 +638,24 @@ function YourMainContent({
 
   // 🔄 Auto-detect team from agent messages → update page
   const lastDetectedTeam = useRef<string | null>(null);
-  const lastCheckedContent = useRef<string>("");
-  
-  // Check messages for team codes — called by effect AND interval
-  const checkMessagesForTeam = useCallback(() => {
-    if (!visibleMessages || visibleMessages.length === 0) return;
-    for (let i = visibleMessages.length - 1; i >= 0; i--) {
-      const msg = visibleMessages[i];
-      if (msg.isTextMessage() && msg.role === MessageRole.Assistant) {
+  const { messages: contextMessages } = useCopilotMessagesContext();
+
+  useEffect(() => {
+    if (!contextMessages || contextMessages.length === 0) return;
+    // Find last assistant text message
+    for (let i = contextMessages.length - 1; i >= 0; i--) {
+      const msg = contextMessages[i];
+      if (msg.isTextMessage() && (msg as TextMessage).role === MessageRole.Assistant) {
         const content = (msg as TextMessage).content;
         if (!content || content.length < 20) break;
-        if (content === lastCheckedContent.current) return;
-        lastCheckedContent.current = content;
+        // Look for FIFA codes in parentheses like "(POR)", "(FRA)"
         const codeMatches = content.match(/\(([A-Z]{3})\)/g);
         if (codeMatches) {
           for (const m of codeMatches) {
             const code = m.slice(1, 4);
             if (fifaCodesSet.current.has(code)) {
               if (code !== lastDetectedTeam.current) {
+                console.log(`[Copa] Team switch detected: ${lastDetectedTeam.current} → ${code}`);
                 lastDetectedTeam.current = code;
                 loadTeamByCode(code);
               }
@@ -666,16 +666,29 @@ function YourMainContent({
         break;
       }
     }
-  }, [visibleMessages, loadTeamByCode]);
+  }, [contextMessages, loadTeamByCode]);
 
-  // Primary: react to visibleMessages changes
-  useEffect(() => { checkMessagesForTeam(); }, [checkMessagesForTeam]);
-
-  // Backup: poll every 2s in case visibleMessages ref doesn't change
+  // Backup: also watch for ActionExecution messages with update_team_info
   useEffect(() => {
-    const id = setInterval(checkMessagesForTeam, 2000);
-    return () => clearInterval(id);
-  }, [checkMessagesForTeam]);
+    if (!contextMessages || contextMessages.length === 0) return;
+    for (let i = contextMessages.length - 1; i >= 0; i--) {
+      const msg = contextMessages[i];
+      if (msg.isActionExecutionMessage()) {
+        const actionMsg = msg as ActionExecutionMessage;
+        if (actionMsg.name === "update_team_info") {
+          const teamCode = String(actionMsg.arguments?.team_code ?? "").toUpperCase();
+          if (teamCode && fifaCodesSet.current.has(teamCode) && teamCode !== lastDetectedTeam.current) {
+            console.log(`[Copa] Team switch via tool: ${lastDetectedTeam.current} → ${teamCode}`);
+            lastDetectedTeam.current = teamCode;
+            loadTeamByCode(teamCode);
+          }
+          return;
+        }
+      }
+      // Stop scanning at the first user message (don't go further back)
+      if (msg.isTextMessage() && (msg as TextMessage).role === MessageRole.User) break;
+    }
+  }, [contextMessages, loadTeamByCode]);
 
   // 🏠 Return to welcome screen
   const goHome = useCallback(() => {
