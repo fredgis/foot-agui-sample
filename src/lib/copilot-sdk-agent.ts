@@ -13,7 +13,7 @@
 import { AbstractAgent, EventType } from "@ag-ui/client";
 import type { RunAgentInput, BaseEvent } from "@ag-ui/core";
 import { Observable } from "rxjs";
-import { CopilotClient, defineTool } from "@github/copilot-sdk";
+import { CopilotClient, defineTool, approveAll } from "@github/copilot-sdk";
 import type { CopilotSession } from "@github/copilot-sdk";
 import { teams, matches, stadiums, groups } from "./worldcup-data";
 
@@ -307,6 +307,7 @@ export class CopilotSDKAgent extends AbstractAgent {
       model: this.modelName,
       tools: buildCopaTools(),
       systemMessage: { content: COPA_SYSTEM_PROMPT },
+      onPermissionRequest: approveAll,
     };
     if (this.providerConfig) {
       sessionConfig.provider = this.providerConfig;
