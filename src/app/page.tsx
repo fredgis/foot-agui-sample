@@ -469,6 +469,32 @@ function WelcomeScreen({
           </div>
         </div>
       )}
+
+      {/* ── FIFA Sources footer ── */}
+      <div style={{ maxWidth: "42rem", margin: "3rem auto 0", padding: "0 1rem 2rem", textAlign: "center" }}>
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "1.25rem" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
+            <a href="https://digitalhub.fifa.com/m/1be9ce37eb98fcc5/original/FWC26-Match-Schedule_English.pdf" target="_blank" rel="noopener noreferrer"
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "2rem", padding: "0.4rem 0.85rem", color: "rgba(255,255,255,0.65)", fontSize: "0.75rem", textDecoration: "none", transition: "all 0.2s ease" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "#fff"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "rgba(255,255,255,0.65)"; }}
+            >📄 Official Match Schedule (PDF)</a>
+            <a href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/standings" target="_blank" rel="noopener noreferrer"
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "2rem", padding: "0.4rem 0.85rem", color: "rgba(255,255,255,0.65)", fontSize: "0.75rem", textDecoration: "none", transition: "all 0.2s ease" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "#fff"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "rgba(255,255,255,0.65)"; }}
+            >📊 Group Standings</a>
+            <a href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/match-schedule-fixtures-results-teams-stadiums" target="_blank" rel="noopener noreferrer"
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "2rem", padding: "0.4rem 0.85rem", color: "rgba(255,255,255,0.65)", fontSize: "0.75rem", textDecoration: "none", transition: "all 0.2s ease" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "#fff"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "rgba(255,255,255,0.65)"; }}
+            >⚽ FIFA.com Schedule</a>
+          </div>
+          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.65rem" }}>
+            Data sourced from official FIFA World Cup 2026™ draw (December 2025)
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
