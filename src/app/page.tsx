@@ -348,13 +348,17 @@ function WelcomeScreen({
                   (e.currentTarget as HTMLButtonElement).style.background = `linear-gradient(135deg, ${team.primaryColor}20, ${team.primaryColor}08)`;
                 }}
               >
-                <img
-                  src={getFlagUrl(team.fifaCode, 80)}
-                  alt=""
-                  width={36}
-                  height={24}
-                  style={{ borderRadius: "4px", boxShadow: "0 2px 8px rgba(0,0,0,0.4)", flexShrink: 0 }}
-                />
+                {getFlagUrl(team.fifaCode, 80) ? (
+                  <img
+                    src={getFlagUrl(team.fifaCode, 80)}
+                    alt=""
+                    width={36}
+                    height={24}
+                    style={{ borderRadius: "4px", boxShadow: "0 2px 8px rgba(0,0,0,0.4)", flexShrink: 0 }}
+                  />
+                ) : (
+                  <span style={{ fontSize: "1.5rem", flexShrink: 0 }}>🏳️</span>
+                )}
                 <div style={{ textAlign: "left" }}>
                   <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "white", lineHeight: 1.1 }}>
                     {team.name}
