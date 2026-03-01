@@ -175,10 +175,17 @@ html {
   border-left: none !important;
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6) !important;
   border-left: 2px solid color-mix(in srgb, var(--copilot-kit-primary-color, #6366f1) 30%, transparent) !important;
+}
+
+/* Both CopilotKit panels: chat (white) and agent (black) at 640px */
+.copilot-sidebar-custom .copilotKitWindow {
   width: 640px !important;
   max-width: 55vw !important;
   height: 100vh !important;
   max-height: 100vh !important;
+}
+.copilot-sidebar-custom .copilotKitSidebarContentWrapper.sidebarExpanded {
+  margin-right: 640px !important;
 }
 
 /* ── CopilotKit popup — mobile ───────────────────────────────────────────────── */

@@ -630,8 +630,8 @@ function YourMainContent({
   setBackgroundImage: (b: string) => void;
   setCountryFlag: (f: string) => void;
 }) {
-  // 🪁 Shared State — agent state from AG-UI (may be overwritten by STATE_DELTA)
-  const { state: agentState, setState: setAgentState } = useCoAgent<AgentState>({
+  // 🪁 AG-UI connection (state sync to server only, NOT used for rendering)
+  const { setState: setAgentState } = useCoAgent<AgentState>({
     name: "my_agent",
     initialState: {
       teamInfo: null,
@@ -642,34 +642,21 @@ function YourMainContent({
     },
   });
 
-  // 🛡️ Local display state — immune to AG-UI STATE_DELTA overwrites
-  const [displayTeam, setDisplayTeam] = useState<AgentState["teamInfo"]>(null);
-  const [displayMatches, setDisplayMatches] = useState<MatchInfo[]>([]);
+  // 🛡️ Fully local display state — 100% immune to AG-UI STATE_DELTA overwrites
+  const defaultState: AgentState = { teamInfo: null, matches: [], selectedStadium: null, tournamentView: null, highlightedCity: null };
+  const [state, setLocalState] = useState<AgentState>(defaultState);
 
-  // Merged state: local team/matches win over agent state
-  const state = useMemo(() => ({
-    ...(agentState ?? { teamInfo: null, matches: [], selectedStadium: null, tournamentView: null, highlightedCity: null }),
-    teamInfo: displayTeam ?? agentState?.teamInfo ?? null,
-    matches: displayTeam ? displayMatches : (agentState?.matches ?? []),
-  }), [agentState, displayTeam, displayMatches]);
-
-  // Wrapper: sets both local display state and agent state
+  // setState: updates local display state + syncs to agent (best effort)
   const setState = useCallback((
-    patchOrFn: Partial<AgentState> | ((prev: AgentState | undefined) => AgentState)
+    patchOrFn: Partial<AgentState> | ((prev: AgentState) => AgentState)
   ) => {
     if (typeof patchOrFn === "function") {
-      setAgentState((prev: AgentState | undefined) => {
-        const safePrev = prev ?? { teamInfo: null, matches: [], selectedStadium: null, tournamentView: null, highlightedCity: null };
-        const result = patchOrFn(safePrev);
-        if ("teamInfo" in result) setDisplayTeam(result.teamInfo ?? null);
-        if ("matches" in result) setDisplayMatches(result.matches ?? []);
-        return result;
-      });
+      setLocalState(patchOrFn);
     } else {
-      if ("teamInfo" in patchOrFn) setDisplayTeam(patchOrFn.teamInfo ?? null);
-      if ("matches" in patchOrFn) setDisplayMatches(patchOrFn.matches ?? []);
-      setAgentState(patchOrFn as AgentState);
+      setLocalState((prev) => ({ ...prev, ...patchOrFn }));
     }
+    // Also sync to AG-UI agent state (so server knows current view)
+    try { setAgentState(patchOrFn as AgentState); } catch { /* best effort */ }
   }, [setAgentState]);
 
   const { appendMessage } = useCopilotChat();
