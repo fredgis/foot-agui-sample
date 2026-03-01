@@ -4,6 +4,15 @@
 >
 > Built with the **[AG-UI Protocol](https://docs.ag-ui.com)**, the **[GitHub Copilot SDK](https://github.com/github/copilot-sdk)**, and **[MCP](https://modelcontextprotocol.io/)** weather tools.
 
+📂 **Project documentation & configuration:**
+
+| File | Description |
+|------|-------------|
+| [`/docs/README.md`](./docs/README.md) | Full documentation — problem → solution, prerequisites, setup, deployment, architecture diagram, RAI notes |
+| [`/docs/docs-architecture.puml`](./docs/docs-architecture.puml) | PlantUML architecture diagram (AG-UI, Copilot SDK, MCP layers) |
+| [`AGENTS.md`](./AGENTS.md) | Custom instructions for the Copa AI agent |
+| [`mcp.json`](./mcp.json) | MCP server configuration (Open-Meteo weather) |
+
 ![Copa Welcome Screen](screenshot.png)
 
 ---
