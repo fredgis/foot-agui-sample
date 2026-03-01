@@ -1,4 +1,12 @@
-# ⚽🏆 Copa — FIFA World Cup 2026 AI Assistant
+```
+     ___                    __     ______                              _ 
+    /   |  ____ ____  ___  / /_   / ____/___  ____  ____ _   ____ _  (_)
+   / /| | / __ `/ _ \/ _ \/ __/  / /   / __ \/ __ \/ __ `/  / __ `/ / / 
+  / ___ |/ /_/ /  __/  __/ /_   / /___/ /_/ / /_/ / /_/ /_ / /_/ / / /  
+ /_/  |_|\__, /\___/\___/\__/   \____/\____/ .___/\__,_/(_)\__,_/_/_/   
+        /____/                            /_/                            
+                          ⚽ FIFA World Cup 2026 ⚽
+```
 
 > An immersive, AI-powered experience to explore the **2026 FIFA World Cup** — 48 teams, 104 matches, 16 stadiums across 3 host nations 🇺🇸🇲🇽🇨🇦
 >
