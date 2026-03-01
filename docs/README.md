@@ -193,4 +193,23 @@ Copa follows a 4-layer architecture: **Frontend** (CopilotKit + React) → **AG-
 
 ---
 
+## GitHub Copilot SDK — Product Feedback
+
+Copa was built as a real-world test of the GitHub Copilot SDK. Here is our developer feedback:
+
+### 👍 What we loved
+
+- **Zero API key setup** — `gh auth login` and the SDK handles everything. No Azure OpenAI deployment, no key rotation, no `.env` secrets to manage.
+- **MCP server support** — Adding live weather data took 5 minutes: one entry in `mcp.json` and the agent could call Open-Meteo tools automatically.
+- **Tool definition is simple** — Define a function, describe it, and the SDK handles orchestration, planning, and execution.
+- **Replaced an entire backend** — What would have been FastAPI + Microsoft Agent Framework + Azure OpenAI + Docker is now a single `npm install @github/copilot-sdk` running in-process inside a Next.js API route.
+
+### 🔧 Areas for improvement
+
+- **Next.js / Turbopack compatibility** — `import.meta.resolve` used internally by the SDK fails in Turbopack. We had to pass `cliPath` explicitly as a workaround.
+- **AG-UI bridge documentation** — Building a custom `CopilotSDKAgent` bridge between AG-UI events and the SDK required reverse-engineering the event format. More examples or a built-in adapter would help adoption.
+- **STATE_DELTA silent failures** — `replace` operations fail silently if the agent has no `initialState` set. An error or warning would save debugging time.
+
+---
+
 **⚽ Built for the 2026 FIFA World Cup 🇺🇸🇲🇽🇨🇦**
