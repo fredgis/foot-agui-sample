@@ -489,7 +489,7 @@ export function VenueMap({
       {/* Mini-card on click */}
       {clickedStadium && (
         <div
-          className="absolute bottom-4 right-4 rounded-xl p-4 shadow-2xl z-10"
+          className="absolute top-4 right-4 rounded-xl p-4 shadow-2xl z-10"
           style={{
             background: "linear-gradient(135deg, #07111f 0%, #0d1f35 100%)",
             border: `2px solid ${themeColor}`,
