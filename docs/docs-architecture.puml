@@ -1,0 +1,34 @@
+@startuml docs-architecture
+skinparam backgroundColor #0D1117
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam defaultFontColor #C9D1D9
+skinparam roundCorner 10
+skinparam componentBorderColor #30363D
+skinparam componentFontColor #E6EDF3
+skinparam ArrowThickness 2
+skinparam ArrowColor #58A6FF
+
+title <font color="#E6EDF3" size="16">⚽ Copa — Architecture</font>
+
+component "**Next.js 16 + React 19**\nTeamCard · VenueMap · Bracket\nMatchSchedule · GroupView" as ui #1F2A40
+
+component "**CopilotKit**\nuseCoAgent · useCopilotAction\nCopilotSidebar / Popup" as ck #2D1F00
+
+component "**CopilotSDKAgent**\nAG-UI ↔ Copilot SDK bridge\n6 Copa Tools" as agent #0D2818
+
+component "**GitHub Copilot SDK**\nLLM via gh auth\nZero API keys" as sdk #3D2900
+
+component "**MCP: Open-Meteo**\nmcp.open-meteo.com/sse\nLive weather" as mcp #1F0D2E
+
+component "**Wikipedia + flagcdn**\nPlayer photos · Flags" as ext #1F0D2E
+
+ui <-down-> ck : state & render
+ck <-down-> agent : <font color="#58A6FF">**AG-UI Protocol (SSE)**</font>\nTEXT · TOOL_CALL · STATE_DELTA
+agent <-down-> sdk : session & tools
+sdk <-down-> mcp : <font color="#A371F7">**MCP Protocol**</font>
+sdk -[hidden]right-> ext
+ui -right-> ext : HTTP
+
+@enduml

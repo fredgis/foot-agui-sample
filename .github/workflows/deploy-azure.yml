@@ -1,0 +1,43 @@
+name: Deploy to Azure
+
+on:
+  push:
+    branches:
+      - worldcup2026
+  workflow_dispatch:
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Deploy Next.js app to Azure Static Web Apps
+  # (Copilot SDK agent runs in-process — no separate backend needed)
+  # ─────────────────────────────────────────────────────────────────────────────
+  deploy:
+    name: Deploy (Azure Static Web Apps)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: /
+          api_location: ""
+          output_location: .next
+          app_build_command: npm run build
+        env:
+          AGENT_URL: ${{ secrets.AGENT_URL }}

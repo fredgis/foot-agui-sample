@@ -1,0 +1,81 @@
+@startuml sequence
+skinparam backgroundColor #0D1117
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam defaultFontColor #C9D1D9
+skinparam roundCorner 8
+skinparam sequenceArrowThickness 2
+skinparam sequenceArrowColor #58A6FF
+skinparam sequenceParticipantBorderColor #30363D
+skinparam sequenceParticipantBackgroundColor #161B22
+skinparam sequenceParticipantFontColor #E6EDF3
+skinparam sequenceLifeLineBorderColor #30363D
+skinparam sequenceLifeLineBackgroundColor #1C2128
+skinparam sequenceDividerBackgroundColor #161B22
+skinparam sequenceDividerBorderColor #30363D
+skinparam sequenceDividerFontColor #8B949E
+skinparam sequenceGroupBackgroundColor #161B22
+skinparam sequenceGroupBorderColor #30363D
+skinparam noteBorderColor #30363D
+skinparam noteBackgroundColor #1C2128
+skinparam noteFontColor #C9D1D9
+skinparam actorBorderColor #58A6FF
+skinparam actorBackgroundColor #161B22
+skinparam actorFontColor #E6EDF3
+
+title <font color="#E6EDF3" size="14">⚽ Data Flow — "Show me France"</font>
+
+actor "👤 User" as U
+participant "🖥️ CopilotKit\n(React hooks)" as F #1F2A40
+participant "⚙️ CopilotSDKAgent\n(AG-UI bridge)" as A #0D2818
+participant "🤖 Copilot SDK\n(CLI subprocess)" as C #2D1F00
+participant "🌐 MCP Server\n(optional)" as M #1F0D2E
+
+U -> F : "Show me France"
+activate F #1F2A40
+F -> A : <font color="#58A6FF">**AG-UI**</font> RunAgent (SSE)
+activate A #0D2818
+A --> F : <font color="#8B949E">//RUN_STARTED//</font>
+
+A -> C : session.sendAndWait()
+activate C #2D1F00
+
+C --> A : tool.execution_start\n(update_team_info, {team_code: "FRA"})
+A --> F : <font color="#8B949E">//TOOL_CALL_START// → //TOOL_CALL_ARGS// → //TOOL_CALL_END//</font>
+A --> F : <font color="#3FB950">**STATE_DELTA**</font>\n[{op:"replace", path:"/teamInfo", value:{…France}}]
+
+note over F : useCoAgent receives patch\n→ TeamCard, theme, schedule\nall update instantly 🇫🇷
+
+C --> A : assistant.message_delta (streaming)
+A --> F : <font color="#8B949E">//TEXT_MESSAGE_CONTENT//</font>\n(word by word)
+
+C --> A : session.idle
+deactivate C
+
+A --> F : <font color="#8B949E">//TEXT_MESSAGE_END// → //RUN_FINISHED//</font>
+deactivate A
+
+note over F : 🎨 Page is now fully French\nBlue theme · roster · map · schedule
+deactivate F
+
+== <font color="#8B949E">Optional: weather follow-up</font> ==
+
+U -> F : "What's the weather in Paris?"
+activate F #1F2A40
+F -> A : <font color="#58A6FF">**AG-UI**</font> RunAgent (SSE)
+activate A #0D2818
+A -> C : session.sendAndWait()
+activate C #2D1F00
+C -> M : <font color="#A371F7">**MCP**</font> current_weather("Paris")
+activate M #1F0D2E
+M --> C : {temp: 18°C, wind: 12km/h, …}
+deactivate M
+C --> A : tool.execution_complete
+A --> F : <font color="#8B949E">//TOOL_CALL//</font> + <font color="#8B949E">//TEXT_MESSAGE_CONTENT//</font>
+deactivate C
+A --> F : <font color="#8B949E">//RUN_FINISHED//</font>
+deactivate A
+deactivate F
+
+@enduml

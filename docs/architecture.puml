@@ -1,0 +1,69 @@
+@startuml architecture
+skinparam backgroundColor #0D1117
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 13
+skinparam defaultFontColor #C9D1D9
+skinparam roundCorner 12
+skinparam packageBorderColor #30363D
+skinparam packageFontColor #E6EDF3
+skinparam packageFontSize 14
+skinparam packageBackgroundColor #161B22
+skinparam componentStyle rectangle
+skinparam componentBorderColor #30363D
+skinparam componentFontColor #E6EDF3
+skinparam ArrowThickness 2
+skinparam ArrowColor #58A6FF
+
+title <font color="#E6EDF3" size="16">⚽ Copa — Architecture Overview</font>
+
+package "👤 Browser" as browser {
+  package "Next.js 16  +  React 19" as nextjs {
+    component "CopilotKit React\n//useCoAgent · useCopilotAction//" as ck #1F2A40
+    component "TeamCard" as tc #2D1B00
+    component "VenueMap" as vm #2D1B00
+    component "MatchSchedule" as ms #2D1B00
+    component "GroupView" as gv #2D1B00
+    component "TournamentBracket" as tb #2D1B00
+    component "WeatherCard" as wc #2D1B00
+  }
+}
+
+package "⚙️ Server  (Next.js API Route)" as server {
+  component "CopilotSDKAgent\n//AG-UI ↔ Copilot SDK bridge//" as agent #0D2818
+  component "Copa Tools (×6)\n//update_team · compare · bracket\nstadium · group · city guide//" as tools #0D3B1E
+}
+
+package "🤖 AI Runtime" as runtime {
+  component "GitHub Copilot SDK\n//@github/copilot-sdk//" as sdk #2D1F00
+  component "LLM\n//GitHub Copilot\nvia gh auth//" as llm #3D2900
+}
+
+package "🌐 External Services" as external {
+  component "MCP: open-meteo\n//Live weather//" as mcp #1F0D2E
+  component "flagcdn.com\n//Flag images//" as flags #1F0D2E
+}
+
+' Relationships
+tc -[hidden]right- vm
+vm -[hidden]right- ms
+ms -[hidden]right- gv
+gv -[hidden]right- tb
+tb -[hidden]right- wc
+
+ck -up-> tc : <font color="#8B949E">state</font>
+ck -up-> vm : <font color="#8B949E">state</font>
+ck -up-> ms : <font color="#8B949E">state</font>
+ck -up-> gv : <font color="#8B949E">state</font>
+ck -up-> tb : <font color="#8B949E">state</font>
+ck -up-> wc : <font color="#8B949E">render</font>
+
+ck -down-> agent : <font color="#58A6FF">**AG-UI Protocol**</font>\n<font color="#8B949E">//SSE: TEXT · TOOL_CALL · STATE_DELTA//</font>
+
+agent -down-> tools
+agent -down-> sdk : <font color="#8B949E">session.sendAndWait()</font>
+sdk -down-> llm : <font color="#8B949E">gh auth token</font>
+agent -right-> mcp : <font color="#A371F7">**MCP Protocol**</font>\n<font color="#8B949E">//SSE transport//</font>
+tc -right-> flags : <font color="#8B949E">HTTP</font>
+
+@enduml
