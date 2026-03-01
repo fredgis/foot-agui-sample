@@ -1,9 +1,39 @@
 "use client";
 
-import { useState, useEffect, useRef, memo } from "react";
+import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { TeamInfo, PlayerInfo } from "@/lib/types";
 import { groups } from "@/lib/worldcup-data";
 import { FlagImg } from "@/lib/flags";
+
+// ── Wikipedia player photo fetcher ────────────────────────────────────────────
+
+interface WikiPlayerData {
+  imageUrl: string | null;
+  extract: string | null;
+}
+
+const wikiCache = new Map<string, WikiPlayerData>();
+
+async function fetchPlayerWiki(playerName: string): Promise<WikiPlayerData> {
+  if (wikiCache.has(playerName)) return wikiCache.get(playerName)!;
+  try {
+    const res = await fetch(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(playerName)}`
+    );
+    if (!res.ok) throw new Error("Not found");
+    const data = await res.json();
+    const result: WikiPlayerData = {
+      imageUrl: data.thumbnail?.source?.replace(/\/\d+px-/, "/400px-") ?? null,
+      extract: data.extract ?? null,
+    };
+    wikiCache.set(playerName, result);
+    return result;
+  } catch {
+    const fallback: WikiPlayerData = { imageUrl: null, extract: null };
+    wikiCache.set(playerName, fallback);
+    return fallback;
+  }
+}
 
 interface TeamCardProps {
   team: TeamInfo | null;
@@ -50,62 +80,171 @@ function PlayerCard({
   index: number;
 }) {
   const [hovered, setHovered] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [wiki, setWiki] = useState<WikiPlayerData | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = useCallback(() => {
+    setExpanded(true);
+    if (!wiki && !loading) {
+      setLoading(true);
+      fetchPlayerWiki(player.name).then((data) => {
+        setWiki(data);
+        setLoading(false);
+      });
+    }
+  }, [player.name, wiki, loading]);
 
   return (
-    <div
-      className="relative p-3 rounded-xl text-center cursor-pointer select-none"
-      style={{
-        background: hovered
-          ? `linear-gradient(135deg, ${themeColor}35, ${themeColor}15)`
-          : `linear-gradient(135deg, ${themeColor}18, ${themeColor}06)`,
-        border: `1px solid ${hovered ? themeColor : themeColor + "40"}`,
-        transform: hovered ? "scale(1.07)" : "scale(1)",
-        transition: "all 0.2s ease",
-        animationDelay: `${0.4 + index * 0.08}s`,
-        animation: "fadeUp 0.5s ease-out both",
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <div className="text-3xl mb-1">{posEmoji[player.position] ?? "⚽"}</div>
-      <div className="font-bold text-xs leading-tight" style={{ color: themeColor }}>
-        {player.name}
-      </div>
-      <div className="text-xs text-gray-500 mt-0.5">{player.position}</div>
+    <>
+      <div
+        className="relative p-3 rounded-xl text-center cursor-pointer select-none"
+        style={{
+          background: hovered
+            ? `linear-gradient(135deg, ${themeColor}35, ${themeColor}15)`
+            : `linear-gradient(135deg, ${themeColor}18, ${themeColor}06)`,
+          border: `1px solid ${hovered ? themeColor : themeColor + "40"}`,
+          transform: hovered ? "scale(1.07)" : "scale(1)",
+          transition: "all 0.2s ease",
+          animationDelay: `${0.4 + index * 0.08}s`,
+          animation: "fadeUp 0.5s ease-out both",
+        }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onClick={handleClick}
+      >
+        <div className="text-3xl mb-1">{posEmoji[player.position] ?? "⚽"}</div>
+        <div className="font-bold text-xs leading-tight" style={{ color: themeColor }}>
+          {player.name}
+        </div>
+        <div className="text-xs text-gray-500 mt-0.5">{player.position}</div>
 
-      {/* Mini popup on hover */}
-      {hovered && (
-        <div
-          className="absolute bottom-full left-1/2 mb-2 z-50 px-3 py-2 rounded-lg whitespace-nowrap text-left pointer-events-none"
-          style={{
-            transform: "translateX(-50%)",
-            background: `${themeColor}ee`,
-            color: "#fff",
-            boxShadow: `0 4px 16px ${themeColor}80`,
-            fontSize: "0.75rem",
-          }}
-        >
-          <div className="font-bold">{player.name}</div>
-          <div className="opacity-80">
-            {player.position} · {player.club}
-          </div>
-          {/* Arrow */}
+        {/* Mini popup on hover */}
+        {hovered && (
           <div
+            className="absolute bottom-full left-1/2 mb-2 z-50 px-3 py-2 rounded-lg whitespace-nowrap text-left pointer-events-none"
             style={{
-              position: "absolute",
-              bottom: "-6px",
-              left: "50%",
               transform: "translateX(-50%)",
-              width: 0,
-              height: 0,
-              borderLeft: "6px solid transparent",
-              borderRight: "6px solid transparent",
-              borderTop: `6px solid ${themeColor}ee`,
+              background: `${themeColor}ee`,
+              color: "#fff",
+              boxShadow: `0 4px 16px ${themeColor}80`,
+              fontSize: "0.75rem",
             }}
-          />
+          >
+            <div className="font-bold">{player.name}</div>
+            <div className="opacity-80">
+              {player.position} · {player.club}
+            </div>
+            {/* Arrow */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: "-6px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: 0,
+                height: 0,
+                borderLeft: "6px solid transparent",
+                borderRight: "6px solid transparent",
+                borderTop: `6px solid ${themeColor}ee`,
+              }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Player detail modal */}
+      {expanded && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.80)" }}
+          onClick={() => setExpanded(false)}
+        >
+          <div
+            className="relative rounded-2xl overflow-hidden shadow-2xl"
+            style={{
+              width: 360,
+              maxWidth: "95vw",
+              background: "linear-gradient(135deg, #07111f 0%, #0d1f35 100%)",
+              border: `2px solid ${themeColor}`,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div
+              className="relative overflow-hidden"
+              style={{ background: `linear-gradient(135deg, ${themeColor}40, ${themeColor}15)` }}
+            >
+              <button
+                className="absolute top-2 right-3 text-white/60 hover:text-white text-xl font-bold leading-none cursor-pointer z-10"
+                style={{ background: "none", border: "none" }}
+                onClick={() => setExpanded(false)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+
+              {loading && (
+                <div className="flex items-center justify-center py-16">
+                  <div className="text-4xl animate-spin">⚽</div>
+                </div>
+              )}
+
+              {!loading && wiki?.imageUrl ? (
+                <div className="flex justify-center pt-4 pb-2">
+                  <img
+                    src={wiki.imageUrl}
+                    alt={player.name}
+                    className="rounded-xl object-cover shadow-lg"
+                    style={{ width: 180, height: 220, objectPosition: "top" }}
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                </div>
+              ) : !loading ? (
+                <div className="flex items-center justify-center py-10">
+                  <span className="text-6xl">{posEmoji[player.position] ?? "⚽"}</span>
+                </div>
+              ) : null}
+            </div>
+
+            {/* Info */}
+            <div className="p-4">
+              <h3 className="text-white font-bold text-lg">{player.name}</h3>
+              <div className="flex gap-2 mt-1 flex-wrap">
+                <span
+                  className="px-2 py-0.5 rounded-full text-xs font-semibold"
+                  style={{ background: `${themeColor}30`, color: themeColor }}
+                >
+                  {player.position}
+                </span>
+                <span
+                  className="px-2 py-0.5 rounded-full text-xs font-semibold"
+                  style={{ background: "rgba(255,255,255,0.1)", color: "#ccc" }}
+                >
+                  {player.club}
+                </span>
+              </div>
+
+              {wiki?.extract && (
+                <p className="text-gray-400 text-xs mt-3 leading-relaxed line-clamp-4">
+                  {wiki.extract}
+                </p>
+              )}
+
+              <a
+                href={`https://en.wikipedia.org/wiki/${encodeURIComponent(player.name)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 w-full py-1.5 rounded-lg text-xs font-semibold text-white text-center block"
+                style={{ background: themeColor }}
+              >
+                Wikipedia ↗
+              </a>
+            </div>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
@@ -303,7 +442,7 @@ export const TeamCard = memo(function TeamCard({ team, themeColor, secondaryColo
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
           {team.keyPlayers.map((player, i) => (
             <PlayerCard
-              key={i}
+              key={player.name}
               player={player}
               themeColor={themeColor}
               index={i}

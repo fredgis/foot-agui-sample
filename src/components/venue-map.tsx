@@ -1,7 +1,54 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { StadiumInfo, MatchInfo } from "@/lib/types";
+
+// ─── Weather Types & Helpers ─────────────────────────────────────────────────
+
+interface WeatherData {
+  current: {
+    temperature: number;
+    windSpeed: number;
+    humidity: number;
+    weatherCode: number;
+  };
+  daily: {
+    date: string;
+    tempMax: number;
+    tempMin: number;
+    weatherCode: number;
+  }[];
+}
+
+const WEATHER_ICONS: Record<number, string> = {
+  0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️",
+  45: "🌫️", 48: "🌫️",
+  51: "🌦️", 53: "🌦️", 55: "🌧️",
+  61: "🌧️", 63: "🌧️", 65: "🌧️",
+  71: "🌨️", 73: "🌨️", 75: "❄️",
+  80: "🌦️", 81: "🌧️", 82: "⛈️",
+  95: "⛈️", 96: "⛈️", 99: "⛈️",
+};
+
+const WEATHER_LABELS: Record<number, string> = {
+  0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
+  45: "Fog", 48: "Freezing fog",
+  51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle",
+  61: "Light rain", 63: "Moderate rain", 65: "Heavy rain",
+  71: "Light snow", 73: "Moderate snow", 75: "Heavy snow",
+  80: "Light showers", 81: "Moderate showers", 82: "Violent showers",
+  95: "Thunderstorm", 96: "Thunderstorm with hail", 99: "Severe thunderstorm",
+};
+
+function getWeatherIcon(code: number): string {
+  return WEATHER_ICONS[code] ?? "🌡️";
+}
+
+function getWeatherLabel(code: number): string {
+  return WEATHER_LABELS[code] ?? "Inconnu";
+}
+
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -100,7 +147,39 @@ export function VenueMap({
 }: VenueMapProps) {
   const [hoveredStadium, setHoveredStadium] = useState<StadiumInfo | null>(null);
   const [clickedStadium, setClickedStadium] = useState<StadiumInfo | null>(null);
+  const [videoStadium, setVideoStadium] = useState<StadiumInfo | null>(null);
+  const [weatherStadium, setWeatherStadium] = useState<StadiumInfo | null>(null);
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
+
+  const openWeather = useCallback((stadium: StadiumInfo) => {
+    setWeatherStadium(stadium);
+    setWeatherData(null);
+    setWeatherLoading(true);
+    fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${stadium.lat}&longitude=${stadium.lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`
+    )
+      .then((r) => r.json())
+      .then((d) => {
+        setWeatherData({
+          current: {
+            temperature: d.current.temperature_2m,
+            windSpeed: d.current.wind_speed_10m,
+            humidity: d.current.relative_humidity_2m,
+            weatherCode: d.current.weather_code,
+          },
+          daily: d.daily.time.map((date: string, i: number) => ({
+            date,
+            tempMax: d.daily.temperature_2m_max[i],
+            tempMin: d.daily.temperature_2m_min[i],
+            weatherCode: d.daily.weather_code[i],
+          })),
+        });
+        setWeatherLoading(false);
+      })
+      .catch(() => setWeatherLoading(false));
+  }, []);
   const [visible, setVisible] = useState(true);
   const prevMatchesRef = useRef<MatchInfo[] | undefined>(undefined);
 
@@ -461,29 +540,166 @@ export function VenueMap({
             </div>
           )}
 
-          <a
-            href={`https://wttr.in/${encodeURIComponent(clickedStadium.city)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 w-full py-1.5 rounded-lg text-xs font-semibold text-white text-center block"
-            style={{ background: themeColor }}
+          <button
+            onClick={() => openWeather(clickedStadium)}
+            className="mt-3 w-full py-1.5 rounded-lg text-xs font-semibold text-white text-center block cursor-pointer"
+            style={{ background: themeColor, border: "none" }}
           >
             🌤️ Météo à {clickedStadium.city}
-          </a>
+          </button>
 
           {clickedStadium.videoUrl && (
-            <a
-              href={clickedStadium.videoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 w-full py-1.5 rounded-lg text-xs font-semibold text-white text-center block"
-              style={{ background: "#c42b2b" }}
+            <button
+              onClick={() => setVideoStadium(clickedStadium)}
+              className="mt-2 w-full py-1.5 rounded-lg text-xs font-semibold text-white text-center block cursor-pointer"
+              style={{ background: "#c42b2b", border: "none" }}
             >
               ▶️ Vidéo du stade
-            </a>
+            </button>
           )}
         </div>
       )}
+
+      {/* Weather popup modal */}
+      {weatherStadium && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.80)" }}
+          onClick={() => setWeatherStadium(null)}
+        >
+          <div
+            className="relative rounded-2xl overflow-hidden shadow-2xl"
+            style={{ width: 420, maxWidth: "95vw", background: "linear-gradient(135deg, #07111f 0%, #0d1f35 100%)", border: `2px solid ${themeColor}` }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: `1px solid ${themeColor}40` }}>
+              <span className="text-white text-sm font-semibold">
+                🌤️ Météo — {weatherStadium.city}, {COUNTRY_FLAGS[weatherStadium.country] ?? "🌍"} {weatherStadium.country}
+              </span>
+              <button
+                className="text-gray-400 hover:text-white text-xl font-bold leading-none cursor-pointer"
+                style={{ background: "none", border: "none" }}
+                onClick={() => setWeatherStadium(null)}
+                aria-label="Fermer"
+              >
+                ×
+              </button>
+            </div>
+
+            {weatherLoading && (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-4xl animate-spin">⚽</div>
+              </div>
+            )}
+
+            {!weatherLoading && weatherData && (
+              <div className="p-4">
+                {/* Current weather */}
+                <div className="flex items-center gap-4 mb-4">
+                  <span className="text-5xl">{getWeatherIcon(weatherData.current.weatherCode)}</span>
+                  <div>
+                    <div className="text-3xl font-bold text-white">{Math.round(weatherData.current.temperature)}°C</div>
+                    <div className="text-sm text-gray-300">{getWeatherLabel(weatherData.current.weatherCode)}</div>
+                  </div>
+                </div>
+
+                {/* Stats row */}
+                <div
+                  className="grid grid-cols-3 gap-3 rounded-xl p-3 mb-4"
+                  style={{ background: "rgba(255,255,255,0.05)" }}
+                >
+                  <div className="text-center">
+                    <div className="text-xs text-gray-400">💧 Humidity</div>
+                    <div className="text-sm font-semibold text-white">{weatherData.current.humidity}%</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xs text-gray-400">💨 Wind</div>
+                    <div className="text-sm font-semibold text-white">{Math.round(weatherData.current.windSpeed)} km/h</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xs text-gray-400">🏟️ Stadium</div>
+                    <div className="text-sm font-semibold text-white" title={weatherStadium.name}>
+                      {weatherStadium.name.length > 14 ? weatherStadium.name.slice(0, 13) + "…" : weatherStadium.name}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 5-day forecast */}
+                <div className="text-xs text-gray-400 mb-2 font-semibold">5-Day Forecast</div>
+                <div className="grid grid-cols-5 gap-2">
+                  {weatherData.daily.map((day) => {
+                    const d = new Date(day.date + "T12:00:00");
+                    const dayName = DAY_NAMES[d.getDay()];
+                    return (
+                      <div
+                        key={day.date}
+                        className="rounded-lg p-2 text-center"
+                        style={{ background: "rgba(255,255,255,0.05)" }}
+                      >
+                        <div className="text-xs text-gray-400 font-medium">{dayName}</div>
+                        <div className="text-xl my-1">{getWeatherIcon(day.weatherCode)}</div>
+                        <div className="text-xs text-white font-semibold">{Math.round(day.tempMax)}°</div>
+                        <div className="text-xs text-gray-500">{Math.round(day.tempMin)}°</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {!weatherLoading && !weatherData && (
+              <div className="flex items-center justify-center py-12 text-gray-400 text-sm">
+                Unable to load weather data
+              </div>
+            )}
+
+            <div className="px-4 py-2 text-center text-xs text-gray-500" style={{ borderTop: `1px solid ${themeColor}20` }}>
+              Données Open-Meteo.com
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video popup modal */}
+      {videoStadium?.videoUrl && (() => {
+        const videoId = new URL(videoStadium.videoUrl!).searchParams.get("v");
+        if (!videoId) return null;
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ background: "rgba(0,0,0,0.80)" }}
+            onClick={() => setVideoStadium(null)}
+          >
+            <div
+              className="relative w-full rounded-2xl overflow-hidden shadow-2xl"
+              style={{ maxWidth: 800, background: "#07111f", border: `2px solid ${themeColor}` }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between px-4 py-2" style={{ borderBottom: `1px solid ${themeColor}40` }}>
+                <span className="text-white text-sm font-semibold">🏟️ {videoStadium.name}</span>
+                <button
+                  className="text-gray-400 hover:text-white text-xl font-bold leading-none cursor-pointer"
+                  style={{ background: "none", border: "none" }}
+                  onClick={() => setVideoStadium(null)}
+                  aria-label="Fermer"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                  title={videoStadium.name}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

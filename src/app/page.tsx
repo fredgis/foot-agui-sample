@@ -1180,8 +1180,8 @@ function YourMainContent({
           {(
             [
               { id: "team", label: "Team", icon: "🏳️" },
-              { id: "matches", label: "Matches", icon: "📅", hidden: !hasMatches },
-              { id: "map", label: "Map", icon: "🗺️", hidden: !hasMatches },
+              { id: "matches", label: "Matches", icon: "📅", hidden: !hasTeam },
+              { id: "map", label: "Map", icon: "🗺️", hidden: !hasTeam },
               { id: "group", label: "Groups", icon: "🌍" },
               { id: "bracket", label: "Bracket", icon: "🏆" },
             ] as { id: MobileTab; label: string; icon: string; hidden?: boolean }[]
@@ -1330,7 +1330,8 @@ function YourMainContent({
               {activeTab === "team" && (
                 <TeamCard team={state.teamInfo} themeColor={themeColor} secondaryColor={secondaryColor} />
               )}
-              {activeTab === "matches" && hasMatches && (
+              {activeTab === "matches" && (
+                hasMatches ? (
                 <MatchSchedule
                   matches={safeMatches}
                   teamCode={state.teamInfo?.fifaCode ?? ""}
@@ -1338,8 +1339,16 @@ function YourMainContent({
                   onMatchClick={handleMatchClick}
                   onOpponentClick={handleOpponentClick}
                 />
+                ) : (
+                  <div className="rounded-xl p-6 text-center" style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${themeColor}30` }}>
+                    <div className="text-4xl mb-3">🎟️</div>
+                    <p className="text-white font-semibold text-sm">Qualification Pending</p>
+                    <p className="text-gray-400 text-xs mt-1">{state.teamInfo?.name} must qualify through playoffs to join the tournament. Match schedule will be available once their spot is confirmed.</p>
+                  </div>
+                )
               )}
-              {activeTab === "map" && hasMatches && (
+              {activeTab === "map" && (
+                hasMatches ? (
                 <VenueMap
                   stadiums={allStadiums}
                   teamMatches={safeMatches}
@@ -1347,6 +1356,19 @@ function YourMainContent({
                   themeColor={themeColor}
                   onStadiumClick={handleStadiumClick}
                 />
+                ) : (
+                  <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${themeColor}30` }}>
+                    <VenueMap
+                      stadiums={allStadiums}
+                      teamMatches={[]}
+                      themeColor={themeColor}
+                      onStadiumClick={handleStadiumClick}
+                    />
+                    <div className="p-3 text-center" style={{ background: "rgba(255,255,255,0.06)" }}>
+                      <p className="text-gray-400 text-xs">🎟️ {state.teamInfo?.name}&apos;s stadiums will be highlighted once their group is confirmed.</p>
+                    </div>
+                  </div>
+                )
               )}
             </div>
           ) : (
@@ -1354,7 +1376,7 @@ function YourMainContent({
             <div className="flex flex-col lg:flex-row gap-6 items-start w-full">
               <div className="flex-1 min-w-0">
                 <TeamCard team={state.teamInfo} themeColor={themeColor} secondaryColor={secondaryColor} />
-                {hasMatches && (
+                {hasMatches ? (
                   <div className="mt-6">
                     <VenueMap
                       stadiums={allStadiums}
@@ -1364,9 +1386,21 @@ function YourMainContent({
                       onStadiumClick={handleStadiumClick}
                     />
                   </div>
+                ) : (
+                  <div className="mt-6 rounded-xl overflow-hidden" style={{ border: `1px solid ${themeColor}30` }}>
+                    <VenueMap
+                      stadiums={allStadiums}
+                      teamMatches={[]}
+                      themeColor={themeColor}
+                      onStadiumClick={handleStadiumClick}
+                    />
+                    <div className="p-3 text-center" style={{ background: "rgba(255,255,255,0.06)" }}>
+                      <p className="text-gray-400 text-xs">🎟️ {state.teamInfo?.name}&apos;s stadiums will be highlighted once their group is confirmed.</p>
+                    </div>
+                  </div>
                 )}
               </div>
-              {hasMatches && (
+              {hasMatches ? (
                 <div
                   className="w-full lg:w-80 shrink-0"
                   style={{
@@ -1386,6 +1420,23 @@ function YourMainContent({
                     onMatchClick={handleMatchClick}
                     onOpponentClick={handleOpponentClick}
                   />
+                </div>
+              ) : (
+                <div
+                  className="w-full lg:w-80 shrink-0"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    backdropFilter: "blur(12px)",
+                    borderRadius: "1rem",
+                    padding: "1.25rem",
+                    border: `1px solid ${themeColor}30`,
+                  }}
+                >
+                  <div className="text-center py-6">
+                    <div className="text-4xl mb-3">🎟️</div>
+                    <p className="text-white font-semibold text-sm">Qualification Pending</p>
+                    <p className="text-gray-400 text-xs mt-1">{state.teamInfo?.name} must qualify through playoffs. Match schedule will be available once their spot is confirmed.</p>
+                  </div>
                 </div>
               )}
             </div>

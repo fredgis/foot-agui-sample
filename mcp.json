@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "weather": {
+      "type": "sse",
+      "url": "https://mcp.open-meteo.com/sse",
+      "tools": ["*"],
+      "description": "Open-Meteo weather API — provides real-time weather data and forecasts for FIFA World Cup 2026 host cities and stadiums."
+    }
+  }
+}
