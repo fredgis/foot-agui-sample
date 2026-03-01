@@ -31,6 +31,10 @@
   <img src="./images/IMG10.png" width="32%" />
 </p>
 
+### 🎬 Demo
+
+https://github.com/user-attachments/assets/5614e39e-7b5d-418f-8788-4aeb0faae347
+
 ---
 
 ## 🎯 What Can Copa Do?
