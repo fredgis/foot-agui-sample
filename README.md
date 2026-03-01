@@ -30,9 +30,13 @@ Copa is a **conversational AI sports commentator** that turns the FIFA World Cup
 | Action | Effect |
 |---|---|
 | Click a **team flag** on the welcome screen | Page transforms with team's national colors and data |
-| Click a **stadium dot** on the SVG map | Stadium details panel appears |
+| Click a **player card** | Modal with Wikipedia photo, bio, position & club |
+| Click a **stadium dot** on the SVG map | Stadium details panel with weather & video buttons |
+| Click **🌤️ Weather** on a stadium | Popup with live 5-day forecast from Open-Meteo API |
+| Click **▶️ Video** on a stadium | Embedded YouTube player popup (no redirect) |
 | Click a **match row** | Stadium pin highlights on the map |
 | Click an **opponent flag** in the schedule | Triggers a compare prompt in Copa's chat |
+| Click **🎲 Simulate** on the bracket | Simulates full tournament based on FIFA rankings |
 | Navigate **Groups** / **Bracket** tabs | Interactive tournament views |
 
 ---
@@ -159,13 +163,16 @@ mcpServers: {
 | 📅 **104 matches** | Complete schedule: group stage (72) → R32 (16) → R16 (8) → QF → SF → Final |
 | 🗺️ **Interactive SVG map** | 16 stadiums across USA / Canada / Mexico with clickable pins |
 | 🌍 **12 groups** | Responsive group view (A→L) with inter-team navigation |
-| 🏆 **Tournament bracket** | Visual tree R32 → Final with phase selection |
+| 🏆 **Tournament bracket** | Visual tree R32 → Final with **🎲 Simulate** button (FIFA ranking-based) |
 | 🎨 **Dynamic theme** | Entire UI changes colors based on the selected team's national colors |
 | 💬 **Generative UI** | Rich cards rendered inside the chat (stadiums, comparisons) |
-| 🌤️ **Live weather** | Real-time weather via MCP (open-meteo) — not cached data |
+| 🌤️ **Live weather** | Real-time weather via MCP + inline popup with 5-day forecast (Open-Meteo API) |
+| 📸 **Player photos** | Click any player → Wikipedia photo, bio & club info in a modal |
+| ▶️ **Stadium videos** | Embedded YouTube player popup on each stadium (no redirect) |
 | 💡 **Smart suggestions** | AI-driven follow-up questions based on current context |
 | 📱 **Mobile-first** | Mobile tabs + CopilotPopup / Desktop sidebar |
 | ⏱️ **Live countdown** | Real-time countdown to June 11, 2026 |
+| 🎟️ **Playoff teams** | 13 teams pending qualification shown with "Qualification Pending" message |
 
 ---
 
@@ -225,19 +232,23 @@ foot-agui-sample/
 │   │   ├── layout.tsx                  # CopilotKit Provider + metadata
 │   │   └── api/copilotkit/route.ts     # CopilotRuntime → CopilotSDKAgent
 │   ├── components/
-│   │   ├── team-card.tsx               # Team profile (players, honors, SVG jersey)
+│   │   ├── team-card.tsx               # Team profile (players w/ Wikipedia photos, honors)
 │   │   ├── match-schedule.tsx          # 104 matches with phase/group filters
-│   │   ├── venue-map.tsx               # Interactive SVG map — 16 stadiums
+│   │   ├── venue-map.tsx               # SVG map — weather popup + YouTube video popup
 │   │   ├── group-view.tsx              # 12 groups (A→L) responsive grid
-│   │   └── tournament-bracket.tsx      # Bracket R32 → Final
+│   │   └── tournament-bracket.tsx      # Bracket R32 → Final + 🎲 Simulate
 │   └── lib/
 │       ├── types.ts                    # Types: TeamInfo, MatchInfo, AgentState
 │       ├── worldcup-data.ts            # 48 teams, 16 stadiums, 12 groups, 104 matches
 │       ├── flags.ts                    # FIFA code → ISO → flagcdn.com images
 │       └── copilot-sdk-agent.ts        # CopilotSDKAgent — AG-UI ↔ Copilot SDK bridge
 ├── docs/
+│   ├── README.md                       # Detailed docs: problem/solution, setup, RAI notes
+│   ├── docs-architecture.puml          # PlantUML — full architecture (AG-UI, SDK, MCP)
 │   ├── architecture.puml               # PlantUML — macro architecture diagram
 │   └── sequence.puml                   # PlantUML — data flow sequence diagram
+├── AGENTS.md                           # Custom agent instructions for Copa
+├── mcp.json                            # MCP server configuration (Open-Meteo weather)
 ├── scripts/
 │   ├── deploy.ps1                      # One-click Azure deploy (idempotent, PowerShell 7+)
 │   └── deploy-config.env.example       # Azure config template
@@ -288,9 +299,10 @@ az group delete --name rg-worldcup2026 --yes --no-wait
 | Protocol | AG-UI (SSE events) | 0.0.46 |
 | AI Agent | GitHub Copilot SDK | 0.1.29 |
 | LLM | GitHub Copilot (via `gh auth`) | — |
-| Weather | open-meteo MCP Server | — |
+| Weather | Open-Meteo MCP Server + API | — |
 | Deployment | Azure Static Web Apps | — |
 | Flags | flagcdn.com (CDN) | — |
+| Player Photos | Wikipedia REST API | — |
 
 ---
 
@@ -298,10 +310,14 @@ az group delete --name rg-worldcup2026 --yes --no-wait
 
 | Metric | Value |
 |---|---|
-| **Lines of code** | ~6,000 (TypeScript + CSS) |
+| **Lines of code** | ~7,500 (TypeScript + CSS) |
 | **React components** | 7 |
 | **AI tools** | 6 custom + MCP weather |
 | **WC2026 data** | 48 teams · 104 matches · 16 stadiums · 12 groups |
+
+> 📋 See [`docs/README.md`](docs/README.md) for detailed architecture documentation and **Responsible AI (RAI) notes**.
+>
+> 📋 See [`AGENTS.md`](AGENTS.md) for custom agent instructions and [`mcp.json`](mcp.json) for MCP server configuration.
 
 > 🤖 This project was developed collaboratively with **GitHub Copilot Agent** — from planning through architecture, implementation, debugging, and documentation.
 
