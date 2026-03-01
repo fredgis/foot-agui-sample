@@ -144,11 +144,35 @@ Copa follows a 4-layer architecture: **Frontend** (CopilotKit + React) → **AG-
 - No user data is collected, stored, or shared. All conversations are ephemeral.
 - The GitHub Copilot SDK processes prompts through GitHub's infrastructure, which has its own [privacy and responsible AI policies](https://docs.github.com/en/copilot/responsible-use-of-github-copilot-features).
 
+### Azure AI Content Safety
+
+- For production deployments, we recommend adding [Azure AI Content Safety](https://azure.microsoft.com/en-us/products/ai-services/ai-content-safety) as a middleware layer to filter harmful inputs/outputs in real time.
+- The AGENTS.md custom instructions enforce topic restrictions (football only) and prohibit harmful content generation at the prompt level.
+- The GitHub Copilot SDK inherits GitHub's built-in content filtering and abuse detection systems.
+
 ### Bias Considerations
 
 - FIFA rankings are used as a proxy for team strength. Rankings may not fully reflect current form.
 - The simulation model favors higher-ranked teams but includes randomness to allow for upsets, reflecting real tournament unpredictability.
 - Team descriptions and historical data are presented factually without editorial bias.
+
+---
+
+## Security & Authentication
+
+- **Authentication**: The GitHub Copilot SDK authenticates via `gh auth` (GitHub CLI). No API keys are stored in the codebase — credentials are managed through GitHub's OAuth flow.
+- **Secrets management**: Deployment secrets (Azure tokens) are stored in GitHub Actions secrets, never in code.
+- **Input sanitization**: Copa's AGENTS.md restricts the agent to football topics only, acting as a prompt-level guardrail against misuse.
+- **No PII collection**: No user data, conversations, or personal information is stored. All sessions are ephemeral.
+- **HTTPS only**: Azure Static Web Apps enforces HTTPS by default.
+
+---
+
+## Observability
+
+- **Structured logging**: The API route (`/api/copilotkit`) emits JSON-structured logs with timestamps, duration, and error details for every request.
+- **Health endpoint**: `GET /api/copilotkit` returns service health status and uptime — compatible with Azure monitoring and load balancer probes.
+- **Azure integration**: For production, connect to [Azure Application Insights](https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview) by adding `APPLICATIONINSIGHTS_CONNECTION_STRING` to the environment. The structured log format is compatible with Azure Monitor ingestion.
 
 ---
 
@@ -162,7 +186,10 @@ Copa follows a 4-layer architecture: **Frontend** (CopilotKit + React) → **AG-
 | AI Agent | GitHub Copilot SDK | 0.1.29 |
 | LLM | GitHub Copilot (via `gh auth`) | — |
 | Weather | Open-Meteo MCP Server | — |
-| Deployment | Azure Static Web Apps | — |
+| Hosting | Azure Static Web Apps | — |
+| CI/CD | GitHub Actions (build + typecheck + deploy) | — |
+| Monitoring | Structured JSON logs + health endpoint | — |
+| Content Safety | GitHub Copilot built-in + AGENTS.md guardrails | — |
 
 ---
 

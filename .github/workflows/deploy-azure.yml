@@ -3,16 +3,45 @@ name: Deploy to Azure
 on:
   push:
     branches:
+      - main
       - worldcup2026
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Build, typecheck & lint — runs on every push and PR
+  # ─────────────────────────────────────────────────────────────────────────────
+  build:
+    name: Build & Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
   # ─────────────────────────────────────────────────────────────────────────────
   # Deploy Next.js app to Azure Static Web Apps
   # (Copilot SDK agent runs in-process — no separate backend needed)
   # ─────────────────────────────────────────────────────────────────────────────
   deploy:
     name: Deploy (Azure Static Web Apps)
+    needs: build
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/worldcup2026')
     runs-on: ubuntu-latest
     permissions:
       contents: read
