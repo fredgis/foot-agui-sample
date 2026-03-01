@@ -2,118 +2,33 @@
 skinparam backgroundColor #0D1117
 skinparam shadowing false
 skinparam defaultFontName "Segoe UI"
-skinparam defaultFontSize 13
+skinparam defaultFontSize 12
 skinparam defaultFontColor #C9D1D9
-skinparam roundCorner 12
-skinparam packageBorderColor #30363D
-skinparam packageFontColor #E6EDF3
-skinparam packageFontSize 14
-skinparam packageBackgroundColor #161B22
-skinparam componentStyle rectangle
+skinparam roundCorner 10
 skinparam componentBorderColor #30363D
 skinparam componentFontColor #E6EDF3
 skinparam ArrowThickness 2
 skinparam ArrowColor #58A6FF
-skinparam noteBorderColor #30363D
-skinparam noteBackgroundColor #1C2333
-skinparam noteFontColor #C9D1D9
 
-title <font color="#E6EDF3" size="18">⚽ Copa — Full Architecture</font>\n<font color="#8B949E" size="12">AG-UI · GitHub Copilot SDK · MCP · CopilotKit</font>
+title <font color="#E6EDF3" size="16">⚽ Copa — Architecture</font>
 
-' ─── Layer 1: Browser ────────────────────────────────────────────────────────
+component "**Next.js 16 + React 19**\nTeamCard · VenueMap · Bracket\nMatchSchedule · GroupView" as ui #1F2A40
 
-package "👤 Browser" as browser #0D1117 {
-  package "Next.js 16  +  React 19  +  TailwindCSS" as nextjs #161B22 {
+component "**CopilotKit**\nuseCoAgent · useCopilotAction\nCopilotSidebar / Popup" as ck #2D1F00
 
-    component "**CopilotKit React**\n//useCoAgent · useCopilotAction\nuseCopilotReadable\nCopilotSidebar / CopilotPopup//" as ck #1F2A40
+component "**CopilotSDKAgent**\nAG-UI ↔ Copilot SDK bridge\n6 Copa Tools" as agent #0D2818
 
-    package "UI Components" as ui #1C2333 {
-      component "TeamCard\n//roster, jersey, history//" as tc #2D1B00
-      component "VenueMap\n//SVG map, 16 stadiums\nweather & video popups//" as vm #2D1B00
-      component "MatchSchedule\n//104 matches, filters//" as ms #2D1B00
-      component "GroupView\n//12 groups A→L//" as gv #2D1B00
-      component "TournamentBracket\n//R32→Final + simulate//" as tb #2D1B00
-    }
-  }
-}
+component "**GitHub Copilot SDK**\nLLM via gh auth\nZero API keys" as sdk #3D2900
 
-' ─── Layer 2: AG-UI Protocol ─────────────────────────────────────────────────
+component "**MCP: Open-Meteo**\nmcp.open-meteo.com/sse\nLive weather" as mcp #1F0D2E
 
-rectangle "**AG-UI Protocol**\n//Open standard · SSE transport//" as agui #0D2838 {
-  component "TEXT_MESSAGE_START / CONTENT / END" as evt1 #0D3348
-  component "TOOL_CALL_START / ARGS / END" as evt2 #0D3348
-  component "STATE_DELTA (JSON Patch)" as evt3 #0D3348
-  component "RUN_STARTED / RUN_FINISHED / RUN_ERROR" as evt4 #0D3348
-}
+component "**Wikipedia + flagcdn**\nPlayer photos · Flags" as ext #1F0D2E
 
-' ─── Layer 3: Server / Agent ─────────────────────────────────────────────────
-
-package "⚙️ Next.js API Route\n///api/copilotkit//" as server #161B22 {
-  component "**CopilotRuntime**\n//CopilotKit server runtime//" as crt #1C2333
-  component "**CopilotSDKAgent**\n//AG-UI ↔ Copilot SDK bridge\nsrc/lib/copilot-sdk-agent.ts//" as agent #0D2818
-  component "**Copa Tools (×6)**\n//update_team_info · compare_teams\nget_stadium_info · get_group_standings\nshow_tournament_bracket · get_city_guide//" as tools #0D3B1E
-}
-
-' ─── Layer 4: AI Runtime ─────────────────────────────────────────────────────
-
-package "🤖 GitHub Copilot SDK\n//@github/copilot-sdk//" as runtime #161B22 {
-  component "**CopilotClient**\n//Session management\nTool orchestration\nStreaming//" as sdk #2D1F00
-  component "**LLM**\n//GitHub Copilot\nvia gh auth token\nZero API keys//" as llm #3D2900
-}
-
-' ─── Layer 5: External / MCP ─────────────────────────────────────────────────
-
-package "🌐 External Services" as external #161B22 {
-  component "**MCP Server: Open-Meteo**\n//mcp.open-meteo.com/sse\nget_current_weather\nget_daily_forecast\nReal-time weather data//" as mcp #1F0D2E
-  component "**Open-Meteo API**\n//api.open-meteo.com\nDirect frontend calls\nWeather popup in VenueMap//" as ometeo #1F0D2E
-  component "**Wikipedia API**\n//Player photos & bios//" as wiki #1F0D2E
-  component "**flagcdn.com**\n//National flag images//" as flags #1F0D2E
-}
-
-' ─── Relationships ───────────────────────────────────────────────────────────
-
-' UI ← CopilotKit state
-ck -up-> ui : <font color="#8B949E">state & render</font>
-
-' CopilotKit ↔ AG-UI
-ck -down-> agui : <font color="#58A6FF">**SSE Stream**</font>
-agui -down-> crt
-
-' Server internals
-crt -down-> agent
-agent -down-> tools
-agent -down-> sdk
-
-' SDK → LLM
-sdk -down-> llm : <font color="#8B949E">gh auth token</font>
-
-' MCP connection (from SDK, via agent config)
-sdk -right-> mcp : <font color="#A371F7">**MCP Protocol**</font>\n<font color="#8B949E">//SSE transport//</font>
-
-' Direct frontend → external
-vm -right-> ometeo : <font color="#8B949E">HTTP (weather popup)</font>
-tc -right-> wiki : <font color="#8B949E">HTTP (player photos)</font>
-tc -right-> flags : <font color="#8B949E">HTTP (flag images)</font>
-
-' ─── Notes ───────────────────────────────────────────────────────────────────
-
-note right of agui
-  **AG-UI Protocol** is an open standard
-  for agent ↔ frontend communication.
-  All events flow over a single SSE stream.
-  github.com/ag-ui-protocol/ag-ui
-end note
-
-note right of mcp
-  **MCP** (Model Context Protocol)
-  defined in **mcp.json** at repo root.
-  Agent instructions in **AGENTS.md**.
-end note
-
-note bottom of llm
-  No OpenAI / Azure API keys.
-  Uses GitHub Copilot subscription
-  via **gh auth login**.
-end note
+ui <-down-> ck : state & render
+ck <-down-> agent : <font color="#58A6FF">**AG-UI Protocol (SSE)**</font>\nTEXT · TOOL_CALL · STATE_DELTA
+agent <-down-> sdk : session & tools
+sdk <-down-> mcp : <font color="#A371F7">**MCP Protocol**</font>
+sdk -[hidden]right-> ext
+ui -right-> ext : HTTP
 
 @enduml
