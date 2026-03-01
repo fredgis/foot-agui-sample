@@ -57,4 +57,4 @@ venv
 __pycache__
 
 # deployment config (contains secrets — never commit)
-scripts/deploy-config.env
+scripts/deploy-config.envtemp/
