@@ -15,6 +15,22 @@
 
 ![Copa Welcome Screen](./images/IMG1.png)
 
+<p align="center">
+  <img src="./images/IMG2.png" width="32%" />
+  <img src="./images/IMG3.png" width="32%" />
+  <img src="./images/IMG4.png" width="32%" />
+</p>
+<p align="center">
+  <img src="./images/IMG5.png" width="32%" />
+  <img src="./images/IMG6.png" width="32%" />
+  <img src="./images/IMG7.png" width="32%" />
+</p>
+<p align="center">
+  <img src="./images/IMG8.png" width="32%" />
+  <img src="./images/IMG9.png" width="32%" />
+  <img src="./images/IMG10.png" width="32%" />
+</p>
+
 ---
 
 ## 🎯 What Can Copa Do?
