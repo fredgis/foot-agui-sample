@@ -8,8 +8,9 @@
 
 | File | Description |
 |------|-------------|
-| [`/docs/README.md`](./docs/README.md) | Full documentation — problem → solution, prerequisites, setup, deployment, architecture diagram, RAI notes |
+| [`/docs/README.md`](./docs/README.md) | Full documentation — problem → solution, prerequisites, setup, deployment, architecture diagram, RAI notes, **GitHub Copilot SDK product feedback** |
 | [`/docs/docs-architecture.puml`](./docs/docs-architecture.puml) | PlantUML architecture diagram (AG-UI, Copilot SDK, MCP layers) |
+| [`/presentations/AgentCopaAI.pptx`](./presentations/AgentCopaAI.pptx) | 2-slide presentation deck — business value & architecture |
 | [`AGENTS.md`](./AGENTS.md) | Custom instructions for the Copa AI agent |
 | [`mcp.json`](./mcp.json) | MCP server configuration (Open-Meteo weather) |
 
