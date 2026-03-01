@@ -36,7 +36,7 @@
 
 https://github.com/user-attachments/assets/5614e39e-7b5d-418f-8788-4aeb0faae347
 
-📺 [Watch in High Quality on YouTube]([https://youtu.be/3L5sMg7E1ag](https://youtu.be/V5BeL0aXsJM))
+📺 [Watch in High Quality on YouTube](https://youtu.be/V5BeL0aXsJM)
 
 ---
 
