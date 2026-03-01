@@ -90,32 +90,22 @@ az group delete --name rg-worldcup2026 --yes --no-wait
 
 ## Architecture
 
-Copa follows a 4-layer architecture:
+Copa follows a 4-layer architecture: **Frontend** (CopilotKit + React) → **AG-UI Protocol** (SSE) → **Copilot SDK Agent** (tools) → **LLM + MCP** (external data).
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  👤 Browser — Next.js 16 + React 19                     │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌───────────┐  │
-│  │ TeamCard │ │ VenueMap │ │ Schedule │ │ Bracket   │  │
-│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └─────┬─────┘  │
-│       └─────────────┴────────────┴─────────────┘        │
-│                         │                                │
-│              CopilotKit (useCoAgent)                     │
-└─────────────────────────┬───────────────────────────────┘
-                          │ AG-UI Protocol (SSE)
-┌─────────────────────────┴───────────────────────────────┐
-│  ⚙️ Next.js API Route                                    │
-│  CopilotSDKAgent — AG-UI ↔ Copilot SDK bridge           │
-│  Copa Tools (×6): update_team, compare, bracket,        │
-│                   stadium, group, city_guide             │
-└─────────────────────────┬───────────────────────────────┘
-                          │
-┌─────────────────────────┴───────────────────────────────┐
-│  🤖 GitHub Copilot SDK                                   │
-│  LLM via gh auth token — zero API keys                  │
-│  MCP: open-meteo (live weather at stadiums)              │
-└─────────────────────────────────────────────────────────┘
-```
+### Architecture Diagram
+
+![Architecture](https://www.plantuml.com/plantuml/svg/~1UDgCaK5Bmp0GXVFx5QwkdenYealGejIYjCXY1CXOoGXKnPaAYaA1EaK6ypCK4OlK9OsOaGfIYQMiL9IOGnM0aaArCXPQKPAA8bK17BJIK9H2bbP2ic92cK5GOcr5GdvARcWUG6LKLAgPWqm3XT4b7oiMX24bAjC2p1aaWzOgf05L9l0ePBi2LaL34aIf0Yk851GaGnKCH6a8PY2hK5YakBaPKj3ab9mAqHpaKX-a7g1j5I14cK1q4o2caCO35KQW2kW0r2aCGCk2XbL0nEf5GaDG7bM0dO7pCIZ0qb4CYCj2aY22qXxaJe6XeXq2YiLA5aeK4bIb62Ac35KHp1pa2nq0cSK1kHWWmaA1oGH1bHW6n1LXG8b5Yq0qm0vQ0sGJ6pCcB4nK5Gh6Yqb55Y5CWp22jW3ra2rK5H2rCnKC5HqK8re8iCC7LL0lOGBo2rK5HarKnjK7P27La0lCIZ0mP4neWBC2VK7LGnL0cK5GWBL2HeO2bq2XCb0be0)
+
+> 📐 PlantUML source: [`docs-architecture.puml`](docs-architecture.puml)
+
+### Key Protocols & SDKs
+
+| Component | Role | How it's used |
+|---|---|---|
+| **[AG-UI Protocol](https://docs.ag-ui.com)** | Open standard for agent ↔ frontend communication | SSE stream: text, tool calls, state deltas between CopilotKit and the agent |
+| **[GitHub Copilot SDK](https://github.com/github/copilot-sdk)** | AI runtime — zero API keys | LLM calls via `gh auth`, tool orchestration, MCP server connections |
+| **[CopilotKit](https://copilotkit.ai)** | React integration layer | `useCoAgent` (state), `useCopilotAction` (tools/generative UI), sidebar/popup |
+| **[MCP](https://modelcontextprotocol.io/)** (Model Context Protocol) | External data sources | Open-Meteo weather server — real-time weather at WC2026 stadiums |
 
 ### Layer Details
 
@@ -123,13 +113,13 @@ Copa follows a 4-layer architecture:
 |---|---|---|
 | **Frontend** | Next.js 16 + React 19 + TailwindCSS | Rich UI components that react to agent state |
 | **Protocol** | AG-UI (SSE events) | Streaming text, tool calls, state sync — one event stream |
-| **Agent** | GitHub Copilot SDK | Zero API keys, custom tools, streaming |
-| **External** | MCP open-meteo server | Real-time weather at any WC2026 venue |
+| **Agent** | GitHub Copilot SDK + CopilotSDKAgent bridge | Zero API keys, 6 custom tools, streaming, MCP support |
+| **External** | MCP open-meteo, Open-Meteo API, Wikipedia API, flagcdn | Weather, player photos, flag images |
 
-### Architecture Diagrams
+### Additional Diagrams
 
-- **Macro architecture**: [`architecture.puml`](architecture.puml) ([rendered](https://www.plantuml.com/plantuml/svg/bLN1Rjj64BqBq3yCf4Dj5x94oP4j8n5CYv9ZM8uDYqaAr8MnMex9ZSXTOdT9EIa2zDHJWRP0qAAvv99_Q2-zj7_Y7sW-eLYIKcJ9Qk4REVFUcxSpE-I1qaJg90g1I1emZLGd4iibDM4y9f94C2PquakHSAydGY6Xsd0iozfTXAY0U6BAk0_N95Hts1vUaoJK0y7rCn8XL4Re2uJdnvKrg15xWs2rrcGB2xsEOpcTHKnXK7AKO3KNCp6X4-BZeP0UoeBVQhJQBUSUr4ADVhll35fhCBdBdVlgBBVBQbk7pJkEg8XYmP7haNuT8aYacd0_n7in_-DxZljFvxQKOke6Z4uuAWNDbLp1VBHdjmU3SgbSqao728-l1TT0JV99fT2jW69ly4d5QbUwj-__X9w82Tn-zmxiXGi4PodAbE7qSTr8T8raqI2eVFhmyqSub6AgK5Q0A1Zdp_1jkGGmXpt36xtzIe7L1lWIu089rM1rCWR76_rAvGJut0Iez4JCGg5FcCu9bxnUJnJsXEsR_5-_G_QMWMogcU3rUgP89r2r1arxfx6YwIA9UaHw6KvJg3OTwx2nYdk1FC5J4cUuD5gBEoMQ1YCQe9U4c84ZjHPy94KIls0upO1-kXReYaHo4fah8mcTeCxjZjSINYBH0ShvoQPtJlQsN7fxPsgtxt_xvuyVOOGoHGcmCHkFVNuC5oBHk9cfg3oVJMPrBYFd91k46OjzL7j-3BVVluCY2IFd1CQIUJuMGo7PqAeDfxbdxQqg4d2521Li_FrhUpERTEmHZLSQIMH6RT14edaSvpsvv4eJZoLPsgnfdE6OVWr-mhnPNPt9LXjEwz3gBpVYquUFlu1z31S9ropA1oZpvvLZ7p7zD1al7j3OFF2P3f9ndURXcl8cHM7bJR8X3F8XB2WDXwU6UbVmagUCW1y0INHGI8HX1DMMq-mOYMNdF_m4_HkDafCmcoIZg38MpgBB9pZjdU-3Y97N8jGeZ8SXIn6c-UqfYaOqDklJS9hz9VvrI7pgyMqg8iCTXCG75X4VLK4r0FMPd3d-0Yum96OxLS1YLIvf2hMl0-PvoB-Hp0zq3TAeN4gZbN2aogL8hOJzj5poqvMm7fTBUhmIdbBZWawWbiIrhjdv_QLluTvXPwVJhtIL9Xhd7xav8uqUoeZKGnb--b267Z-KCLr_SedSGxdmVJSaJqnvhLlixJ8p_xjKkbjR-UgVIw455U7MLg5ooUylLQ-FHlrzSFjVkMPTtREpuLNF7WxDoyYrtVwLqn-wThs-u2QtC3EKBVHoq2pRsdwWKapmRONSixdtaZ2ziJcNDyoPYjctTIh5Pe8M4-HpTk4YlslTR7UM1UpMhZNODQqwxPq_i56W9U4g5b8lDCGiqAnWld7hF3zrtVE5FXuWzv8eB9V-1G00))
-- **Sequence diagram**: [`sequence.puml`](sequence.puml) ([rendered](https://www.plantuml.com/plantuml/svg/lLNBJkH65DqZyGzNPf66D3Hk61wjWOpnWo2w0U564oaTjGhxTdS9kygfAjDX41Ahp2RAIz58cGsRoIXIDjbDDjdCf_03uHEYSXjmG_FA8YjRhdFlFUVSMzSlf292fN444hzEaGKuFYOFA4k8837ia-2WAtZAGfj7NC34h6EQvc8H8diav7tAkj0XaHoA3h53qaXvdAaj4YCOFdOvmjw6SGVAfwyGpEeTfpa5UzandUKY9YSe60fO6kAMIxA4uFrcZmO73AM4wfsOlCIp9Ml1yqQXTeXGDA09OMgDYn157Z4tExSmvpmKSTDDSy5SguvaKuWgI7SNNCUR6uMlqmxMASD7ahg2ts9aLytgI0yTUaX354_GS1dnE4evkg1sQMrvVjaTXLqNF4sUm6I0lvy7u-eXzpB8muvfsBtpIWB5XssvFN03pCCICzo84HaVKrH52Cyxd2a8zE6AaPyQ8EahN37CUMFr_EtVu115m8ju7yvFVm73x_4-n0YU82n0utb5frZLARDYO5oS_VGEzYGA0uY4lV6nv7fQzUcRt_xvwmUmUK8ZhZQfQh7IBf90GO_p0pcPHNamONfLQtxsHlJvsryBmRwpQNMHwGpM-lJU1kmB6dPnaCBIwwYwP2xT8l3kpMK2y9tD5YlPzGsGwNuYU80oPs33HDKnlTcR32xElliH6lOE-2WEKRHOYIUASaQYGLn3CvzrggvsP0-cLy63sYtNChFe8L5ObEffk0Mr6sqPjDzOdPhAL4vDvPx3Rieo_L3oVNUoaBEWtOBfdCDmqi7rCLOhbTszhRRVj7QRhbEf5DffQJOsr42Yb9Ip6Oaij5Zuab1LAbOhM3K-PcVrj0Z5UJI3ts2GQd_QsP-anKff4XA5ROKaRbFMuMKupju37c8D36_NCauc7yExkRrTRzjMlJvWNwd0-RS_G_6xjRlkZ_ZiRXM5tbLepbjRVZQhNVURLjDjEswzQLrvts9V7lEaPWXC8XAWKOQ4g5xDg6Wj6wp3ZJ8SaYZ5sl7vwVj1rqzElj8EwGK0_115LZILQFD15mK6I0zHwbH1hyKqxoQIs2OYB8FgOOnba44FmpJ25YDH10CpWJAf25FH4LoSlVxZukprX-5M42bfXfY9KKhInNQ8aI9GaaeWYIdhFivnzujck-7wlhNkjktjhQQxrRnoiiLAVIv2s3y2_PmSPd0vGpICS7minElXoKVjAQMp1kPjrTFhRMnj-9yFZM-XWdNRz8kpxt-77T95e18OxqCdZQ8Zy0GoRVnQbEB0R_Zu0GIN2eL-YqcY7vSj6AhYwIehAtS8sCvtH0twI5GF1NHu5F7-T9fSNkQLbU6DyR97r2TIqxYAeGnsYA3oi_ztVpnv2zWwfd6BXpMtQ7gBcaV3thbc4QH285FjN6N9o3GQnTo5fTh8HaKJEbOO9pKmbpx-QPUXJrbO0xDw45TwPJW_VNyor9x6FPifu74IeS8dBPshMODF_zjzkNaB7hUe7nprcoFv0bcOnj7usBy0))
+- **Macro architecture**: [`architecture.puml`](architecture.puml)
+- **Sequence diagram**: [`sequence.puml`](sequence.puml)
 
 ---
 
