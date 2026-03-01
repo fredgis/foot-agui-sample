@@ -600,7 +600,7 @@ export default function CopilotKitPage() {
         <CopilotSidebar
           labels={chatLabels}
           className="copilot-sidebar-custom"
-          defaultOpen={true}
+          defaultOpen={false}
           clickOutsideToClose={false}
         >
           <YourMainContent {...contentProps} />
