@@ -13,7 +13,7 @@
 | [`AGENTS.md`](./AGENTS.md) | Custom instructions for the Copa AI agent |
 | [`mcp.json`](./mcp.json) | MCP server configuration (Open-Meteo weather) |
 
-![Copa Welcome Screen](screenshot.png)
+![Copa Welcome Screen](./images/IMG1.png)
 
 ---
 
