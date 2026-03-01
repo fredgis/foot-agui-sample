@@ -179,9 +179,10 @@ export const TeamCard = memo(function TeamCard({ team, themeColor, secondaryColo
       return () => clearTimeout(t);
     } else if (currentCode) {
       prevTeamCodeRef.current = currentCode;
-      // Small delay to trigger entrance animation
-      const t = setTimeout(() => setVisible(true), 30);
-      return () => clearTimeout(t);
+      // Set visible immediately — setTimeout was getting cancelled by
+      // rapid re-renders (state detection, AG-UI events) within 30ms,
+      // leaving the card stuck at opacity: 0 forever.
+      setVisible(true);
     } else {
       prevTeamCodeRef.current = null;
       setVisible(false);
